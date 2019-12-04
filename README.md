@@ -3,7 +3,7 @@
 [![Downloads][img_downloads]][pkgi_downloads] [![Release][img_latest]][pkgi_latest] [![License][img_license]][pkgi_license]
 
 
-pkgi-ps3 allows to download pkg files on your PS3.
+`pkgi-ps3` allows to download pkg files on your PS3.
 
 This homebrew allows to download & install pkg files directly on your PlayStation 3.
 
@@ -22,7 +22,7 @@ Current limitations:
 
 # Download
 
-Get latest version as [vpk file here][pkgi-ps3_latest].
+Get latest version as [pkg file here][pkgi_latest].
 
 # Setup instructions
 
@@ -35,16 +35,22 @@ contentid,flags,name,name2,rap,url,size,checksum
 
 where:
 
-* *contentid* is full content id of item, for example: `UP0000-NPXX99999_00-0000112223333000`.
-* *flags* is currently unused number, set it to 0.
-* *name* is arbitrary string to display for name.
-* *name2* is currently unused alternative name, leave it empty.
-* *rap*  the 16 hex bytes for a RAP file, if needed by the pkg (.rap will be created on `/dev_hdd0/exdata`). Leave empty to skip .rap file.
-* *url* is HTTP URL where to download PKG, pkg content id must match the specified contentid.
-* *size* is size of pkg in bytes, or 0 if not known.
-* *checksum* is sha256 digest of pkg as 32 hex bytes to make sure pkg is not tampered with. Leave empty to skip the check.
+* `contentid` is full content id of item, for example: `UP0000-NPXX99999_00-0000112223333000`.
+* `flags` is currently unused number, set it to 0.
+* `name` is arbitrary string to display for name.
+* `name2` is currently unused alternative name, leave it empty.
+* `rap`  the 16 hex bytes for a RAP file, if needed by the pkg (.rap will be created on `/dev_hdd0/exdata`). Leave empty to skip .rap file.
+* `url` is HTTP URL where to download PKG, pkg content id must match the specified contentid.
+* `size` is size of pkg in bytes, or 0 if not known.
+* `checksum` is sha256 digest of pkg as 32 hex bytes to make sure pkg is not tampered with. Leave empty to skip the check.
 
 Name cannot contain newlines or commas.
+
+An example `pkgi.txt` file:
+```
+EP0000-NP9999999_00-0AB00A00FR000000,0,My PKG Test,,dac109e963294de6cd6f6faf3f045fe9,http://192.168.1.1/html/mypackage.pkg,2715513,afb545c6e71bd95f77994ab4a659efbb8df32208f601214156ad89b1922e73c3
+UP0001-NP00PKGI3_00-0000000000000000,0,PKGi PS3 v0.1.0,,,http://bucanero.heliohost.org/pkgi.pkg,284848,3dc8de2ed94c0f9efeafa81df9b7d58f8c169e2875133d6d2649a7d477c1ae13
+```
 
 # Usage
 
@@ -93,10 +99,7 @@ UDP multicast address 239.255.0.100:30000. To receive them you can use [socat][]
 
 # License
 
-This is free and unencumbered software released into the public domain.
-
-Anyone is free to copy, modify, publish, use, compile, sell, or distribute this software, either in source code form or as a
-compiled binary, for any purpose, commercial or non-commercial, and by any means.
+`pkgi-ps3` is released under the [MIT License](LICENSE).
 
 [pkg_dec]: https://github.com/weaknespase/PkgDecrypt
 [pkg_releases]: https://github.com/mmozeiko/pkgi/releases
