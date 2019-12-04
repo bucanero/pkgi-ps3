@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<sfo>
+	<value name="APP_VER" type="string">
+		00.01
+	</value>
+	<value name="ATTRIBUTE" type="integer">
+		0
+	</value>
+	<value name="BOOTABLE" type="integer">
+		1
+	</value>
+	<value name="CATEGORY" type="string">
+		HG
+	</value>
+	<value name="LICENSE" type="string">
+		This application was created with the official non-official SDK called PSL1GHT, for more information visit http://www.psl1ght.com/ . This is in no way associated with Sony Computer Entertainment Inc., please do not contact them for help, they will not be able to provide it.
+	</value>
+	<value name="PARENTAL_LEVEL" type="integer">
+		0
+	</value>
+	<value name="PS3_SYSTEM_VER" type="string">
+		01.8000
+	</value>
+	<value name="RESOLUTION" type="integer">
+		63
+	</value>
+	<value name="SOUND_FORMAT" type="integer">
+		279
+	</value>
+	<value name="TITLE" type="string">
+		Test - PSL1GHT
+	</value>
+	<value name="TITLE_ID" type="string">
+		TEST00000
+	</value>
+	<value name="VERSION" type="string">
+		00.01
+	</value>
+</sfo>
