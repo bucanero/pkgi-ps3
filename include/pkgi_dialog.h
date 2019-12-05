@@ -1,6 +1,8 @@
 #pragma once
 
-typedef struct pkgi_input pkgi_input;
+#include "pkgi.h"
+
+//typedef struct pkgi_input pkgi_input;
 
 void pkgi_dialog_init(void);
 
