@@ -56,7 +56,12 @@ typedef enum {
     RegionUnknown,
 } GameRegion;
 
-typedef struct Config Config;
+typedef struct Config {
+    DbSort sort;
+    DbSortOrder order;
+    uint32_t filter;
+    int no_version_check;
+} Config;
 
 int pkgi_db_update(const char* update_url, char* error, uint32_t error_size);
 void pkgi_db_get_update_status(uint32_t* updated, uint32_t* total);
