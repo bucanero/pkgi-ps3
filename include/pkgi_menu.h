@@ -1,8 +1,9 @@
 #pragma once
 
 #include "pkgi_db.h"
+#include "pkgi.h"
 
-typedef struct pkgi_input pkgi_input;
+//typedef struct pkgi_input pkgi_input;
 
 typedef enum {
     MenuResultSearch,
