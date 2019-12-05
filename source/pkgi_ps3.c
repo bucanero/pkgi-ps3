@@ -883,7 +883,7 @@ void pkgi_draw_rect(int x, int y, int w, int h, uint32_t color)
 	ya2d_drawRect(x, y, w, h, RGBA_COLOR(color, 255));
 }
 
-void pkgi_draw_text_z(int x, int y, int z, uint32_t color, char* text)
+void pkgi_draw_text_z(int x, int y, int z, uint32_t color, const char* text)
 {
     int i=x, j=y;
     SetFontColor(RGBA_COLOR(color, 255), 0);

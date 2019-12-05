@@ -145,8 +145,9 @@ void pkgi_free_texture(pkgi_texture texture);
 void pkgi_clip_set(int x, int y, int w, int h);
 void pkgi_clip_remove(void);
 void pkgi_draw_rect(int x, int y, int w, int h, uint32_t color);
+void pkgi_draw_fill_rect(int x, int y, int w, int h, uint32_t color);
 void pkgi_draw_text(int x, int y, uint32_t color, const char* text);
-void pkgi_draw_text_z(int x, int y, int z, uint32_t color, char* text);
+void pkgi_draw_text_z(int x, int y, int z, uint32_t color, const char* text);
 int pkgi_text_width(const char* text);
 int pkgi_text_height(const char* text);
 
