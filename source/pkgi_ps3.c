@@ -176,9 +176,7 @@ static int pkgi_power_thread(SceSize args, void *argp)
 
 int pkgi_dialog_lock(void)
 {
-    int res = 0;
-//    int res = sysMutexLock(g_dialog_lock, 10000);
-    //int res = sceKernelLockLwMutex(&g_dialog_lock, 1, NULL);
+    int res = sysMutexLock(g_dialog_lock, 0);
     if (res != 0)
     {
         LOG("dialog lock failed error=0x%08x", res);
@@ -188,9 +186,7 @@ int pkgi_dialog_lock(void)
 
 int pkgi_dialog_unlock(void)
 {
-    int res = 0;
-//    int res = sysMutexUnlock(g_dialog_lock);
-    //int res = sceKernelUnlockLwMutex(&g_dialog_lock, 1);
+    int res = sysMutexUnlock(g_dialog_lock);
     if (res != 0)
     {
         LOG("dialog unlock failed error=0x%08x", res);
@@ -744,7 +740,7 @@ void pkgi_start_thread(const char* name, pkgi_thread_entry* start)
 
 void pkgi_sleep(uint32_t msec)
 {
-    usleep(msec);
+    usleep(msec * 1000);
     //sceKernelDelayThread(msec * 1000);
 }
 
@@ -877,7 +873,7 @@ void pkgi_clip_remove(void)
 
 void pkgi_draw_fill_rect(int x, int y, int w, int h, uint32_t color)
 {
-     ya2d_drawFillRectZ(x, y, PKGI_MENU_Z, w, h, RGBA_COLOR(color, 255));
+    ya2d_drawFillRectZ(x, y, PKGI_MENU_Z, w, h, RGBA_COLOR(color, 255));
     ya2d_drawRectZ(x, y, PKGI_MENU_Z, w, h, RGBA_COLOR(PKGI_COLOR_MENU_BORDER, 255));
 }
 
@@ -892,29 +888,31 @@ void pkgi_draw_text_z(int x, int y, int z, uint32_t color, char* text)
     int i=x, j=y;
     SetFontColor(RGBA_COLOR(color, 255), 0);
     while (*text) {
-        if(*text == '\n') {
-            j += PKGI_FONT_HEIGHT;
-            text++;
-            continue;
-        }
-        
         switch(*text) {
+            case '\n':
+                j += PKGI_FONT_HEIGHT;
+                text++;
+                continue;
             case '\xfa':
                 pkgi_draw_textureZ(tex_buttons.circle, i, j, z);
-                *text=' ';
-                break;
+                i += PKGI_FONT_WIDTH;
+                text++;
+                continue;
             case '\xfb':
                 pkgi_draw_textureZ(tex_buttons.cross, i, j, z);
-                *text=' ';
-                break;
+                i += PKGI_FONT_WIDTH;
+                text++;
+                continue;
             case '\xfc':
                 pkgi_draw_textureZ(tex_buttons.triangle, i, j, z);
-                *text=' ';
-                break;
+                i += PKGI_FONT_WIDTH;
+                text++;
+                continue;
             case '\xfd':
-//                pkgi_draw_texture(tex_buttons.square, x+i*PKGI_FONT_WIDTH, y+3);
-                *text=' ';
-                break;
+//                pkgi_draw_texture(tex_buttons.square, i, j, z);
+                i += PKGI_FONT_WIDTH;
+                text++;
+                continue;
         }
         
         DrawChar(i, j, z, (u8) *text);
@@ -927,33 +925,8 @@ void pkgi_draw_text(int x, int y, uint32_t color, const char* text)
 {
     SetFontColor(RGBA_COLOR(color, 255), 0);
     DrawString((float)x, (float)y, (char *)text);
-//    vita2d_pgf_draw_text(g_font, x, y + 20, RGBA_COLOR(color), 1.f, text);
 }
 
-void pkgi_draw_text_and_icons(int x, int y, uint32_t color, char* text)
-{
-    for (int i=0; i < strlen(text); i++) {
-        switch(text[i]) {
-            case '\xfa':
-                pkgi_draw_texture(tex_buttons.circle, x+i*PKGI_FONT_WIDTH, y+3);
-                text[i]=' ';
-                break;
-            case '\xfb':
-                pkgi_draw_texture(tex_buttons.cross, x+i*PKGI_FONT_WIDTH, y+3);
-                text[i]=' ';
-                break;
-            case '\xfc':
-                pkgi_draw_texture(tex_buttons.triangle, x+i*PKGI_FONT_WIDTH, y+3);
-                text[i]=' ';
-                break;
-            case '\xfd':
-//                pkgi_draw_texture(tex_buttons.square, x+i*PKGI_FONT_WIDTH, y+3);
-                text[i]=' ';
-                break;
-        }
-    }
-    pkgi_draw_text(x, y, color, text);
-}
 
 int pkgi_text_width(const char* text)
 {

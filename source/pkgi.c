@@ -105,30 +105,22 @@ static void pkgi_download_thread(void)
     LOG("download thread start");
 
     char message[256];
-//    if (item->zrif == NULL || pkgi_rap_decode(item->zrif, rap, message, sizeof(message)))
-    if (1)
+
+    // short delay to allow download dialog to animate smoothly
+//    pkgi_sleep(300);
+
+    pkgi_lock_process();
+    if (pkgi_download(item->content, item->url, item->rap, item->digest) && install(item->content))
     {
-        // short delay to allow download dialog to animate smoothly
-        pkgi_sleep(300);
-
-        pkgi_lock_process();
-        if (pkgi_download(item->content, item->url, item->rap, item->digest) && install(item->content))
-//        if (pkgi_download(item->content, item->url, item->zrif == NULL ? NULL : rap, item->digest) && install(item->content))
-        {
-            pkgi_snprintf(message, sizeof(message), "Successfully installed %s", item->name);
-            pkgi_dialog_message(message);
-            LOG("download completed!");
-        }
-        pkgi_unlock_process();
-
-        if (pkgi_dialog_is_cancelled())
-        {
-            pkgi_dialog_close();
-        }
+        pkgi_snprintf(message, sizeof(message), "Successfully installed %s", item->name);
+        pkgi_dialog_message(message);
+        LOG("download completed!");
     }
-    else
+    pkgi_unlock_process();
+
+    if (pkgi_dialog_is_cancelled())
     {
-        pkgi_dialog_error(message);
+        pkgi_dialog_close();
     }
 
     item->presence = PresenceUnknown;
@@ -444,8 +436,6 @@ static void pkgi_do_refresh(void)
 
 static void pkgi_do_head(void)
 {
-//    const char* version = PKGI_VERSION;
-
     char title[256];
     pkgi_snprintf(title, sizeof(title), "PKGi PS3 v%s", PKGI_VERSION);
     pkgi_draw_text(0, 0, PKGI_COLOR_TEXT_HEAD, title);
@@ -534,8 +524,7 @@ static void pkgi_do_tail(void)
     }
 
     pkgi_clip_set(left, bottom_y, VITA_WIDTH - right - left, VITA_HEIGHT - bottom_y);
-    pkgi_draw_text_and_icons((VITA_WIDTH - pkgi_text_width(text)) / 2, bottom_y, PKGI_COLOR_TEXT_TAIL, text);
-//    pkgi_draw_text((VITA_WIDTH - pkgi_text_width(text)) / 2, bottom_y, PKGI_COLOR_TEXT_TAIL, text);
+    pkgi_draw_text_z((VITA_WIDTH - pkgi_text_width(text)) / 2, bottom_y, PKGI_FONT_Z, PKGI_COLOR_TEXT_TAIL, text);
     pkgi_clip_remove();
 }
 
