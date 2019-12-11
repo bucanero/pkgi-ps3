@@ -204,7 +204,7 @@ int pkgi_db_update(const char* update_url, char* error, uint32_t error_size)
         }
         *ptr++ = 0;
 
-        const char* name_org = ptr;
+        const char* description = ptr;
         while (ptr < end && *ptr != ',')
         {
             ptr++;
@@ -267,7 +267,7 @@ int pkgi_db_update(const char* update_url, char* error, uint32_t error_size)
         db[db_count].content = content;
         db[db_count].flags = (uint32_t)pkgi_strtoll(flags);
         db[db_count].name = name;
-        db[db_count].name_org = (name_org[0] == 0 ? name : name_org);
+        db[db_count].description = description;
         db[db_count].rap = (rap[0] == 0 ? NULL : pkgi_hexbytes(rap, PKGI_RAP_SIZE));
         db[db_count].url = url;
         db[db_count].size = pkgi_strtoll(size);

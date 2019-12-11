@@ -229,8 +229,6 @@ static void update_progress(void)
 }
 
 
-
-// ------
 static int create_dummy_pkg(void)
 {	
 	void *filew;
@@ -264,9 +262,7 @@ static int create_dummy_pkg(void)
 			break;
 		}
 		download_offset += numr;
-
 		update_progress();
-//		LOG("w %d / %d", download_offset, download_size);
 	}
 
 	if(filew) pkgi_close(filew);
@@ -352,7 +348,6 @@ static int queue_pkg_task()
 	return 1;
 }
 
-// ------
 
 static void download_start(void)
 {
@@ -578,7 +573,6 @@ static int create_rap(const char* contentid, const uint8_t* rap)
 }
 
 int pkgi_download(const DbItem* item, const int background_dl)
-// const char* content, const char* url, const uint8_t* rif, const uint8_t* digest
 {
     int result = 0;
 

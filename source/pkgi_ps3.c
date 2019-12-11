@@ -1019,13 +1019,11 @@ void pkgi_clip_remove(void)
 void pkgi_draw_fill_rect(int x, int y, int w, int h, uint32_t color)
 {
     ya2d_drawFillRect(x, y, w, h, RGBA_COLOR(color, 255));
-//    ya2d_drawRect(x, y, w, h, RGBA_COLOR(PKGI_COLOR_MENU_BORDER, 255));
 }
 
 void pkgi_draw_fill_rect_z(int x, int y, int z, int w, int h, uint32_t color)
 {
     ya2d_drawFillRectZ(x, y, z, w, h, RGBA_COLOR(color, 255));
-//    ya2d_drawRectZ(x, y, z, w, h, RGBA_COLOR(border, 255));
 }
 
 void pkgi_draw_rect_z(int x, int y, int z, int w, int h, uint32_t color)
@@ -1503,7 +1501,6 @@ int pkgi_write(void* f, const void* buffer, uint32_t size)
     if (write < 0)
     {
         LOG("fwrite error 0x%08x", write);
-//        return -1;
     }
     else
     {

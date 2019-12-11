@@ -8,9 +8,8 @@
 #include "pkgi_style.h"
 
 #include <stddef.h>
-
-#define PKGI_UPDATE_URL "http://192.168.1.1/html/home.html"
-#define PKGI_VERSION "0.1.0"
+#define PKGI_UPDATE_URL     "http://pkgi.bucanero.com.ar/version.txt" //api.github.com/repos/bucanero/pkgi-ps3/releases/latest
+#define PKGI_VERSION        "1.0.0"
 
 typedef enum  {
     StateError,
@@ -107,7 +106,6 @@ static void pkgi_download_thread(void)
     char message[256];
 
     // short delay to allow download dialog to animate smoothly
-    // item->content, item->url, item->rap, item->digest
     pkgi_sleep(300);
 
     pkgi_lock_process();
@@ -302,8 +300,7 @@ static void pkgi_do_main(pkgi_input* input)
 
         if (i == selected_item)
         {
-//            pkgi_draw_rect(0, y, VITA_WIDTH, font_height + PKGI_MAIN_ROW_PADDING - 1, PKGI_COLOR_SELECTED_BACKGROUND);
-            pkgi_draw_fill_rect(0, y, VITA_WIDTH, font_height + PKGI_MAIN_ROW_PADDING - 1, PKGI_COLOR(60, 60, 60));
+            pkgi_draw_fill_rect(0, y, VITA_WIDTH, font_height + PKGI_MAIN_ROW_PADDING - 1, PKGI_COLOR_SELECTED_BACKGROUND);
         }
         uint32_t color = PKGI_COLOR_TEXT;
 
@@ -591,7 +588,7 @@ static void pkgi_check_for_update(void)
         }
         buffer[size] = 0;
 
-        static const char find[] = "\"name\":\"pkgi v";
+        static const char find[] = "\"name\":\"PKGi PS3 v";
         const char* start = pkgi_strstr(buffer, find);
         if (start != NULL)
         {

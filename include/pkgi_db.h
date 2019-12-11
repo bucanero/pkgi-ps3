@@ -40,7 +40,7 @@ typedef struct {
     const char* content;
     uint32_t flags;
     const char* name;
-    const char* name_org;
+    const char* description;
     const uint8_t* rap;
     const char* url;
     const uint8_t* digest;
