@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <sfo>
 	<value name="APP_VER" type="string">
-		00.01
+		01.00
 	</value>
 	<value name="ATTRIBUTE" type="integer">
 		0
@@ -28,12 +28,12 @@
 		279
 	</value>
 	<value name="TITLE" type="string">
-		Test - PSL1GHT
+		PKGi PS3
 	</value>
 	<value name="TITLE_ID" type="string">
-		TEST00000
+		NP00PKGI3
 	</value>
 	<value name="VERSION" type="string">
-		00.01
+		01.00
 	</value>
 </sfo>
