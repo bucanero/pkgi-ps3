@@ -11,7 +11,6 @@
 
 #define PKGI_UPDATE_URL "http://192.168.1.1/html/home.html"
 #define PKGI_VERSION "0.1.0"
-// http://192.168.1.1/html/OPEN_SOURCE_SOFTWARE_NOTICE.pdf
 
 typedef enum  {
     StateError,
@@ -71,7 +70,8 @@ static void pkgi_refresh_thread(void)
         state = StateError;
     }
     
-    sysThreadExit(0);
+//    sysThreadExit(0);
+    pkgi_thread_exit();
 }
 
 static int install(const char* content)
@@ -107,10 +107,11 @@ static void pkgi_download_thread(void)
     char message[256];
 
     // short delay to allow download dialog to animate smoothly
-//    pkgi_sleep(300);
+    // item->content, item->url, item->rap, item->digest
+    pkgi_sleep(300);
 
     pkgi_lock_process();
-    if (pkgi_download(item->content, item->url, item->rap, item->digest) && install(item->content))
+    if (pkgi_download(item, config.dl_mode_background) && install(item->content))
     {
         pkgi_snprintf(message, sizeof(message), "Successfully installed %s", item->name);
         pkgi_dialog_message(message);
@@ -301,7 +302,8 @@ static void pkgi_do_main(pkgi_input* input)
 
         if (i == selected_item)
         {
-            pkgi_draw_rect(0, y, VITA_WIDTH, font_height + PKGI_MAIN_ROW_PADDING - 1, PKGI_COLOR_SELECTED_BACKGROUND);
+//            pkgi_draw_rect(0, y, VITA_WIDTH, font_height + PKGI_MAIN_ROW_PADDING - 1, PKGI_COLOR_SELECTED_BACKGROUND);
+            pkgi_draw_fill_rect(0, y, VITA_WIDTH, font_height + PKGI_MAIN_ROW_PADDING - 1, PKGI_COLOR(60, 60, 60));
         }
         uint32_t color = PKGI_COLOR_TEXT;
 
@@ -378,7 +380,7 @@ static void pkgi_do_main(pkgi_input* input)
             uint32_t height = max_items * avail_height / db_count;
             uint32_t start = first_item * (avail_height - (height < min_height ? min_height : 0)) / db_count;
             height = max32(height, min_height);
-            pkgi_draw_rect(VITA_WIDTH - PKGI_MAIN_SCROLL_WIDTH - 1, font_height + PKGI_MAIN_HLINE_EXTRA + start, PKGI_MAIN_SCROLL_WIDTH, height, PKGI_COLOR_SCROLL_BAR);
+            pkgi_draw_fill_rect(VITA_WIDTH - PKGI_MAIN_SCROLL_WIDTH - 1, font_height + PKGI_MAIN_HLINE_EXTRA + start, PKGI_MAIN_SCROLL_WIDTH, height, PKGI_COLOR_SCROLL_BAR);
         }
     }
 
@@ -440,7 +442,7 @@ static void pkgi_do_head(void)
     pkgi_snprintf(title, sizeof(title), "PKGi PS3 v%s", PKGI_VERSION);
     pkgi_draw_text(0, 0, PKGI_COLOR_TEXT_HEAD, title);
 
-    pkgi_draw_rect(0, font_height, VITA_WIDTH, PKGI_MAIN_HLINE_HEIGHT, PKGI_COLOR_HLINE);
+    pkgi_draw_fill_rect(0, font_height, VITA_WIDTH, PKGI_MAIN_HLINE_HEIGHT, PKGI_COLOR_HLINE);
 
     int rightw;
     if (pkgi_battery_present())
@@ -486,7 +488,7 @@ static void pkgi_do_head(void)
 
 static void pkgi_do_tail(void)
 {
-    pkgi_draw_rect(0, bottom_y, VITA_WIDTH, PKGI_MAIN_HLINE_HEIGHT, PKGI_COLOR_HLINE);
+    pkgi_draw_fill_rect(0, bottom_y, VITA_WIDTH, PKGI_MAIN_HLINE_HEIGHT, PKGI_COLOR_HLINE);
 
     uint32_t count = pkgi_db_count();
     uint32_t total = pkgi_db_total();
@@ -661,7 +663,7 @@ int main()
     input.pressed = 0;
     while (pkgi_update(&input))
     {
-        pkgi_draw_texture(background, -20, -10);
+        pkgi_draw_texture(background, -50, -20);
 
         if (state == StateUpdateDone)
         {

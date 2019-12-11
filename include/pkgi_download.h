@@ -1,7 +1,8 @@
 #pragma once
 
 #include <stdint.h>
+#include "pkgi_db.h"
 
 #define PKGI_RAP_SIZE 16
 
-int pkgi_download(const char* content, const char* url, const uint8_t* rif, const uint8_t* digest);
+int pkgi_download(const DbItem* item, const int background_dl);

@@ -138,8 +138,8 @@ void pkgi_do_dialog(pkgi_input* input)
 
     if (dialog_delta != 0)
     {
-        dialog_width += dialog_delta * (int32_t)(input->delta * PKGI_ANIMATION_SPEED / 1000000);
-        dialog_height += dialog_delta * (int32_t)(input->delta * PKGI_ANIMATION_SPEED / 1000000);
+        dialog_width += dialog_delta * (int32_t)(input->delta * PKGI_ANIMATION_SPEED / 1000);
+        dialog_height += dialog_delta * (int32_t)(input->delta * PKGI_ANIMATION_SPEED / 500);
 
         if (dialog_delta < 0 && (dialog_width <= 0 || dialog_height <= 0))
         {
@@ -184,7 +184,8 @@ void pkgi_do_dialog(pkgi_input* input)
 
     if (local_width != 0 && local_height != 0)
     {
-        pkgi_draw_fill_rect((VITA_WIDTH - local_width) / 2, (VITA_HEIGHT - local_height) / 2, local_width, local_height, PKGI_COLOR_MENU_BACKGROUND);
+        pkgi_draw_fill_rect_z((VITA_WIDTH - local_width) / 2, (VITA_HEIGHT - local_height) / 2, PKGI_MENU_Z, local_width, local_height, PKGI_COLOR_MENU_BACKGROUND);
+        pkgi_draw_rect_z((VITA_WIDTH - local_width) / 2, (VITA_HEIGHT - local_height) / 2, PKGI_MENU_Z, local_width, local_height, PKGI_COLOR_MENU_BORDER);
     }
 
     if (local_width != PKGI_DIALOG_WIDTH || local_height != PKGI_DIALOG_HEIGHT)
@@ -244,13 +245,13 @@ void pkgi_do_dialog(pkgi_input* input)
             uint32_t end = start < PKGI_DIALOG_PROCESS_BAR_CHUNK ? start : start + PKGI_DIALOG_PROCESS_BAR_CHUNK > avail + PKGI_DIALOG_PROCESS_BAR_CHUNK ? avail : start;
             start = start < PKGI_DIALOG_PROCESS_BAR_CHUNK ? 0 : start - PKGI_DIALOG_PROCESS_BAR_CHUNK;
 
-            pkgi_draw_fill_rect(PKGI_DIALOG_HMARGIN + PKGI_DIALOG_PADDING, VITA_HEIGHT / 2, avail, PKGI_DIALOG_PROCESS_BAR_HEIGHT, PKGI_COLOR_PROGRESS_BACKGROUND);
-            pkgi_draw_fill_rect(PKGI_DIALOG_HMARGIN + PKGI_DIALOG_PADDING + start, VITA_HEIGHT / 2, end - start, PKGI_DIALOG_PROCESS_BAR_HEIGHT, PKGI_COLOR_PROGRESS_BAR);
+            pkgi_draw_fill_rect_z(PKGI_DIALOG_HMARGIN + PKGI_DIALOG_PADDING, VITA_HEIGHT / 2, PKGI_MENU_Z, avail, PKGI_DIALOG_PROCESS_BAR_HEIGHT, PKGI_COLOR_PROGRESS_BACKGROUND);
+            pkgi_draw_fill_rect_z(PKGI_DIALOG_HMARGIN + PKGI_DIALOG_PADDING + start, VITA_HEIGHT / 2, PKGI_MENU_Z, end - start, PKGI_DIALOG_PROCESS_BAR_HEIGHT, PKGI_COLOR_PROGRESS_BAR);
         }
         else
         {
-            pkgi_draw_fill_rect(PKGI_DIALOG_HMARGIN + PKGI_DIALOG_PADDING, VITA_HEIGHT / 2, w - 2 * PKGI_DIALOG_PADDING, PKGI_DIALOG_PROCESS_BAR_HEIGHT, PKGI_COLOR_PROGRESS_BACKGROUND);
-            pkgi_draw_fill_rect(PKGI_DIALOG_HMARGIN + PKGI_DIALOG_PADDING, VITA_HEIGHT / 2, (int)((w - 2 * PKGI_DIALOG_PADDING) * local_progress), PKGI_DIALOG_PROCESS_BAR_HEIGHT, PKGI_COLOR_PROGRESS_BAR);
+            pkgi_draw_fill_rect_z(PKGI_DIALOG_HMARGIN + PKGI_DIALOG_PADDING, VITA_HEIGHT / 2, PKGI_MENU_Z, w - 2 * PKGI_DIALOG_PADDING, PKGI_DIALOG_PROCESS_BAR_HEIGHT, PKGI_COLOR_PROGRESS_BACKGROUND);
+            pkgi_draw_fill_rect_z(PKGI_DIALOG_HMARGIN + PKGI_DIALOG_PADDING, VITA_HEIGHT / 2, PKGI_MENU_Z, (int)((w - 2 * PKGI_DIALOG_PADDING) * local_progress), PKGI_DIALOG_PROCESS_BAR_HEIGHT, PKGI_COLOR_PROGRESS_BAR);
 
             char percent[256];
             pkgi_snprintf(percent, sizeof(percent), "%.0f%%", local_progress * 100.f);

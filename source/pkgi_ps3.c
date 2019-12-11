@@ -5,6 +5,8 @@
 #include <sys/stat.h>
 #include <sys/thread.h>
 #include <sys/mutex.h>
+#include <sys/memory.h>
+#include <sysutil/osk.h>
 
 #include <http/https.h>
 #include <io/pad.h>
@@ -12,7 +14,6 @@
 #include <net/net.h>
 
 #include <unistd.h>
-#include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -20,6 +21,12 @@
 
 #include <dbglogger.h>
 
+
+
+#define OSKDIALOG_FINISHED          0x503
+#define OSKDIALOG_UNLOADED          0x504
+#define OSKDIALOG_INPUT_ENTERED     0x505
+#define OSKDIALOG_INPUT_CANCELED    0x506
 
 #define SCE_IME_DIALOG_MAX_TITLE_LENGTH	(128)
 #define SCE_IME_DIALOG_MAX_TEXT_LENGTH	(512)
@@ -128,8 +135,6 @@ static void pkgi_start_debug_log(void)
 {
 #ifdef PKGI_ENABLE_LOGGING
     dbglogger_init_file(PKGI_APP_FOLDER "/pkgi.dbg");
-//    dbglogger_init_mode(TCP_LOGGER, "192.168.1.102", 18999);
-//    dbglogger_init_str("udp:239.255.0.100:30000");
 //    dbglogger_init();
     LOG("PKGi PS3 logging initialized");
 #endif
@@ -256,6 +261,7 @@ static int convert_to_utf16(const char* utf8, uint16_t* utf16, uint32_t availabl
             available -= 2;
         }
     }
+    utf16[count]=0;
     return count;
 }
 
@@ -311,39 +317,150 @@ static int convert_from_utf16(const uint16_t* utf16, char* utf8, uint32_t size)
             size -= 4;
         }
     }
+    utf8[count]=0;
     return count;
 }
 
+//------------
+
+
+
+
+volatile int osk_event = 0;
+volatile int osk_unloaded = 0;
+static int osk_action = 0;
+
+static sys_mem_container_t container_mem;
+
+static oskCallbackReturnParam OutputReturnedParam;
+static oskParam DialogOskParam;
+static oskInputFieldInfo inputFieldInfo;
+
+static int osk_level = 0;
+
+static void osk_exit(void)
+{
+    if(osk_level == 2) {
+        oskAbort();
+        oskUnloadAsync(&OutputReturnedParam);
+        
+        osk_event = 0;
+        osk_action=-1;
+    }
+
+    if(osk_level >= 1) {
+        sysUtilUnregisterCallback(SYSUTIL_EVENT_SLOT0);
+        sysMemContainerDestroy(container_mem);
+    }
+
+}
+
+static void osk_event_handle(u64 status, u64 param, void * userdata)
+{
+    switch((u32) status) 
+    {
+	    case OSKDIALOG_INPUT_CANCELED:
+		    osk_event = OSKDIALOG_INPUT_CANCELED;
+		    break;
+
+        case OSKDIALOG_UNLOADED:
+		    osk_unloaded = 1;
+		    break;
+
+        case OSKDIALOG_INPUT_ENTERED:
+	    	osk_event = OSKDIALOG_INPUT_ENTERED;
+		    break;
+
+	    case OSKDIALOG_FINISHED:
+	    	osk_event = OSKDIALOG_FINISHED;
+		    break;
+
+        default:
+            break;
+    }
+}
+
+#define PKGI_OSK_INPUT_LENGTH 128
+
 void pkgi_dialog_input_text(const char* title, const char* text)
 {
-/*
-    SceImeDialogParam param;
-    sceImeDialogParamInit(&param);
-
-    int title_len = convert_to_utf16(title, g_ime_title, PKGI_COUNTOF(g_ime_title) - 1);
-    int text_len = convert_to_utf16(text, g_ime_text, PKGI_COUNTOF(g_ime_text) - 1);
-    g_ime_title[title_len] = 0;
-    g_ime_text[text_len] = 0;
-
-    param.supportedLanguages = 0x0001FFFF;
-    param.languagesForced = SCE_TRUE;
-    param.type = SCE_IME_TYPE_DEFAULT;
-    param.option = 0;
-    param.title = g_ime_title;
-    param.maxTextLength = 128;
-    param.initialText = g_ime_text;
-    param.inputTextBuffer = g_ime_input;
-
-    int res = sceImeDialogInit(&param);
-    if (res < 0)
-    {
-        LOG("sceImeDialogInit failed, error 0x%08x", res);
+	int ret = 0;       
+    osk_level = 0;
+    
+	if(sysMemContainerCreate(&container_mem, 8*1024*1024) < 0) {
+	    ret = -1;
+	    goto error_end;
     }
-    else
+
+    osk_level = 1;
+
+    convert_to_utf16(title, g_ime_title, PKGI_COUNTOF(g_ime_title) - 1);
+    convert_to_utf16(text, g_ime_text, PKGI_COUNTOF(g_ime_text) - 1);
+    
+    inputFieldInfo.message =  g_ime_title;
+    inputFieldInfo.startText = g_ime_text;
+    inputFieldInfo.maxLength = PKGI_OSK_INPUT_LENGTH;
+       
+    OutputReturnedParam.res = OSK_NO_TEXT; //OSK_OK;     
+    OutputReturnedParam.len = PKGI_OSK_INPUT_LENGTH; 
+
+    OutputReturnedParam.str = g_ime_input;
+
+    memset(g_ime_input, 0, sizeof(g_ime_input));
+
+    if(oskSetKeyLayoutOption (OSK_10KEY_PANEL | OSK_FULLKEY_PANEL) < 0) {
+        ret = -2; 
+        goto error_end;
+    }
+
+    DialogOskParam.firstViewPanel = OSK_PANEL_TYPE_ALPHABET_FULL_WIDTH;
+    DialogOskParam.allowedPanels = (OSK_PANEL_TYPE_ALPHABET | OSK_PANEL_TYPE_NUMERAL | OSK_PANEL_TYPE_ENGLISH);
+
+
+    if(oskAddSupportLanguage (DialogOskParam.allowedPanels) < 0) {
+        ret = -3; 
+        goto error_end;
+    }
+
+    if(oskSetLayoutMode( OSK_LAYOUTMODE_HORIZONTAL_ALIGN_CENTER | OSK_LAYOUTMODE_VERTICAL_ALIGN_CENTER ) < 0) {
+        ret = -4; 
+        goto error_end;
+    }
+
+    oskPoint pos = {0.0, 0.0};
+
+    DialogOskParam.controlPoint = pos;
+    DialogOskParam.prohibitFlags = OSK_PROHIBIT_RETURN;
+    if(oskSetInitialInputDevice(OSK_DEVICE_PAD) < 0) {
+        ret = -5; 
+        goto error_end;
+    }
+    
+    sysUtilUnregisterCallback(SYSUTIL_EVENT_SLOT0);
+    sysUtilRegisterCallback(SYSUTIL_EVENT_SLOT0, osk_event_handle, NULL);
+    
+    osk_action = 0;
+    osk_unloaded = 0;
+    
+    if(oskLoadAsync(container_mem, (const void *) &DialogOskParam, (const void *)  &inputFieldInfo) < 0) {
+        ret= -6; 
+        goto error_end;
+    }
+
+    osk_level = 2;
+
+    if (ret == 0)
     {
         g_ime_active = 1;
+        return;
     }
-    */
+
+error_end:
+    LOG("Keyboard Init failed, error 0x%08x", ret);
+
+    osk_exit();
+    osk_level = 0;
+
 }
 
 int pkgi_dialog_input_update(void)
@@ -352,29 +469,54 @@ int pkgi_dialog_input_update(void)
     {
         return 0;
     }
-/*
-    SceCommonDialogStatus status = sceImeDialogGetStatus();
-    if (status == SCE_COMMON_DIALOG_STATUS_FINISHED)
+    
+    if (!osk_unloaded)
     {
-        SceImeDialogResult result = { 0 };
-        sceImeDialogGetResult(&result);
-
-        g_ime_active = 0;
-        sceImeDialogTerm();
-
-        if (result.button == SCE_IME_DIALOG_BUTTON_ENTER)
+        switch(osk_event) 
         {
-            return 1;
+            case OSKDIALOG_INPUT_ENTERED:
+                oskGetInputText(&OutputReturnedParam);
+                osk_event = 0;
+                break;
+
+            case OSKDIALOG_INPUT_CANCELED:
+                oskAbort();
+                oskUnloadAsync(&OutputReturnedParam);
+
+                osk_event = 0;
+                osk_action = -1;
+                break;
+
+            case OSKDIALOG_FINISHED:
+                if (osk_action != -1) osk_action = 1;
+                oskUnloadAsync(&OutputReturnedParam);
+                osk_event = 0;
+                break;
+
+            default:    
+                break;
         }
     }
-*/
+    else
+    {
+        g_ime_active = 0;
+
+        if ((OutputReturnedParam.res == OSK_OK) && (osk_action == 1))
+        {
+            osk_exit();
+            return 1;
+        } 
+         
+        osk_exit();
+    }
+
     return 0;
 }
 
 void pkgi_dialog_input_get_text(char* text, uint32_t size)
 {
-    int count = convert_from_utf16(g_ime_input, text, size - 1);
-    text[count] = 0;
+    convert_from_utf16(g_ime_input, text, size - 1);
+    LOG("input: %s", text);
 }
 
 
@@ -686,9 +828,7 @@ int pkgi_install(const char* titleid)
 
 uint32_t pkgi_time_msec()
 {
-    u64 sec, nsec;
-    sysGetCurrentTime(&sec, &nsec);
-    return(nsec/1000);
+    return ya2d_millis();
 }
 
 /* static int pkgi_vita_thread(SceSize args, void* argp)
@@ -718,6 +858,11 @@ static void pkgi_vita_thread(void* argp)
 	sysThreadExit(0);
 }
 */
+
+void pkgi_thread_exit()
+{
+	sysThreadExit(0);
+}
 
 void pkgi_start_thread(const char* name, pkgi_thread_entry* start)
 {
@@ -847,7 +992,7 @@ void pkgi_draw_texture(pkgi_texture texture, int x, int y)
     ya2d_drawTexture(tex, x, y);
 }
 
-void pkgi_draw_textureZ(pkgi_texture texture, int x, int y, int z)
+void pkgi_draw_texture_z(pkgi_texture texture, int x, int y, int z)
 {
 	ya2d_Texture *tex = texture;
     ya2d_drawTextureZ(tex, x, y, z);
@@ -873,10 +1018,20 @@ void pkgi_clip_remove(void)
 
 void pkgi_draw_fill_rect(int x, int y, int w, int h, uint32_t color)
 {
-    ya2d_drawFillRectZ(x, y, PKGI_MENU_Z, w, h, RGBA_COLOR(color, 255));
-    ya2d_drawRectZ(x, y, PKGI_MENU_Z, w, h, RGBA_COLOR(PKGI_COLOR_MENU_BORDER, 255));
+    ya2d_drawFillRect(x, y, w, h, RGBA_COLOR(color, 255));
+//    ya2d_drawRect(x, y, w, h, RGBA_COLOR(PKGI_COLOR_MENU_BORDER, 255));
 }
 
+void pkgi_draw_fill_rect_z(int x, int y, int z, int w, int h, uint32_t color)
+{
+    ya2d_drawFillRectZ(x, y, z, w, h, RGBA_COLOR(color, 255));
+//    ya2d_drawRectZ(x, y, z, w, h, RGBA_COLOR(border, 255));
+}
+
+void pkgi_draw_rect_z(int x, int y, int z, int w, int h, uint32_t color)
+{
+	ya2d_drawRectZ(x, y, z, w, h, RGBA_COLOR(color, 255));
+}
 
 void pkgi_draw_rect(int x, int y, int w, int h, uint32_t color)
 {
@@ -894,22 +1049,22 @@ void pkgi_draw_text_z(int x, int y, int z, uint32_t color, const char* text)
                 text++;
                 continue;
             case '\xfa':
-                pkgi_draw_textureZ(tex_buttons.circle, i, j, z);
+                pkgi_draw_texture_z(tex_buttons.circle, i, j, z);
                 i += PKGI_FONT_WIDTH;
                 text++;
                 continue;
             case '\xfb':
-                pkgi_draw_textureZ(tex_buttons.cross, i, j, z);
+                pkgi_draw_texture_z(tex_buttons.cross, i, j, z);
                 i += PKGI_FONT_WIDTH;
                 text++;
                 continue;
             case '\xfc':
-                pkgi_draw_textureZ(tex_buttons.triangle, i, j, z);
+                pkgi_draw_texture_z(tex_buttons.triangle, i, j, z);
                 i += PKGI_FONT_WIDTH;
                 text++;
                 continue;
             case '\xfd':
-//                pkgi_draw_texture(tex_buttons.square, i, j, z);
+//                pkgi_draw_texture_z(tex_buttons.square, i, j, z);
                 i += PKGI_FONT_WIDTH;
                 text++;
                 continue;
@@ -1162,12 +1317,6 @@ int pkgi_http_response_length(pkgi_http* http, int64_t* length)
 
 	        res = httpResponseGetContentLength(http->transaction, &content_length);
             
-/*            if (res == (int)SCE_HTTP_ERROR_NO_CONTENT_LENGTH || res == (int)SCE_HTTP_ERROR_CHUNK_ENC)
-            {
-                LOG("http response has no content length (or chunked encoding)");
-                *length = 0;
-            }
-            else */ 
             if (res < 0)
             {
                 LOG("httpResponseGetContentLength failed: 0x%08x", res);
@@ -1189,9 +1338,7 @@ int pkgi_http_read(pkgi_http* http, void* buffer, uint32_t size)
 {
     if (http->local)
     {
-//        int read = sceIoPread(http->fd, buffer, size, http->offset);
-//        int read = fread(buffer, size, http->offset, http->fd);
-        int read = 1000;
+        int read = fread(buffer, 1, size, http->fd);
         http->offset += read;
         return read;
     }
@@ -1352,17 +1499,17 @@ int pkgi_read(void* f, void* buffer, uint32_t size)
 int pkgi_write(void* f, const void* buffer, uint32_t size)
 {
 //    LOG("asking to write %u bytes", size);
-    size_t write = fwrite(buffer, 1, size, (FILE*)f);
+    size_t write = fwrite(buffer, size, 1, (FILE*)f);
     if (write < 0)
     {
         LOG("fwrite error 0x%08x", write);
-        return -1;
+//        return -1;
     }
     else
     {
 //        LOG("wrote %d bytes", write);
     }
-    return (uint32_t)write == size;
+    return (write == 1);
 }
 
 void pkgi_close(void* f)

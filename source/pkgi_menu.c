@@ -21,6 +21,7 @@ typedef enum {
     MenuSort,
     MenuFilter,
     MenuRefresh,
+    MenuMode,
 } MenuType;
 
 typedef struct {
@@ -35,7 +36,7 @@ static const MenuEntry menu_entries[] =
     { MenuSearchClear, PKGI_UTF8_CLEAR " clear", 0 },
 
     { MenuText, "Sort by:", 0 },
-    { MenuSort, "Title", SortByTitle},
+    { MenuSort, "Title", SortByTitle },
     { MenuSort, "Region", SortByRegion },
     { MenuSort, "Name", SortByName },
     { MenuSort, "Size", SortBySize },
@@ -45,6 +46,10 @@ static const MenuEntry menu_entries[] =
     { MenuFilter, "Europe", DbFilterRegionEUR },
     { MenuFilter, "Japan", DbFilterRegionJPN },
     { MenuFilter, "USA", DbFilterRegionUSA },
+
+    { MenuText, "DL mode:", 0 },
+    { MenuMode, "Direct", 0 },
+    { MenuMode, "Background", 1 },
 
     { MenuRefresh, "Refresh...", 0 },
 };
@@ -77,7 +82,7 @@ int pkgi_do_menu(pkgi_input* input)
 {
     if (menu_delta != 0)
     {
-        menu_width += menu_delta * (int32_t)(input->delta * PKGI_ANIMATION_SPEED/2 / 1000000);
+        menu_width += menu_delta * (int32_t)(input->delta * PKGI_ANIMATION_SPEED/ 3000);
 
         if (menu_delta < 0 && menu_width <= 0)
         {
@@ -94,7 +99,8 @@ int pkgi_do_menu(pkgi_input* input)
 
     if (menu_width != 0)
     {
-        pkgi_draw_fill_rect(VITA_WIDTH - menu_width, 25, menu_width, PKGI_MENU_HEIGHT, PKGI_COLOR_MENU_BACKGROUND);
+        pkgi_draw_fill_rect_z(VITA_WIDTH - menu_width, 25, PKGI_MENU_Z, menu_width, PKGI_MENU_HEIGHT, PKGI_COLOR_MENU_BACKGROUND);
+        pkgi_draw_rect_z(VITA_WIDTH - menu_width, 25, PKGI_MENU_Z, menu_width, PKGI_MENU_HEIGHT, PKGI_COLOR_MENU_BORDER);
     }
 
     if (input->active & PKGI_BUTTON_UP)
@@ -179,6 +185,10 @@ int pkgi_do_menu(pkgi_input* input)
         {
             menu_config.filter ^= menu_entries[menu_selected].value;
         }
+        else if (type == MenuMode)
+        {
+            menu_config.dl_mode_background = menu_entries[menu_selected].value;
+        }
     }
 
     if (menu_width != PKGI_MENU_WIDTH)
@@ -239,6 +249,11 @@ int pkgi_do_menu(pkgi_input* input)
             pkgi_snprintf(text, sizeof(text), "%s %s",
                 menu_config.filter & entry->value ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF,
                 entry->text);
+        }
+        else if (type == MenuMode)
+        {
+            pkgi_snprintf(text, sizeof(text), "%s %s",
+                menu_config.dl_mode_background == entry->value ? PKGI_UTF8_CHECK_ON : " ", entry->text);            
         }
         
         pkgi_draw_text_z(x, y, PKGI_MENU_TEXT_Z, color, text);

@@ -23,7 +23,7 @@
 #define PKGI_UTF8_MB "Mb" // "\xe3\x8e\x86" // 0x3386
 #define PKGI_UTF8_GB "Gb" // "\xe3\x8e\x87" // 0x3387
 
-#define PKGI_UTF8_CLEAR "\xc3\x97" // 0x00d7
+#define PKGI_UTF8_CLEAR "\x1a" // 0x00d7
 
 #define PKGI_UTF8_SORT_ASC  "\x1e" //"\xe2\x96\xb2" // 0x25b2
 #define PKGI_UTF8_SORT_DESC "\x1f" //"\xe2\x96\xbc" // 0x25bc

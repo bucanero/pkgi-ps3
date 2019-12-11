@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 
+
 // values compatible with psp2/ctrl.h header
 #define PKGI_BUTTON_SELECT 0x00000001
 #define PKGI_BUTTON_START  0x00000008
@@ -40,6 +41,7 @@ typedef struct pkgi_input {
 
 
 #ifdef PKGI_ENABLE_LOGGING
+//#define LOG dbglogger_log
 #define LOG(msg, ...) pkgi_log(msg, ## __VA_ARGS__)
 #else
 #define LOG(...)
@@ -140,12 +142,15 @@ typedef void* pkgi_texture;
 
 pkgi_texture pkgi_load_png_raw(const void* data, uint32_t size);
 void pkgi_draw_texture(pkgi_texture texture, int x, int y);
+void pkgi_draw_texture_z(pkgi_texture texture, int x, int y, int z);
 void pkgi_free_texture(pkgi_texture texture);
 
 void pkgi_clip_set(int x, int y, int w, int h);
 void pkgi_clip_remove(void);
 void pkgi_draw_rect(int x, int y, int w, int h, uint32_t color);
+void pkgi_draw_rect_z(int x, int y, int z, int w, int h, uint32_t color);
 void pkgi_draw_fill_rect(int x, int y, int w, int h, uint32_t color);
+void pkgi_draw_fill_rect_z(int x, int y, int z, int w, int h, uint32_t color);
 void pkgi_draw_text(int x, int y, uint32_t color, const char* text);
 void pkgi_draw_text_z(int x, int y, int z, uint32_t color, const char* text);
 int pkgi_text_width(const char* text);

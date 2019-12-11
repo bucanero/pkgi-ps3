@@ -113,6 +113,7 @@ void pkgi_load_config(Config* config, char* refresh_url, uint32_t refresh_len)
     config->order = SortAscending;
     config->filter = DbFilterAll;
     config->no_version_check = 0;
+    config->dl_mode_background = 0;
 
     char data[4096];
     char path[256];
@@ -173,6 +174,10 @@ void pkgi_load_config(Config* config, char* refresh_url, uint32_t refresh_len)
             else if (pkgi_stricmp(key, "no_version_check") == 0)
             {
                 config->no_version_check = 1;
+            }
+            else if (pkgi_stricmp(key, "dl_mode_background") == 0)
+            {
+                config->dl_mode_background = 1;
             }
         }
     }
@@ -241,6 +246,11 @@ void pkgi_save_config(const Config* config, const char* update_url)
     if (config->no_version_check)
     {
         len += pkgi_snprintf(data + len, sizeof(data) - len, "no_version_check 1\n");
+    }
+
+    if (config->dl_mode_background)
+    {
+        len += pkgi_snprintf(data + len, sizeof(data) - len, "dl_mode_background 1\n");
     }
 
     char path[256];
