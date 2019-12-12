@@ -660,7 +660,7 @@ int main()
     input.pressed = 0;
     while (pkgi_update(&input))
     {
-        pkgi_draw_texture(background, -50, -20);
+        pkgi_draw_texture(background, -50, -10);
 
         if (state == StateUpdateDone)
         {

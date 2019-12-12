@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 
+#include <dbglogger.h>
 
 // values compatible with psp2/ctrl.h header
 #define PKGI_BUTTON_SELECT 0x00000001
@@ -41,13 +42,11 @@ typedef struct pkgi_input {
 
 
 #ifdef PKGI_ENABLE_LOGGING
-//#define LOG dbglogger_log
-#define LOG(msg, ...) pkgi_log(msg, ## __VA_ARGS__)
+#define LOG dbglogger_log
 #else
 #define LOG(...)
 #endif
 
-void pkgi_log(const char* msg, ...);
 
 int pkgi_snprintf(char* buffer, uint32_t size, const char* msg, ...);
 void pkgi_vsnprintf(char* buffer, uint32_t size, const char* msg, va_list args);

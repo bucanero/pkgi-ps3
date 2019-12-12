@@ -19,9 +19,6 @@
 
 #include <ya2d/ya2d.h>
 
-#include <dbglogger.h>
-
-
 
 #define OSKDIALOG_FINISHED          0x503
 #define OSKDIALOG_UNLOADED          0x504
@@ -56,21 +53,6 @@ static struct t_tex_buttons
     pkgi_texture triangle;
 //    pkgi_texture square;
 } tex_buttons;
-
-
-#ifdef PKGI_ENABLE_LOGGING
-void pkgi_log(const char* msg, ...)
-{
-    char buffer[512];
-
-    va_list args;
-    va_start(args, msg);
-    vsnprintf(buffer, sizeof(buffer) - 1, msg, args);
-    va_end(args);
-
-    dbglogger_log(buffer);
-}
-#endif
 
 
 int pkgi_snprintf(char* buffer, uint32_t size, const char* msg, ...)
@@ -135,7 +117,6 @@ static void pkgi_start_debug_log(void)
 {
 #ifdef PKGI_ENABLE_LOGGING
     dbglogger_init_file(PKGI_APP_FOLDER "/pkgi.dbg");
-//    dbglogger_init();
     LOG("PKGi PS3 logging initialized");
 #endif
 }
@@ -673,8 +654,10 @@ int pkgi_update(pkgi_input* input)
     }
 
     if (input->active & PKGI_BUTTON_SELECT) {
+#ifdef PKGI_ENABLE_LOGGING
         LOG("screenshot");
         dbglogger_screenshot_tmp(0);
+#endif
     }
 
     if (input->active & PKGI_BUTTON_START) {
@@ -693,7 +676,6 @@ int pkgi_update(pkgi_input* input)
 
 void pkgi_swap(void)
 {
-    // LOG("vita2d pool free space = %u KB", vita2d_pool_free_space() / 1024);
 	ya2d_screenFlip();
 }
 
@@ -1092,7 +1074,6 @@ int pkgi_text_height(const char* text)
     return PKGI_FONT_HEIGHT;
 }
 
-#define USE_LOCAL 0
 
 struct pkgi_http
 {
@@ -1228,7 +1209,6 @@ pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
         {
             char range[64];
             pkgi_snprintf(range, sizeof(range), "bytes=%llu-", offset);
-//            if ((err = sceHttpAddRequestHeader(req, "Range", range, SCE_HTTP_HEADER_ADD)) < 0)
             httpHeader reqHead;
             reqHead.name = "Range";
             reqHead.value = range;

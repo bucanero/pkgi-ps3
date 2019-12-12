@@ -18,9 +18,7 @@ static char root[256];
 static char resume_file[256];
 
 static pkgi_http* http;
-static const char* download_title;
-static const char* download_content;
-static const char* download_url;
+static const DbItem* db_item;
 static int download_resume;
 
 static uint64_t initial_offset;  // where http download resumes
@@ -32,14 +30,12 @@ static sha256_ctx sha;
 static void* item_file;     // current file handle
 static char item_name[256]; // current file name
 static char item_path[256]; // current file path
-static int item_index;      // current item
 
 
 // temporary buffer for downloads
 static uint8_t down[64 * 1024];
 
 // pkg header
-static uint32_t index_count;
 static uint64_t total_size;
 
 
@@ -132,7 +128,7 @@ static int create_pdb_files(void)
 
 	// 000000CA - PKG Link download URL
 	char pkg_link_hdr[4] = { 0x00, 0x00, 0x00, 0xCA };
-	write_pdb_string(pkg_link_hdr, download_url, fpPDB);
+	write_pdb_string(pkg_link_hdr, db_item->url, fpPDB);
 
 	// 0000006A - Icon location / path (PNG w/o extension) 
 	char iconpath_hdr[4] ={ 0x00, 0x00, 0x00, 0x6A };
@@ -142,7 +138,7 @@ static int create_pdb_files(void)
 	char title_hdr[4] = { 0x00, 0x00, 0x00, 0x69 };
 	
 	char title_str[256] = "";
-	pkgi_snprintf(title_str, sizeof(title_str), "\xE2\x98\x85 Download \x22%s\x22", download_title);
+	pkgi_snprintf(title_str, sizeof(title_str), "\xE2\x98\x85 Download \x22%s\x22", db_item->name);
 	write_pdb_string(title_hdr, title_str, fpPDB);
 	
 	pkgi_write(fpPDB, pkg_d0end_data, pkg_d0end_data_size);
@@ -177,14 +173,7 @@ static void update_progress(void)
     if (info_now >= info_update)
     {
         char text[256];
-        if (item_index < 0)
-        {
-            pkgi_snprintf(text, sizeof(text), "%s", item_name);
-        }
-        else
-        {
-            pkgi_snprintf(text, sizeof(text), "[%u/%u] %s", item_index, index_count, item_name);
-        }
+        pkgi_snprintf(text, sizeof(text), "%s", item_name);
 
         if (download_resume)
         {
@@ -296,8 +285,8 @@ static int queue_pkg_task()
 	}
 	
     initial_offset = 0;
-    LOG("requesting %s @ %llu", download_url, 0);
-    http = pkgi_http_get(download_url, download_content, 0);
+    LOG("requesting %s @ %llu", db_item->url, 0);
+    http = pkgi_http_get(db_item->url, db_item->content, 0);
     if (!http)
     {
     	pkgi_dialog_error("Could not send HTTP request");
@@ -370,8 +359,8 @@ static int download_data(uint8_t* buffer, uint32_t size, int save)
     if (!http)
     {
         initial_offset = download_offset;
-        LOG("requesting %s @ %llu", download_url, download_offset);
-        http = pkgi_http_get(download_url, download_content, download_offset);
+        LOG("requesting %s @ %llu", db_item->url, download_offset);
+        http = pkgi_http_get(db_item->url, db_item->content, download_offset);
         if (!http)
         {
             pkgi_dialog_error("Could not send HTTP request");
@@ -596,12 +585,9 @@ int pkgi_download(const DbItem* item, const int background_dl)
 
     http = NULL;
     item_file = NULL;
-    item_index = -1;
     download_size = 0;
     download_offset = 0;
-    download_content = item->content;
-    download_url = item->url;
-    download_title = item->name;
+    db_item = item;
 
     dialog_extra[0] = 0;
     dialog_eta[0] = 0;
