@@ -6,7 +6,13 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 ### Added
 
+* Generic text database format support
 * Changelog file
+
+### Fixed
+
+* The app now creates `/dev_hdd0/exdata` if it doesn't exists
+* Fixed a bug when the URL was missing
 
 ## [v1.0.0](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.0.0) - 2019-12-11
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <sfo>
 	<value name="APP_VER" type="string">
-		01.00
+		01.05
 	</value>
 	<value name="ATTRIBUTE" type="integer">
 		0
@@ -34,6 +34,6 @@
 		NP00PKGI3
 	</value>
 	<value name="VERSION" type="string">
-		01.00
+		01.05
 	</value>
 </sfo>

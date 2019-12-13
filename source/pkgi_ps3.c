@@ -1104,6 +1104,12 @@ pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
 {
     LOG("http get");
 
+    if (pkgi_strstr(url, "http://") != url)
+    {
+        LOG("unsupported URL type %s", url);
+        return NULL;
+    }
+
     pkgi_http* http = NULL;
     for (size_t i = 0; i < 4; i++)
     {
