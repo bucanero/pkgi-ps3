@@ -1,1 +1,1 @@
-20191204;0.0.1-beta;https://github.com/bucanero/pkgi-ps3/releases/download/v0.0.1-beta/pkgi-ps3.pkg
+{ "name":"PKGi PS3 v1.0.0" }
