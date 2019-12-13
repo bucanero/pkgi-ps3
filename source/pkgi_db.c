@@ -28,7 +28,7 @@ typedef enum {
     TypeRap,
     TypeUrl,
     TypeSize,
-    TypeDigest,
+    TypeChecksum,
     TypeUnknown
 } ColumnType;
 
@@ -54,7 +54,7 @@ static ColumnEntry entries[] =
     { TypeRap, "rap", "" },
     { TypeUrl, "url", "" },
     { TypeSize, "size", "" },
-    { TypeDigest, "sha256", "" },
+    { TypeChecksum, "checksum", "" },
 };
 
 static const ColumnType default_format[] =
@@ -66,7 +66,7 @@ static const ColumnType default_format[] =
     TypeRap,
     TypeUrl,
     TypeSize,
-    TypeDigest
+    TypeChecksum
 };
  
 
@@ -300,7 +300,7 @@ int pkgi_db_update(const char* update_url, char* error, uint32_t error_size)
             db[db_count].rap = pkgi_hexbytes(dbf.data[TypeRap].data, PKGI_RAP_SIZE);
             db[db_count].url = dbf.data[TypeUrl].data;
             db[db_count].size = pkgi_strtoll(dbf.data[TypeSize].data);
-            db[db_count].digest = pkgi_hexbytes(dbf.data[TypeDigest].data, SHA256_DIGEST_SIZE);
+            db[db_count].digest = pkgi_hexbytes(dbf.data[TypeChecksum].data, SHA256_DIGEST_SIZE);
             db_item[db_count] = db + db_count;
             db_count++;
         }        
