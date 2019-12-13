@@ -55,9 +55,12 @@ int pkgi_stricontains(const char* str, const char* sub);
 int pkgi_stricmp(const char* a, const char* b);
 void pkgi_strncpy(char* dst, uint32_t size, const char* src);
 char* pkgi_strrchr(const char* str, char ch);
+uint32_t pkgi_strlen(const char *str);
 void pkgi_memcpy(void* dst, const void* src, uint32_t size);
 void pkgi_memmove(void* dst, const void* src, uint32_t size);
 int pkgi_memequ(const void* a, const void* b, uint32_t size);
+void* pkgi_malloc(uint32_t size);
+void pkgi_free(void* ptr);
 
 int pkgi_is_unsafe_mode(void);
 
@@ -86,6 +89,7 @@ uint32_t pkgi_time_msec();
 
 typedef void pkgi_thread_entry(void);
 void pkgi_start_thread(const char* name, pkgi_thread_entry* start);
+void pkgi_thread_exit(void);
 void pkgi_sleep(uint32_t msec);
 
 int pkgi_load(const char* name, void* data, uint32_t max);

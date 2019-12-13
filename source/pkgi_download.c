@@ -3,15 +3,10 @@
 #include "pkgi.h"
 #include "pkgi_utils.h"
 #include "pkgi_sha256.h"
+#include "pdb_data.h"
 
 #include <stddef.h>
-
-
-
-#include "pdb_data.h"
 #include <sys/stat.h>
-#include <string.h>
-#include <stdlib.h>
 
 static char root[256];
 
@@ -76,7 +71,7 @@ static void write_pdb_string(const char* header, const char* pdbstr, void* fp)
 {
 	pkgi_write(fp, header, 4);
     
-	unsigned int pdbstr_len = strlen(pdbstr) + 1;
+	unsigned int pdbstr_len = pkgi_strlen(pdbstr) + 1;
 	pkgi_write(fp, (char*) &pdbstr_len, 4);
 	pkgi_write(fp, (char*) &pdbstr_len, 4);
 	pkgi_write(fp, pdbstr, pdbstr_len);
@@ -237,7 +232,7 @@ static int create_dummy_pkg(void)
 		return 0;
 	}
 
-	buffer = (char*)malloc(BUFF_SIZE);
+	buffer = (char*)pkgi_malloc(BUFF_SIZE);
 
 	while(fsize > 0)
 	{
@@ -258,7 +253,7 @@ static int create_dummy_pkg(void)
 
 	if(buffer) 
 	{
-		free(buffer);
+		pkgi_free(buffer);
 		buffer = NULL;
 	}
 		

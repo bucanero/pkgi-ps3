@@ -25,6 +25,8 @@
 #define OSKDIALOG_INPUT_ENTERED     0x505
 #define OSKDIALOG_INPUT_CANCELED    0x506
 
+#define PKGI_OSK_INPUT_LENGTH 128
+
 #define SCE_IME_DIALOG_MAX_TITLE_LENGTH	(128)
 #define SCE_IME_DIALOG_MAX_TEXT_LENGTH	(512)
 
@@ -96,6 +98,21 @@ void pkgi_strncpy(char* dst, uint32_t size, const char* src)
 char* pkgi_strrchr(const char* str, char ch)
 {
     return strrchr(str, ch);
+}
+
+uint32_t pkgi_strlen(const char *str)
+{
+    return strlen(str);
+}
+
+void *pkgi_malloc(uint32_t size)
+{
+    return malloc(size);
+}
+
+void pkgi_free(void *ptr)
+{
+    free(ptr);
 }
 
 void pkgi_memcpy(void* dst, const void* src, uint32_t size)
@@ -305,17 +322,12 @@ static int convert_from_utf16(const uint16_t* utf16, char* utf8, uint32_t size)
 //------------
 
 
-
-
 volatile int osk_event = 0;
 volatile int osk_unloaded = 0;
 static int osk_action = 0;
 
 static sys_mem_container_t container_mem;
-
 static oskCallbackReturnParam OutputReturnedParam;
-static oskParam DialogOskParam;
-static oskInputFieldInfo inputFieldInfo;
 
 static int osk_level = 0;
 
@@ -361,10 +373,11 @@ static void osk_event_handle(u64 status, u64 param, void * userdata)
     }
 }
 
-#define PKGI_OSK_INPUT_LENGTH 128
 
 void pkgi_dialog_input_text(const char* title, const char* text)
 {
+    oskParam DialogOskParam;
+    oskInputFieldInfo inputFieldInfo;
 	int ret = 0;       
     osk_level = 0;
     
@@ -382,9 +395,8 @@ void pkgi_dialog_input_text(const char* title, const char* text)
     inputFieldInfo.startText = g_ime_text;
     inputFieldInfo.maxLength = PKGI_OSK_INPUT_LENGTH;
        
-    OutputReturnedParam.res = OSK_NO_TEXT; //OSK_OK;     
-    OutputReturnedParam.len = PKGI_OSK_INPUT_LENGTH; 
-
+    OutputReturnedParam.res = OSK_NO_TEXT;
+    OutputReturnedParam.len = PKGI_OSK_INPUT_LENGTH;
     OutputReturnedParam.str = g_ime_input;
 
     memset(g_ime_input, 0, sizeof(g_ime_input));
@@ -396,7 +408,6 @@ void pkgi_dialog_input_text(const char* title, const char* text)
 
     DialogOskParam.firstViewPanel = OSK_PANEL_TYPE_ALPHABET_FULL_WIDTH;
     DialogOskParam.allowedPanels = (OSK_PANEL_TYPE_ALPHABET | OSK_PANEL_TYPE_NUMERAL | OSK_PANEL_TYPE_ENGLISH);
-
 
     if(oskAddSupportLanguage (DialogOskParam.allowedPanels) < 0) {
         ret = -3; 
@@ -423,7 +434,7 @@ void pkgi_dialog_input_text(const char* title, const char* text)
     osk_action = 0;
     osk_unloaded = 0;
     
-    if(oskLoadAsync(container_mem, (const void *) &DialogOskParam, (const void *)  &inputFieldInfo) < 0) {
+    if(oskLoadAsync(container_mem, (const void *) &DialogOskParam, (const void *) &inputFieldInfo) < 0) {
         ret= -6; 
         goto error_end;
     }
@@ -441,7 +452,6 @@ error_end:
 
     osk_exit();
     osk_level = 0;
-
 }
 
 int pkgi_dialog_input_update(void)

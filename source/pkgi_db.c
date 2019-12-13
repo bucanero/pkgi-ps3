@@ -20,6 +20,57 @@ static uint32_t db_count;
 static DbItem* db_item[MAX_DB_SIZE];
 static uint32_t db_item_count;
 
+typedef enum {
+    TypeContentId,
+    TypeFlags,
+    TypeName,
+    TypeDescription,
+    TypeRap,
+    TypeUrl,
+    TypeSize,
+    TypeDigest,
+    TypeUnknown
+} ColumnType;
+
+typedef struct {
+    ColumnType type;
+    const char* text_id;
+    const char* data;
+} ColumnEntry;
+
+typedef struct {
+    char delimiter;
+    uint8_t total_columns;
+    ColumnType* type;
+    ColumnEntry* data;
+} dbFormat;
+
+static ColumnEntry entries[] =
+{
+    { TypeContentId, "contentid", "" },
+    { TypeFlags, "flags", "" },
+    { TypeName, "name", "" },
+    { TypeDescription, "description", "" },
+    { TypeRap, "rap", "" },
+    { TypeUrl, "url", "" },
+    { TypeSize, "size", "" },
+    { TypeDigest, "sha256", "" },
+};
+
+static const ColumnType default_format[] =
+{
+    TypeContentId,
+    TypeFlags,
+    TypeName,
+    TypeDescription,
+    TypeRap,
+    TypeUrl,
+    TypeSize,
+    TypeDigest
+};
+ 
+
+
 static int64_t pkgi_strtoll(const char* str)
 {
     int64_t res = 0;
@@ -73,19 +124,74 @@ static uint8_t* pkgi_hexbytes(const char* digest, uint32_t length)
     return result;
 }
 
+static char* generate_contentid(void)
+{
+    char* cid = (char*)pkgi_malloc(37);
+    pkgi_snprintf(cid, 36, "X00000-X%08d_00-0000000000000000", db_count);
+    return cid;
+}
+
 int pkgi_db_update(const char* update_url, char* error, uint32_t error_size)
 {
     db_total = 0;
     db_size = 0;
     db_count = 0;
     db_item_count = 0;
+    uint8_t column = 0;
+    dbFormat dbf = { ',', 8, (ColumnType*)default_format, entries };
 
     char path[256];
-    pkgi_snprintf(path, sizeof(path), "%s/pkgi.txt", pkgi_get_config_folder());  
+    pkgi_snprintf(path, sizeof(path), "%s/dbformat.txt", pkgi_get_config_folder());  
+
+    LOG("loading format from %s", path);
+
+    int loaded = pkgi_load(path, db_data, sizeof(db_data) - 1);
+    if (loaded > 0) {
+        char* ptr = db_data;
+        char* end = db_data + loaded + 1;
+        column = 0;
+        ColumnType types[64];
+    
+        dbf.delimiter = *ptr++;
+        
+        if (ptr < end && *ptr == '\r')
+        {
+            ptr++;
+        }
+        if (ptr < end && *ptr == '\n')
+        {
+            ptr++;
+        }
+
+        while (ptr < end && *ptr)
+        {
+            const char* column_name = ptr;
+            types[column] = TypeUnknown;
+
+            while (ptr < end && *ptr != dbf.delimiter && *ptr != '\n' && *ptr != '\r' && column < 64)
+            {
+                ptr++;
+            }
+            *ptr++ = 0;
+
+            int j;
+            for (j = 0; j < 8; j++) {
+                if (pkgi_stricmp(entries[j].text_id, column_name) == 0) {
+                    types[column] = entries[j].type;
+                }
+            }
+        
+            column++;
+        }
+        dbf.total_columns = column;
+        dbf.type = types;
+    } 
+    
+    pkgi_snprintf(path, sizeof(path), "%s/pkgi.txt", pkgi_get_config_folder());
 
     LOG("loading update from %s", path);
     
-    int loaded = pkgi_load(path, db_data, sizeof(db_data) - 1);
+    loaded = pkgi_load(path, db_data, sizeof(db_data) - 1);
 
     if (loaded > 0)
     {
@@ -171,109 +277,33 @@ int pkgi_db_update(const char* update_url, char* error, uint32_t error_size)
 
     while (ptr < end && *ptr)
     {
-        const char* content = ptr;
-        while (ptr < end && *ptr != ',')
-        {
-            ptr++;
-        }
-        if (ptr == end)
-        {
-            break;
-        }
-        *ptr++ = 0;
+        column = 0;
+        while (ptr < end && column < dbf.total_columns) {
+            const char* content = ptr;
 
-        const char* flags = ptr;
-        while (ptr < end && *ptr != ',')
-        {
-            ptr++;
-        }
-        if (ptr == end)
-        {
-            break;
-        }
-        *ptr++ = 0;
+            while (ptr < end && *ptr != dbf.delimiter && *ptr != '\n' && *ptr != '\r')
+            {
+                ptr++;
+            }
+            *ptr++ = 0;
 
-        const char* name = ptr;
-        while (ptr < end && *ptr != ',')
-        {
-            ptr++;
-        }
-        if (ptr == end)
-        {
-            break;
-        }
-        *ptr++ = 0;
-
-        const char* description = ptr;
-        while (ptr < end && *ptr != ',')
-        {
-            ptr++;
-        }
-        if (ptr == end)
-        {
-            break;
-        }
-        *ptr++ = 0;
-
-        const char* rap = ptr;
-        while (ptr < end && *ptr != ',')
-        {
-            ptr++;
-        }
-        if (ptr == end)
-        {
-            break;
-        }
-        *ptr++ = 0;
-
-        const char* url = ptr;
-        while (ptr < end && *ptr != ',')
-        {
-            ptr++;
-        }
-        if (ptr == end)
-        {
-            break;
-        }
-        *ptr++ = 0;
-
-        const char* size = ptr;
-        while (ptr < end && *ptr != ',')
-        {
-            ptr++;
-        }
-        if (ptr == end)
-        {
-            break;
-        }
-        *ptr++ = 0;
-
-        const char* digest = ptr;
-        while (ptr < end && *ptr != '\n' && *ptr != '\r')
-        {
-            ptr++;
-        }
-        if (ptr == end)
-        {
-            break;
-        }
-        *ptr++ = 0;
-
-        if (*ptr == '\n')
-        {
-            ptr++;
+            dbf.data[dbf.type[column]].data = content;
+            column++;
         }
 
-        db[db_count].content = content;
-        db[db_count].flags = (uint32_t)pkgi_strtoll(flags);
-        db[db_count].name = name;
-        db[db_count].description = description;
-        db[db_count].rap = (rap[0] == 0 ? NULL : pkgi_hexbytes(rap, PKGI_RAP_SIZE));
-        db[db_count].url = url;
-        db[db_count].size = pkgi_strtoll(size);
-        db[db_count].digest = pkgi_hexbytes(digest, SHA256_DIGEST_SIZE);
-        db_item[db_count] = db + db_count;
-        db_count++;
+        if (column == dbf.total_columns) {
+            // contentid can't be empty, let's generate one
+            db[db_count].content = (dbf.data[TypeContentId].data[0] == 0 ? generate_contentid() : dbf.data[TypeContentId].data);
+            db[db_count].flags = (uint32_t)pkgi_strtoll(dbf.data[TypeFlags].data);
+            db[db_count].name = dbf.data[TypeName].data;
+            db[db_count].description = dbf.data[TypeDescription].data;
+            db[db_count].rap = pkgi_hexbytes(dbf.data[TypeRap].data, PKGI_RAP_SIZE);
+            db[db_count].url = dbf.data[TypeUrl].data;
+            db[db_count].size = pkgi_strtoll(dbf.data[TypeSize].data);
+            db[db_count].digest = pkgi_hexbytes(dbf.data[TypeDigest].data, SHA256_DIGEST_SIZE);
+            db_item[db_count] = db + db_count;
+            db_count++;
+        }        
 
         if (db_count == MAX_DB_ITEMS)
         {
@@ -281,6 +311,10 @@ int pkgi_db_update(const char* update_url, char* error, uint32_t error_size)
         }
 
         if (ptr < end && *ptr == '\r')
+        {
+            ptr++;
+        }
+        if (ptr < end && *ptr == '\n')
         {
             ptr++;
         }
