@@ -8,8 +8,16 @@
 #include <stddef.h>
 #include <sys/stat.h>
 
-static char root[256];
+#define BUFF_SIZE  0x200000 // 2MB
 
+#define PDB_HDR_FILENAME	"\x00\x00\x00\xCB"
+#define PDB_HDR_DATETIME	"\x00\x00\x00\xCC"
+#define PDB_HDR_URL			"\x00\x00\x00\xCA"
+#define PDB_HDR_ICON		"\x00\x00\x00\x6A"
+#define PDB_HDR_TITLE		"\x00\x00\x00\x69"
+#define PDB_HDR_SIZE		"\x00\x00\x00\xCE"
+
+static char root[256];
 static char resume_file[256];
 
 static pkgi_http* http;
@@ -62,11 +70,6 @@ uint32_t get_task_dir_id(void)
 	return task_id;
 }
 
-
-#define BUFF_SIZE  0x200000 // 2MB
-
-
-
 static void write_pdb_string(const char* header, const char* pdbstr, void* fp)
 {
 	pkgi_write(fp, header, 4);
@@ -105,36 +108,25 @@ static int create_pdb_files(void)
     pkgi_write(fpPDB, pkg_d0top_data, d0top_data_size);
 	
 	// 000000CE - Download expected size (in bytes)
-	char dl_size[12] = {
-		0x00, 0x00, 0x00, 0xCE,
-		0x00, 0x00, 0x00, 0x08,
-		0x00, 0x00, 0x00, 0x08
-	};
-	pkgi_write(fpPDB, dl_size, 12);
+	pkgi_write(fpPDB, PDB_HDR_SIZE "\x00\x00\x00\x08\x00\x00\x00\x08", 12);
 	pkgi_write(fpPDB, (char*) &total_size, 8);
 
 	// 000000CB - PKG file name
-	char filename_hdr[4] = { 0x00, 0x00, 0x00, 0xCB };	
-	write_pdb_string(filename_hdr, root, fpPDB);
+	write_pdb_string(PDB_HDR_FILENAME, root, fpPDB);
 
 	// 000000CC - date/time
-	char pkg_time_hdr[4] = { 0x00, 0x00, 0x00, 0xCC };
-	write_pdb_string(pkg_time_hdr, "Mon, 11 Dec 2017 11:45:10 GMT", fpPDB);
+	write_pdb_string(PDB_HDR_DATETIME, "Mon, 11 Dec 2017 11:45:10 GMT", fpPDB);
 
 	// 000000CA - PKG Link download URL
-	char pkg_link_hdr[4] = { 0x00, 0x00, 0x00, 0xCA };
-	write_pdb_string(pkg_link_hdr, db_item->url, fpPDB);
+	write_pdb_string(PDB_HDR_URL, db_item->url, fpPDB);
 
 	// 0000006A - Icon location / path (PNG w/o extension) 
-	char iconpath_hdr[4] ={ 0x00, 0x00, 0x00, 0x6A };
-	write_pdb_string(iconpath_hdr, szIconFile, fpPDB);
+	write_pdb_string(PDB_HDR_ICON, szIconFile, fpPDB);
 
-	// 00000069 - Display title
-	char title_hdr[4] = { 0x00, 0x00, 0x00, 0x69 };
-	
+	// 00000069 - Display title	
 	char title_str[256] = "";
 	pkgi_snprintf(title_str, sizeof(title_str), "\xE2\x98\x85 Download \x22%s\x22", db_item->name);
-	write_pdb_string(title_hdr, title_str, fpPDB);
+	write_pdb_string(PDB_HDR_TITLE, title_str, fpPDB);
 	
 	pkgi_write(fpPDB, pkg_d0end_data, pkg_d0end_data_size);
 	pkgi_close(fpPDB);
@@ -325,7 +317,7 @@ static int queue_pkg_task()
     
 	if(!create_pdb_files())
 	{
-		pkgi_dialog_error("Could not create PDB files to HDD.");
+		pkgi_dialog_error("Could not create task files to HDD.");
 		return 0;
 	}
 
@@ -433,7 +425,7 @@ static int create_file(void)
         char error[256];
         pkgi_snprintf(error, sizeof(error), "cannot create folder %s", folder);
         pkgi_dialog_error(error);
-        return 1;
+        return 0;
     }
 
     LOG("creating %s file", item_name);
@@ -540,6 +532,14 @@ static int create_rap(const char* contentid, const uint8_t* rap)
 {
     LOG("creating %s.rap", contentid);
     pkgi_dialog_update_progress("Creating RAP file", NULL, NULL, 1.f);
+
+    if (!pkgi_mkdirs(PKGI_RAP_FOLDER))
+    {
+        char error[256];
+        pkgi_snprintf(error, sizeof(error), "cannot create folder %s", PKGI_RAP_FOLDER);
+        pkgi_dialog_error(error);
+        return 0;
+    }
 
     char path[256];
     pkgi_snprintf(path, sizeof(path), "%s/%s.rap", PKGI_RAP_FOLDER, contentid);
