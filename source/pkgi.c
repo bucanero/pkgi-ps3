@@ -69,7 +69,6 @@ static void pkgi_refresh_thread(void)
         state = StateError;
     }
     
-//    sysThreadExit(0);
     pkgi_thread_exit();
 }
 
@@ -640,10 +639,8 @@ int main()
     LOG("started");
 
     pkgi_load_config(&config, refresh_url, sizeof(refresh_url));
-    LOG("config loaded");
     
     pkgi_dialog_init();
-    LOG("dialog init'd");
     
     font_height = pkgi_text_height("M");
     avail_height = VITA_HEIGHT - 2 * (font_height + PKGI_MAIN_HLINE_EXTRA);

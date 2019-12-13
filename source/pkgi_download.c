@@ -533,7 +533,10 @@ static int create_rap(const char* contentid, const uint8_t* rap)
     LOG("creating %s.rap", contentid);
     pkgi_dialog_update_progress("Creating RAP file", NULL, NULL, 1.f);
 
-    if (!pkgi_mkdirs(PKGI_RAP_FOLDER))
+    char path[256];
+    pkgi_snprintf(path, sizeof(path), "%s", PKGI_RAP_FOLDER);
+
+    if (!pkgi_mkdirs(path))
     {
         char error[256];
         pkgi_snprintf(error, sizeof(error), "cannot create folder %s", PKGI_RAP_FOLDER);
@@ -541,7 +544,6 @@ static int create_rap(const char* contentid, const uint8_t* rap)
         return 0;
     }
 
-    char path[256];
     pkgi_snprintf(path, sizeof(path), "%s/%s.rap", PKGI_RAP_FOLDER, contentid);
 
     if (!pkgi_save(path, rap, PKGI_RAP_SIZE))
