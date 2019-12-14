@@ -7,6 +7,7 @@
 #include <sys/mutex.h>
 #include <sys/memory.h>
 #include <sysutil/osk.h>
+#include <sysutil/msg.h>
 
 #include <http/https.h>
 #include <io/pad.h>
@@ -39,6 +40,28 @@
 #define PKGI_USER_AGENT "Mozilla/5.0 (PLAYSTATION 3; 1.00)"
 
 
+struct pkgi_http
+{
+    int used;
+    int local;
+
+    FILE* fd;
+    uint64_t size;
+    uint64_t offset;
+
+    httpClientId client;
+    httpTransId transaction;
+};
+
+typedef struct 
+{
+    pkgi_texture circle;
+    pkgi_texture cross;
+    pkgi_texture triangle;
+//    pkgi_texture square;
+} t_tex_buttons;
+
+
 static sys_mutex_t g_dialog_lock;
 //static volatile int g_power_lock;
 
@@ -47,15 +70,24 @@ static int g_cancel_button;
 static uint32_t g_button_frame_count;
 static u64 g_time;
 
+static int g_ime_active;
+static int osk_action = 0;
+static int osk_level = 0;
 
-static struct t_tex_buttons
-{
-    pkgi_texture circle;
-    pkgi_texture cross;
-    pkgi_texture triangle;
-//    pkgi_texture square;
-} tex_buttons;
+static sys_mem_container_t container_mem;
+static oskCallbackReturnParam OutputReturnedParam;
 
+volatile int osk_event = 0;
+volatile int osk_unloaded = 0;
+
+volatile int dialog_action = 0;
+
+static uint16_t g_ime_title[SCE_IME_DIALOG_MAX_TITLE_LENGTH];
+static uint16_t g_ime_text[SCE_IME_DIALOG_MAX_TEXT_LENGTH];
+static uint16_t g_ime_input[SCE_IME_DIALOG_MAX_TEXT_LENGTH + 1];
+
+static pkgi_http g_http[4];
+static t_tex_buttons tex_buttons;
 
 int pkgi_snprintf(char* buffer, uint32_t size, const char* msg, ...)
 {
@@ -197,12 +229,6 @@ int pkgi_dialog_unlock(void)
     return (res == 0);
 }
 
-static int g_ime_active;
-
-static uint16_t g_ime_title[SCE_IME_DIALOG_MAX_TITLE_LENGTH];
-static uint16_t g_ime_text[SCE_IME_DIALOG_MAX_TEXT_LENGTH];
-static uint16_t g_ime_input[SCE_IME_DIALOG_MAX_TEXT_LENGTH + 1];
-
 static int convert_to_utf16(const char* utf8, uint16_t* utf16, uint32_t available)
 {
     int count = 0;
@@ -319,17 +345,6 @@ static int convert_from_utf16(const uint16_t* utf16, char* utf8, uint32_t size)
     return count;
 }
 
-//------------
-
-
-volatile int osk_event = 0;
-volatile int osk_unloaded = 0;
-static int osk_action = 0;
-
-static sys_mem_container_t container_mem;
-static oskCallbackReturnParam OutputReturnedParam;
-
-static int osk_level = 0;
 
 static void osk_exit(void)
 {
@@ -511,6 +526,55 @@ void pkgi_dialog_input_get_text(char* text, uint32_t size)
 }
 
 
+
+
+void msg_dialog_event(msgButton button, void *userdata)
+{
+    switch(button) {
+
+        case MSG_DIALOG_BTN_YES:
+            dialog_action = 1;
+            break;
+        case MSG_DIALOG_BTN_NO:
+        case MSG_DIALOG_BTN_ESCAPE:
+        case MSG_DIALOG_BTN_NONE:
+            dialog_action = 2;
+            break;
+        default:
+		    break;
+    }
+}
+
+void wait_dialog() 
+{
+    while(!dialog_action)
+        {
+            sysUtilCheckCallback();
+            tiny3d_Flip();
+        }
+
+    msgDialogAbort();
+    usleep(100000);
+}
+
+void DrawDialogOK(char * str)
+{
+    dialog_action = 0;
+    msgType mdialogok = MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_OK;
+    msgDialogOpen2(mdialogok, str, msg_dialog_event, (void*) 0x0000aaab, NULL );
+    wait_dialog();
+}
+
+int DrawDialogYesNo(char * str)
+{
+    dialog_action = 0;
+    msgType mdialogyesno = MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_YESNO  | MSG_DIALOG_DEFAULT_CURSOR_NO;
+    msgDialogOpen2(mdialogyesno, str, msg_dialog_event, (void*)  0x0000aaaa, NULL );
+    wait_dialog();
+    return dialog_action;
+}
+
+
 void pkgi_start(void)
 {
 //    sceSysmoduleLoadModuleInternal(SCE_SYSMODULE_INTERNAL_PROMOTER_UTIL);
@@ -617,9 +681,6 @@ void pkgi_start(void)
 int pkgi_update(pkgi_input* input)
 {
 	ya2d_controlsRead();
-
-//    SceCtrlData pad = { 0 };
-//    sceCtrlPeekBufferPositive(0, &pad, 1);
     
     uint32_t previous = input->down;
 //0x78
@@ -666,13 +727,17 @@ int pkgi_update(pkgi_input* input)
     if (input->active & PKGI_BUTTON_SELECT) {
 #ifdef PKGI_ENABLE_LOGGING
         LOG("screenshot");
-        dbglogger_screenshot_tmp(0);
+//        dbglogger_screenshot_tmp(0);
 #endif
+        DrawDialogOK(   "               PKGi PS3 v" PKGI_VERSION "            \n\n"
+                        "  original PS Vita version by mmozeiko    \n\n"
+                        "  ported to PlayStation 3 by Bucanero     ");
     }
 
     if (input->active & PKGI_BUTTON_START) {
         LOG("exit");
-        return 0;
+        if (DrawDialogYesNo("Exit to XMB?") == 1)
+            return 0;
     }
 	ya2d_screenClear();
 	ya2d_screenBeginDrawing();
@@ -1084,21 +1149,6 @@ int pkgi_text_height(const char* text)
     return PKGI_FONT_HEIGHT;
 }
 
-
-struct pkgi_http
-{
-    int used;
-    int local;
-
-    FILE* fd;
-    uint64_t size;
-    uint64_t offset;
-
-    httpClientId client;
-    httpTransId transaction;
-};
-
-static pkgi_http g_http[4];
 
 pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
 {

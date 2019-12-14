@@ -5,6 +5,9 @@
 
 #include <dbglogger.h>
 
+#define PKGI_UPDATE_URL     "http://pkgi.bucanero.com.ar/version.txt" //api.github.com/repos/bucanero/pkgi-ps3/releases/latest
+#define PKGI_VERSION        "1.0.5"
+
 // values compatible with psp2/ctrl.h header
 #define PKGI_BUTTON_SELECT 0x00000001
 #define PKGI_BUTTON_START  0x00000008

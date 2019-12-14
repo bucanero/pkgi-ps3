@@ -232,7 +232,7 @@ static int create_dummy_pkg(void)
 	    fsize = fsize - numr;
 		
 		// write
-		if(!pkgi_write(filew, buffer, numr)) 
+		if(!pkgi_write(filew, buffer, numr) || pkgi_dialog_is_cancelled())
 		{
 			bCopyError = 1;
 			break;

@@ -8,8 +8,6 @@
 #include "pkgi_style.h"
 
 #include <stddef.h>
-#define PKGI_UPDATE_URL     "http://pkgi.bucanero.com.ar/version.txt" //api.github.com/repos/bucanero/pkgi-ps3/releases/latest
-#define PKGI_VERSION        "1.0.5"
 
 typedef enum  {
     StateError,
