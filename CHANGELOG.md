@@ -12,7 +12,7 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 ### Fixed
 
-* The app now creates `/dev_hdd0/exdata` if it doesn't exists
+* The app now creates `/dev_hdd0/exdata` if folder doesn't exists
 * Fixed unresponsive `background download` dialog while creating a PKG file
 * Fixed a bug when the URL was missing
 
