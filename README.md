@@ -100,7 +100,7 @@ Press left or right trigger buttons **(L1/R1)** to move pages up or down.
 
 1. Where to get a `rap` string? 
 
-  You can use a tool like RIF2RAP to generate a `rap` from your existing `rif` files. Then you can use any generic Hex viewer to get the hex byte string.
+  You can use a tool like RIF2RAP to generate a `.rap` from your existing `.rif` files. Then you can use a tool like `hexdump` to get the hex byte string.
 
 2. Where to get `.pkg` links?
 
