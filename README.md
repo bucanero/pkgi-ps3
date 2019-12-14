@@ -22,12 +22,16 @@ Notes:
 
 # Download
 
-Get the latest version as a [.pkg file here][pkgi_latest].
+Get the [latest version here][pkgi_latest].
 
 # Setup instructions
 
-You need to create a `pkgi.txt` file in `/dev_hdd0/game/NP00PKGI3/USRDIR` that contains the items available for installation. The file uses a very
-simple CSV format where each line means one item in the list:
+You need to create a `pkgi.txt` file in `/dev_hdd0/game/NP00PKGI3/USRDIR` that contains the items available for installation.
+The text database format is user customizable. Check [this section](#user-defined-db-format) to learn how to define your custom db format.
+
+## Default DB format
+
+The default database file format uses a very simple CSV format where each line means one item in the list:
 
 ```
 contentid,flags,name,description,rap,url,size,checksum
@@ -53,6 +57,37 @@ An example `pkgi.txt` file:
 EP0000-NP9999999_00-0AB00A00FR000000,0,My PKG Test,A description of my pkg,dac109e963294de6cd6f6faf3f045fe9,http://192.168.1.1/html/mypackage.pkg,2715513,afb545c6e71bd95f77994ab4a659efbb8df32208f601214156ad89b1922e73c3
 UP0001-NP00PKGI3_00-0000000000000000,0,PKGi PS3 v0.1.0,,,http://bucanero.heliohost.org/pkgi.pkg,284848,3dc8de2ed94c0f9efeafa81df9b7d58f8c169e2875133d6d2649a7d477c1ae13
 ```
+
+## User-defined DB format
+
+To use a custom database format, you need to create a `dbformat.txt` file, and save it on `/dev_hdd0/game/NP00PKGI3/USRDIR`.
+
+The `dbformat.txt` definition file is a 2-line text file:
+* Line 1: the custom delimiter character (e.g.: `;`, `,`, `|`, etc.)
+* Line 2: the column names for every column in the custom database, delimited by the proper delimiter defined in line 1
+
+**Note:** For the columns to be properly recognized, use the column tag names defined in the table above.
+
+All the columns are optional. Your database might have more (or less) columns, so any unrecognized column will be skipped.
+
+Example `dbformat.txt`, for a database using semi-colon (`;`) as separator:
+
+```
+;
+name;TITLE ID;REGION;TYPE;url;rap;size
+```
+
+**Result:** only the `name,url,rap,size` fields will be used.
+
+
+Example `dbformat.txt`, for a database using character pipe (`|`) as separator:
+
+```
+|
+REGION|TITLE|name|url|rap|contentid|DATE|PKG FILENAME|size|checksum
+```
+
+**Result:** only the `name,url,rap,contentid,size,checksum` fields will be used.
 
 # Usage
 
