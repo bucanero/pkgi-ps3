@@ -1,1 +1,1 @@
-{ "name":"PKGi PS3 v1.0.0" }
+{ "name":"PKGi PS3 v1.0.5" }
