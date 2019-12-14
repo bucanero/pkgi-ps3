@@ -27,7 +27,7 @@ Get the [latest version here][pkgi_latest].
 # Setup instructions
 
 You need to create a `pkgi.txt` file in `/dev_hdd0/game/NP00PKGI3/USRDIR` that contains the items available for installation.
-The text database format is user customizable. Check [this section](#user-defined-db-format) to learn how to define your custom db format.
+The text database format is user customizable. Check [this section](#user-defined-db-format) to learn how to define your own custom db format.
 
 ## Default DB format
 
