@@ -124,9 +124,9 @@ You need to have installed:
 - [YA2D lib](https://github.com/bucanero/ya2d_ps3) (an extended version from my repo)
 - [dbglogger lib](https://github.com/bucanero/psl1ght-libs/tree/master/dbglogger) (my own debug logging library)
 
-Run `make` to create a release build.
+Run `make` to create a release build. After than run `make pkg` to create a `.pkg` install file. 
 
-After than run `make pkg` to create a `pkg` install file. You can also set the environment variable `PS3LOAD=tcp:x.x.x.x` to the PS3's IP address
+You can also set the environment variable `PS3LOAD=tcp:x.x.x.x` to the PS3's IP address
 ; that will allow to use `make run` and send `pkgi-ps3.self` directly to the PS3Load listener.
 
 To enable debugging logging pass `-DPKGI_ENABLE_LOGGING=ON` argument to make. Then application will send debug messages to
