@@ -74,10 +74,10 @@ Example `dbformat.txt`, for a database using semi-colon (`;`) as separator:
 
 ```
 ;
-name;TITLE ID;REGION;TYPE;url;rap;size
+name;TITLE ID;REGION;description;AUTHOR;TYPE;url;rap;size
 ```
 
-**Result:** only the `name,url,rap,size` fields will be used.
+**Result:** only the `name,description,url,rap,size` fields will be used.
 
 
 Example `dbformat.txt`, for a database using character pipe (`|`) as separator:
