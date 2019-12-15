@@ -47,8 +47,8 @@ where:
 | `description` | is a string for the item's description. Currently unused, can be left empty.
 | `rap` | the 16 hex bytes for a RAP file, if needed by the item (`.rap` file will be created on `/dev_hdd0/exdata`). Leave empty to skip the `.rap` file.
 | `url` | is the HTTP URL where to download the `.pkg`.
-| `size` | is the size in bytes of the `.pkg`, or 0 if unknown.
-| `checksum` | is a sha256 digest of the `.pkg` (as 32 hex bytes) to make sure the file is not tampered with. Leave empty to skip the check.
+| `size` | is the size in bytes of the `.pkg` file, or 0 if unknown.
+| `checksum` | is a SHA256 digest of the `.pkg` file (as 32 hex bytes) to make sure the file is not tampered with. Leave empty to skip the check.
 
 **Note:** `name` and `description` cannot contain newlines or commas.
 
