@@ -14,6 +14,7 @@ typedef enum  {
     StateRefreshing,
     StateUpdateDone,
     StateMain,
+    StateTerminate
 } State;
 
 static State state;
@@ -216,6 +217,17 @@ static void pkgi_do_main(pkgi_input* input)
     
     if (input)
     {
+        if (input->active & PKGI_BUTTON_START) {
+            if (draw_msgDialog_YesNo("Exit to XMB?") == 1)
+                state = StateTerminate;
+        }
+
+        if (input->active & PKGI_BUTTON_SELECT) {
+            draw_msgDialog_OK("             \xE2\x98\x85  PKGi PS3 v" PKGI_VERSION "  \xE2\x98\x85          \n\n"
+                              "  original PS Vita version by mmozeiko    \n\n"
+                              "  ported to PlayStation 3 by Bucanero     ");
+        }
+
         if (input->active & PKGI_BUTTON_UP)
         {
             if (selected_item == first_item && first_item > 0)
@@ -438,33 +450,21 @@ static void pkgi_do_head(void)
 
     pkgi_draw_fill_rect(0, font_height, VITA_WIDTH, PKGI_MAIN_HLINE_HEIGHT, PKGI_COLOR_HLINE);
 
-    int rightw;
-    if (pkgi_battery_present())
+    char battery[256];
+    pkgi_snprintf(battery, sizeof(battery), "CPU: %u\0xf8C RSX: %u\0xf8C", pkgi_get_temperature(0), pkgi_get_temperature(1));
+
+    uint32_t color;
+    if (pkgi_temperature_is_high())
     {
-        char battery[256];
-        pkgi_snprintf(battery, sizeof(battery), "Battery: %u%%", pkgi_bettery_get_level());
-
-        uint32_t color;
-        if (pkgi_battery_is_low())
-        {
-            color = PKGI_COLOR_BATTERY_LOW;
-        }
-        else if (pkgi_battery_is_charging())
-        {
-            color = PKGI_COLOR_BATTERY_CHARGING;
-        }
-        else
-        {
-            color = PKGI_COLOR_TEXT_HEAD;
-        }
-
-        rightw = pkgi_text_width(battery);
-        pkgi_draw_text(VITA_WIDTH - PKGI_MAIN_HLINE_EXTRA - rightw, 0, color, battery);
+        color = PKGI_COLOR_BATTERY_LOW;
     }
     else
     {
-        rightw = 0;
+        color = PKGI_COLOR_BATTERY_CHARGING;
     }
+
+    int rightw = pkgi_text_width(battery);
+    pkgi_draw_text(VITA_WIDTH - PKGI_MAIN_HLINE_EXTRA - rightw, 0, color, battery);
 
     if (search_active)
     {
@@ -683,7 +683,7 @@ int main()
             pkgi_do_main(pkgi_dialog_is_open() || pkgi_menu_is_open() ? NULL : &input);
             break;
 
-        case StateUpdateDone:
+        default:
             // never happens, just to shut up the compiler
             break;
         }

@@ -31,11 +31,10 @@
 #define SCE_IME_DIALOG_MAX_TITLE_LENGTH	(128)
 #define SCE_IME_DIALOG_MAX_TEXT_LENGTH	(512)
 
-#define ANALOG_CENTER 0x78
-//128
-#define ANALOG_THRESHOLD 0x68
-//64
-#define ANALOG_SENSITIVITY 16
+#define ANALOG_CENTER       0x78
+#define ANALOG_THRESHOLD    0x68
+#define ANALOG_MIN          (ANALOG_CENTER - ANALOG_THRESHOLD)
+#define ANALOG_MAX          (ANALOG_CENTER + ANALOG_THRESHOLD)
 
 #define PKGI_USER_AGENT "Mozilla/5.0 (PLAYSTATION 3; 1.00)"
 
@@ -187,27 +186,14 @@ int pkgi_cancel_button(void)
     return g_cancel_button;
 }
 
-/*
-static int pkgi_power_thread(SceSize args, void *argp)
+static int sys_game_get_temperature(int sel, u32 *temperature) 
 {
-    return 0;
-
-    PKGI_UNUSED(args);
-    PKGI_UNUSED(argp);
-    for (;;)
-    {
-        int lock;
-        __atomic_load(&g_power_lock, &lock, __ATOMIC_SEQ_CST);
-        if (lock > 0)
-        {
-            sceKernelPowerTick(SCE_KERNEL_POWER_TICK_DISABLE_AUTO_SUSPEND);
-        }
-
-        sceKernelDelayThread(10 * 1000 * 1000);
-    }
-    return 0;
+    u32 temp;
+  
+    lv2syscall2(383, (u64) sel, (u64) &temp); 
+    *temperature = (temp >> 24);
+    return_to_user_prog(int);
 }
-    */
 
 int pkgi_dialog_lock(void)
 {
@@ -557,7 +543,7 @@ void wait_dialog()
     usleep(100000);
 }
 
-void DrawDialogOK(char * str)
+void draw_msgDialog_OK(char * str)
 {
     dialog_action = 0;
     msgType mdialogok = MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_OK;
@@ -565,7 +551,7 @@ void DrawDialogOK(char * str)
     wait_dialog();
 }
 
-int DrawDialogYesNo(char * str)
+int draw_msgDialog_YesNo(const char * str)
 {
     dialog_action = 0;
     msgType mdialogyesno = MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_YESNO  | MSG_DIALOG_DEFAULT_CURSOR_NO;
@@ -573,7 +559,6 @@ int DrawDialogYesNo(char * str)
     wait_dialog();
     return dialog_action;
 }
-
 
 void pkgi_start(void)
 {
@@ -636,6 +621,9 @@ void pkgi_start(void)
 
 	ya2d_init();
 
+	ya2d_paddata[0].ANA_L_H = ANALOG_CENTER;
+	ya2d_paddata[0].ANA_L_V = ANALOG_CENTER;
+
     tex_buttons.circle   = pkgi_load_png(CIRCLE);
     tex_buttons.cross    = pkgi_load_png(CROSS);
     tex_buttons.triangle = pkgi_load_png(TRIANGLE);
@@ -683,30 +671,29 @@ int pkgi_update(pkgi_input* input)
 	ya2d_controlsRead();
     
     uint32_t previous = input->down;
-//0x78
-//0x68
     input->down = 0;
 
     if (ya2d_paddata[0].BTN_CROSS)      input->down |= PKGI_BUTTON_X;
     if (ya2d_paddata[0].BTN_TRIANGLE)   input->down |= PKGI_BUTTON_T;
     if (ya2d_paddata[0].BTN_CIRCLE)     input->down |= PKGI_BUTTON_O;
     if (ya2d_paddata[0].BTN_SQUARE)     input->down |= PKGI_BUTTON_S;
-
-    if (ya2d_paddata[0].BTN_UP)         input->down |= PKGI_BUTTON_UP;
-    if (ya2d_paddata[0].BTN_DOWN)       input->down |= PKGI_BUTTON_DOWN;
-    if (ya2d_paddata[0].BTN_LEFT)       input->down |= PKGI_BUTTON_LEFT;
-    if (ya2d_paddata[0].BTN_RIGHT)      input->down |= PKGI_BUTTON_RIGHT;
+    if (ya2d_paddata[0].BTN_SELECT)     input->down |= PKGI_BUTTON_SELECT;
+    if (ya2d_paddata[0].BTN_START)      input->down |= PKGI_BUTTON_START;
+ 
+    if (ya2d_paddata[0].BTN_UP || (ya2d_paddata[0].ANA_L_V < ANALOG_MIN))
+        input->down |= PKGI_BUTTON_UP;
+        
+    if (ya2d_paddata[0].BTN_DOWN || (ya2d_paddata[0].ANA_L_V > ANALOG_MAX))
+        input->down |= PKGI_BUTTON_DOWN;
+        
+    if (ya2d_paddata[0].BTN_LEFT || (ya2d_paddata[0].ANA_L_H < ANALOG_MIN))
+        input->down |= PKGI_BUTTON_LEFT;
+        
+    if (ya2d_paddata[0].BTN_RIGHT || (ya2d_paddata[0].ANA_L_H > ANALOG_MAX))
+        input->down |= PKGI_BUTTON_RIGHT;
 
     if (ya2d_paddata[0].BTN_L1 || ya2d_paddata[0].BTN_L2)      input->down |= PKGI_BUTTON_LT;
     if (ya2d_paddata[0].BTN_R1 || ya2d_paddata[0].BTN_R2)      input->down |= PKGI_BUTTON_RT;
-
-    if (ya2d_paddata[0].BTN_SELECT)     input->down |= PKGI_BUTTON_SELECT;
-    if (ya2d_paddata[0].BTN_START)      input->down |= PKGI_BUTTON_START;
-
-//    if (ya2d_paddata[0].ANA_L_H < (ANALOG_CENTER - ANALOG_THRESHOLD)) input->down |= PKGI_BUTTON_LEFT;
-//    if (ya2d_paddata[0].ANA_L_H > (ANALOG_CENTER + ANALOG_THRESHOLD)) input->down |= PKGI_BUTTON_RIGHT;
-//    if (ya2d_paddata[0].ANA_L_V < (ANALOG_CENTER - ANALOG_THRESHOLD)) input->down |= PKGI_BUTTON_UP;
-//    if (ya2d_paddata[0].ANA_L_V > (ANALOG_CENTER + ANALOG_THRESHOLD)) input->down |= PKGI_BUTTON_DOWN;
  
     input->pressed = input->down & ~previous;
     input->active = input->pressed;
@@ -724,21 +711,13 @@ int pkgi_update(pkgi_input* input)
         g_button_frame_count = 0;
     }
 
-    if (input->active & PKGI_BUTTON_SELECT) {
 #ifdef PKGI_ENABLE_LOGGING
+    if (input->active & PKGI_BUTTON_S) {
         LOG("screenshot");
-//        dbglogger_screenshot_tmp(0);
+        dbglogger_screenshot_tmp(0);
+    }
 #endif
-        DrawDialogOK(   "               PKGi PS3 v" PKGI_VERSION "            \n\n"
-                        "  original PS Vita version by mmozeiko    \n\n"
-                        "  ported to PlayStation 3 by Bucanero     ");
-    }
 
-    if (input->active & PKGI_BUTTON_START) {
-        LOG("exit");
-        if (DrawDialogYesNo("Exit to XMB?") == 1)
-            return 0;
-    }
 	ya2d_screenClear();
 	ya2d_screenBeginDrawing();
 
@@ -794,24 +773,19 @@ void pkgi_end(void)
 //    sceKernelExitProcess(0);
 }
 
-int pkgi_battery_present()
+int pkgi_get_temperature(uint8_t cpu)
 {
-    return 0;
+    u32 temp = 0;
+    sys_game_get_temperature(cpu, &temp);
+    return temp;
 }
 
-int pkgi_bettery_get_level()
+int pkgi_temperature_is_high()
 {
-    return 0;
-}
+    u32 temp = pkgi_get_temperature(0);
+    u32 temp2 = pkgi_get_temperature(1);
 
-int pkgi_battery_is_low()
-{
-    return 0;
-}
-
-int pkgi_battery_is_charging()
-{
-    return 0;
+    return ((temp >= 70 || temp2 >= 70));
 }
 
 uint64_t pkgi_get_free_space(void)

@@ -75,10 +75,8 @@ int pkgi_update(pkgi_input* input);
 void pkgi_swap(void);
 void pkgi_end(void);
 
-int pkgi_battery_present();
-int pkgi_bettery_get_level();
-int pkgi_battery_is_low();
-int pkgi_battery_is_charging();
+int pkgi_temperature_is_high();
+int pkgi_get_temperature(uint8_t cpu);
 
 uint64_t pkgi_get_free_space(void);
 const char* pkgi_get_config_folder(void);
@@ -135,16 +133,16 @@ int pkgi_write(void* f, const void* buffer, uint32_t size);
 
 // UI stuff
 typedef void* pkgi_texture;
-#ifdef _MSC_VER
-#define pkgi_load_png(name) \
-    pkgi_load_png_raw(# name ## ".png", 0)
-#else
+
 #define pkgi_load_png(name) \
     ({ extern const uint8_t _##name##_png[]; \
        extern const uint32_t _##name##_png_size; \
        pkgi_load_png_raw((void*) _##name##_png, _##name##_png_size); \
     })
-#endif
+
+void draw_msgDialog_OK(char * str);
+int draw_msgDialog_YesNo(const char * str);
+
 
 pkgi_texture pkgi_load_png_raw(const void* data, uint32_t size);
 void pkgi_draw_texture(pkgi_texture texture, int x, int y);
