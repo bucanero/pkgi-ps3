@@ -5,8 +5,8 @@
 #include "pkgi_sha256.h"
 #include "pdb_data.h"
 
-#include <stddef.h>
 #include <sys/stat.h>
+#include <lv2/sysfs.h>
 
 #define BUFF_SIZE  0x200000 // 2MB
 
@@ -16,6 +16,7 @@
 #define PDB_HDR_ICON		"\x00\x00\x00\x6A"
 #define PDB_HDR_TITLE		"\x00\x00\x00\x69"
 #define PDB_HDR_SIZE		"\x00\x00\x00\xCE"
+#define PDB_HDR_CONTENT		"\x00\x00\x00\xD9"
 
 static char root[256];
 static char resume_file[256];
@@ -49,6 +50,21 @@ static uint32_t info_start;
 static uint32_t info_update;
 
 static uint32_t	task_id = 10000002;
+
+
+// Async IO stuff
+#define AIO_BUFFERS		4
+#define AIO_NUMBER		2
+#define AIO_FAILED 		0
+#define AIO_READY 		1
+#define AIO_BUSY  		2
+
+static sysFSAio aio_write[AIO_NUMBER];
+
+uint8_t write_status[AIO_NUMBER];
+uint8_t buffer_to_write;
+
+
 
 uint32_t get_task_dir_id(void)
 {
@@ -205,58 +221,107 @@ static void update_progress(void)
 }
 
 
+static void writing_callback(sysFSAio *xaio, s32 error, s32 xid, u64 size)
+{
+	int i = xaio->usrdata;
+	
+	if(error != 0) {
+		write_status[i] = AIO_FAILED;
+		LOG("Error : writing error %X", (unsigned int) error);
+	} else 
+	if(size != xaio->size) {
+		write_status[i] = AIO_FAILED;
+		LOG("Error : writing size %X / %X", (unsigned int) size, (unsigned int) xaio->size);
+	} else {
+		buffer_to_write++;
+		if (buffer_to_write == AIO_BUFFERS) buffer_to_write=0;
+		write_status[i] = AIO_READY;
+		download_offset+=size;
+	}
+}
+
 static int create_dummy_pkg(void)
-{	
-	void *filew;
-	uint32_t numr	= 0;	// bytes to save
-	uint64_t fsize	= download_size;
-	char *buffer 	= NULL;
-	int bCopyError 	= 0;
-
-
-	char szFileOut[256] ="";
-	pkgi_snprintf(szFileOut, sizeof(szFileOut), "/dev_hdd0/vsh/task/%d/%s", task_id, root); 
+{
+    int fdw, i;
+	static int id_w[2] = {-1, -1};
 	
-	filew = pkgi_create(szFileOut);
-	if(!filew)
-	{
-	    LOG("Failed to create file %s", szFileOut);
-		return 0;
+	char dst[256] ="";
+	pkgi_snprintf(dst, sizeof(dst), "/dev_hdd0/vsh/task/%d/%s", task_id, root);
+
+    if(sysFsAioInit(dst)!= 0)  {
+		LOG("Error : AIO_FAILED to copy_async / sysFsAioInit(dst)");
+		return AIO_FAILED;
 	}
 
-	buffer = (char*)pkgi_malloc(BUFF_SIZE);
+	if(sysFsOpen(dst, SYS_O_CREAT | SYS_O_TRUNC | SYS_O_WRONLY, &fdw, 0, 0) != 0) {
+		LOG("Error : AIO_FAILED to copy_async / sysFsOpen(src)");
+		return AIO_FAILED;
+	}
 
-	while(fsize > 0)
-	{
-		numr  = (fsize < BUFF_SIZE ? fsize : BUFF_SIZE);
-	    fsize = fsize - numr;
-		
-		// write
-		if(!pkgi_write(filew, buffer, numr) || pkgi_dialog_is_cancelled())
+	char *mem = (char *) pkgi_malloc(AIO_BUFFERS * BUFF_SIZE);
+	if(mem == NULL) {
+		LOG("Error : AIO_FAILED to copy_async / malloc");
+		return AIO_FAILED;
+	}
+	
+	for(i=0; i < AIO_NUMBER; i++) {
+		aio_write[i].fd = -1;
+		write_status[i]=AIO_READY;
+	}
+
+	uint64_t writing_pos=0ULL;		
+	buffer_to_write=0;
+	download_offset=0;
+	
+    while(download_offset < download_size)
+    {
+    	i = !i;
+
+		if((write_status[i] == AIO_READY) && (writing_pos < download_size))
 		{
-			bCopyError = 1;
-			break;
+			aio_write[i].fd = fdw;
+			aio_write[i].offset = writing_pos;
+			aio_write[i].buffer_addr = (u32) (u64) &mem[buffer_to_write * BUFF_SIZE];
+			aio_write[i].size = min64(BUFF_SIZE, download_size - writing_pos);
+			aio_write[i].usrdata = i;
+									
+			write_status[i] = AIO_BUSY;
+			writing_pos += aio_write[i].size;
+						
+			if(sysFsAioWrite(&aio_write[i], &id_w[i], writing_callback) != 0) {
+				LOG("Error : AIO_FAILED to copy_async / sysFsAioWrite");
+				goto error;
+			}
 		}
-		download_offset += numr;
+			
+		if(write_status[i] == AIO_FAILED || pkgi_dialog_is_cancelled()) {
+			LOG("Error : AIO_FAILED to copy_async / write_status = AIO_FAILED !");
+			goto error;
+		}
+			
 		update_progress();
-	}
-
-	if(filew) pkgi_close(filew);
-
-	if(buffer) 
-	{
-		pkgi_free(buffer);
-		buffer = NULL;
-	}
-		
-	if(bCopyError)
-	{
-		// delete file
-		pkgi_rm(szFileOut);
-		return 0;
-	}
+    }
 	
-	return 1;
+	for(i=0; i<AIO_NUMBER; i++) {
+		sysFsClose(aio_write[i].fd);
+	}
+	sysFsAioFinish("/dev_hdd0");
+    pkgi_free(mem);
+	
+    return 1;
+
+error:
+	for(i=0; i<AIO_NUMBER; i++) {
+		sysFsAioCancel(id_w[i]);
+	}
+	for(i=0; i<AIO_NUMBER; i++) {
+		sysFsClose(aio_write[i].fd);
+	}
+
+	sysFsAioFinish(dst);
+    pkgi_free(mem);
+
+    return AIO_FAILED;
 }
 
 
@@ -330,7 +395,7 @@ static void download_start(void)
     LOG("resuming pkg download from %llu offset", download_offset);
     download_resume = 0;
     info_update = pkgi_time_msec() + 1000;
-    pkgi_dialog_set_progress_title("Downloading");
+    pkgi_dialog_set_progress_title("Downloading...");
 }
 
 static int download_data(uint8_t* buffer, uint32_t size, int save)
@@ -539,7 +604,7 @@ static int create_rap(const char* contentid, const uint8_t* rap)
     if (!pkgi_mkdirs(path))
     {
         char error[256];
-        pkgi_snprintf(error, sizeof(error), "cannot create folder %s", PKGI_RAP_FOLDER);
+        pkgi_snprintf(error, sizeof(error), "Cannot create folder %s", PKGI_RAP_FOLDER);
         pkgi_dialog_error(error);
         return 0;
     }
