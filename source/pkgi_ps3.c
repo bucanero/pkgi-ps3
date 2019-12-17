@@ -57,12 +57,12 @@ typedef struct
     pkgi_texture circle;
     pkgi_texture cross;
     pkgi_texture triangle;
-//    pkgi_texture square;
+    pkgi_texture square;
 } t_tex_buttons;
 
 
 static sys_mutex_t g_dialog_lock;
-//static volatile int g_power_lock;
+static uint32_t cpu_temp_c[2];
 
 static int g_ok_button;
 static int g_cancel_button;
@@ -193,6 +193,17 @@ static int sys_game_get_temperature(int sel, u32 *temperature)
     lv2syscall2(383, (u64) sel, (u64) &temp); 
     *temperature = (temp >> 24);
     return_to_user_prog(int);
+}
+
+static void pkgi_temperature_thread(void)
+{
+    while (1)
+    {
+        sys_game_get_temperature(0, &cpu_temp_c[0]);
+        sys_game_get_temperature(1, &cpu_temp_c[1]);
+        usleep(10 * 1000 * 1000);
+    }
+    return;
 }
 
 int pkgi_dialog_lock(void)
@@ -512,8 +523,6 @@ void pkgi_dialog_input_get_text(char* text, uint32_t size)
 }
 
 
-
-
 void msg_dialog_event(msgButton button, void *userdata)
 {
     switch(button) {
@@ -534,10 +543,10 @@ void msg_dialog_event(msgButton button, void *userdata)
 void wait_dialog() 
 {
     while(!dialog_action)
-        {
-            sysUtilCheckCallback();
-            tiny3d_Flip();
-        }
+    {
+        sysUtilCheckCallback();
+        ya2d_screenFlip();
+    }
 
     msgDialogAbort();
     usleep(100000);
@@ -607,17 +616,7 @@ void pkgi_start(void)
         g_cancel_button = PKGI_BUTTON_O;
     }
     
-/*
-    sceCtrlSetSamplingMode(SCE_CTRL_MODE_ANALOG);
-
-    g_power_lock = 0;
-    SceUID power_thread = sceKernelCreateThread("power_thread", &pkgi_power_thread, 0x10000100, 0x40000, 0, 0, NULL);
-    if (power_thread >= 0)
-    {
-        sceKernelStartThread(power_thread, 0, NULL);
-    }    
-*/
-
+    pkgi_start_thread("temperature_thread", &pkgi_temperature_thread);
 
 	ya2d_init();
 
@@ -627,7 +626,7 @@ void pkgi_start(void)
     tex_buttons.circle   = pkgi_load_png(CIRCLE);
     tex_buttons.cross    = pkgi_load_png(CROSS);
     tex_buttons.triangle = pkgi_load_png(TRIANGLE);
-//    tex_buttons.square   = pkgi_load_png(SQUARE);
+    tex_buttons.square   = pkgi_load_png(SQUARE);
 
     ResetFont();
     ya2d_texturePointer = (u32 *) AddFontFromBitmapArray((u8 *) console_font_16x32, (u8 *) ya2d_texturePointer, 0, 255, 16, 32, 1, BIT7_FIRST_PIXEL);
@@ -648,7 +647,6 @@ void pkgi_start(void)
             LOG("Error: httpInit failed");
         }
     }
-
 
     g_time = pkgi_time_msec();
 
@@ -741,7 +739,7 @@ void pkgi_end(void)
     pkgi_free_texture(tex_buttons.circle);
     pkgi_free_texture(tex_buttons.cross);
     pkgi_free_texture(tex_buttons.triangle);
-//    pkgi_free_texture(tex_buttons.square);
+    pkgi_free_texture(tex_buttons.square);
 
 //    vita2d_fini();
 //    vita2d_free_pgf(g_font);
@@ -775,17 +773,12 @@ void pkgi_end(void)
 
 int pkgi_get_temperature(uint8_t cpu)
 {
-    u32 temp = 0;
-    sys_game_get_temperature(cpu, &temp);
-    return temp;
+    return cpu_temp_c[cpu];
 }
 
 int pkgi_temperature_is_high()
 {
-    u32 temp = pkgi_get_temperature(0);
-    u32 temp2 = pkgi_get_temperature(1);
-
-    return ((temp >= 70 || temp2 >= 70));
+    return ((cpu_temp_c[0] >= 70 || cpu_temp_c[1] >= 70));
 }
 
 uint64_t pkgi_get_free_space(void)
