@@ -75,7 +75,7 @@ int pkgi_update(pkgi_input* input);
 void pkgi_swap(void);
 void pkgi_end(void);
 
-int pkgi_temperature_is_high();
+int pkgi_temperature_is_high(void);
 int pkgi_get_temperature(uint8_t cpu);
 
 uint64_t pkgi_get_free_space(void);
@@ -134,19 +134,20 @@ int pkgi_write(void* f, const void* buffer, uint32_t size);
 // UI stuff
 typedef void* pkgi_texture;
 
-#define pkgi_load_png(name) \
-    ({ extern const uint8_t _##name##_png[]; \
-       extern const uint32_t _##name##_png_size; \
-       pkgi_load_png_raw((void*) _##name##_png, _##name##_png_size); \
+#define pkgi_load_image_buffer(name, type) \
+    ({ extern const uint8_t name##_##type []; \
+       extern const uint32_t name##_##type##_size; \
+       pkgi_load_##type##_raw((void*) name##_##type , name##_##type##_size); \
     })
 
-void draw_msgDialog_OK(char * str);
+void draw_msgDialog_OK(const char * str);
 int draw_msgDialog_YesNo(const char * str);
 
 
 pkgi_texture pkgi_load_png_raw(const void* data, uint32_t size);
+pkgi_texture pkgi_load_jpg_raw(const void* data, uint32_t size);
 void pkgi_draw_texture(pkgi_texture texture, int x, int y);
-void pkgi_draw_texture_z(pkgi_texture texture, int x, int y, int z);
+void pkgi_draw_texture_z(pkgi_texture texture, int x, int y, int z, float scale);
 void pkgi_free_texture(pkgi_texture texture);
 
 void pkgi_clip_set(int x, int y, int w, int h);

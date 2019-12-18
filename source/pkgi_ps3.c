@@ -623,13 +623,11 @@ void pkgi_start(void)
 	ya2d_paddata[0].ANA_L_H = ANALOG_CENTER;
 	ya2d_paddata[0].ANA_L_V = ANALOG_CENTER;
 
-    tex_buttons.circle   = pkgi_load_png(CIRCLE);
-    tex_buttons.cross    = pkgi_load_png(CROSS);
-    tex_buttons.triangle = pkgi_load_png(TRIANGLE);
-    tex_buttons.square   = pkgi_load_png(SQUARE);
+    tex_buttons.circle   = pkgi_load_image_buffer(CIRCLE, png);
+    tex_buttons.cross    = pkgi_load_image_buffer(CROSS, png);
+    tex_buttons.triangle = pkgi_load_image_buffer(TRIANGLE, png);
+    tex_buttons.square   = pkgi_load_image_buffer(SQUARE, png);
 
-    ResetFont();
-    ya2d_texturePointer = (u32 *) AddFontFromBitmapArray((u8 *) console_font_16x32, (u8 *) ya2d_texturePointer, 0, 255, 16, 32, 1, BIT7_FIRST_PIXEL);
     SetFontSize(PKGI_FONT_WIDTH, PKGI_FONT_HEIGHT);
     SetFontZ(PKGI_FONT_Z);
 
@@ -710,7 +708,7 @@ int pkgi_update(pkgi_input* input)
     }
 
 #ifdef PKGI_ENABLE_LOGGING
-    if (input->active & PKGI_BUTTON_S) {
+    if ((input->active & PKGI_BUTTON_RIGHT) && (input->active & PKGI_BUTTON_LEFT)) {
         LOG("screenshot");
         dbglogger_screenshot_tmp(0);
     }
@@ -776,7 +774,7 @@ int pkgi_get_temperature(uint8_t cpu)
     return cpu_temp_c[cpu];
 }
 
-int pkgi_temperature_is_high()
+int pkgi_temperature_is_high(void)
 {
     return ((cpu_temp_c[0] >= 70 || cpu_temp_c[1] >= 70));
 }
@@ -811,7 +809,7 @@ int pkgi_is_incomplete(const char* titleid)
 
     struct stat st;
     int res = stat(path, &st);
-    return res == 0;
+    return (res == 0);
 }
 
 int pkgi_is_installed(const char* titleid)
@@ -827,7 +825,7 @@ int pkgi_is_installed(const char* titleid)
         res = 0;
     }
     
-    return res == 0;
+    return (res == 0);
 }
 
 int pkgi_install(const char* titleid)
@@ -847,41 +845,13 @@ int pkgi_install(const char* titleid)
     {
         LOG("scePromoterUtilityPromotePkgWithRif failed");
     }
-    return res == 0;
+    return (res == 0);
 }
 
 uint32_t pkgi_time_msec()
 {
     return ya2d_millis();
 }
-
-/* static int pkgi_vita_thread(SceSize args, void* argp)
-static void pkgi_vita_thread(void* argp)
-{
-    PKGI_UNUSED(args);
-    pkgi_thread_entry* start = *((pkgi_thread_entry**)argp);
-    start();
-    sysThreadExit(0);
-    //
-	s32 running = 0;
-	sys_ppu_thread_t id;
-	sys_ppu_thread_stack_t stackinfo;
-
-	sysThreadGetId(&id);
-	sysThreadGetStackInformation(&stackinfo);
-
-	LOG("stack\naddr: %p, size: %d\n",stackinfo.addr,stackinfo.size);
-	while(running<5) {
-		LOG("Thread: %08llX\n",(unsigned long long int)id);
-
-		sysThreadYield();
-		sleep(2);
-		running++;
-	}
-
-	sysThreadExit(0);
-}
-*/
 
 void pkgi_thread_exit()
 {
@@ -896,11 +866,9 @@ void pkgi_start_thread(const char* name, pkgi_thread_entry* start)
 //	size_t stacksize = 1024*1024; //0xF000;
 //	void *threadarg = (void*)0x1337;
 
-//pkgi_vita_thread
 	ret = sysThreadCreate(&id, (void (*)(void *))start, (void*)0x1337, 1500, 1024*1024, THREAD_JOINABLE, (char*)name);
-	LOG("name %s | sysThreadCreate: %d\n",name, ret);
+	LOG("sysThreadCreate: %s (0x%08x)",name, id);
 
-//    SceUID id = sceKernelCreateThread(name, &pkgi_vita_thread, 0x40, 1024*1024, 0, 0, NULL);
     if (ret != 0)
     {
         LOG("failed to start %s thread", name);
@@ -999,6 +967,17 @@ void pkgi_unlock_process(void)
     */
 }
 
+pkgi_texture pkgi_load_jpg_raw(const void* data, uint32_t size)
+{
+	ya2d_Texture *tex = ya2d_loadJPGfromBuffer((void *)data, size);
+
+    if (!tex)
+    {
+        LOG("failed to load texture");
+    }
+    return tex;
+}
+
 pkgi_texture pkgi_load_png_raw(const void* data, uint32_t size)
 {
 	ya2d_Texture *tex = ya2d_loadPNGfromBuffer((void *)data, size);
@@ -1067,26 +1046,27 @@ void pkgi_draw_text_z(int x, int y, int z, uint32_t color, const char* text)
     while (*text) {
         switch(*text) {
             case '\n':
+                i = x;
                 j += PKGI_FONT_HEIGHT;
                 text++;
                 continue;
             case '\xfa':
-                pkgi_draw_texture_z(tex_buttons.circle, i, j, z);
+                pkgi_draw_texture_z(tex_buttons.circle, i, j, z, 0.5f);
                 i += PKGI_FONT_WIDTH;
                 text++;
                 continue;
             case '\xfb':
-                pkgi_draw_texture_z(tex_buttons.cross, i, j, z);
+                pkgi_draw_texture_z(tex_buttons.cross, i, j, z, 0.5f);
                 i += PKGI_FONT_WIDTH;
                 text++;
                 continue;
             case '\xfc':
-                pkgi_draw_texture_z(tex_buttons.triangle, i, j, z);
+                pkgi_draw_texture_z(tex_buttons.triangle, i, j, z, 0.5f);
                 i += PKGI_FONT_WIDTH;
                 text++;
                 continue;
             case '\xfd':
-//                pkgi_draw_texture_z(tex_buttons.square, i, j, z);
+                pkgi_draw_texture_z(tex_buttons.square, i, j, z, 0.5f);
                 i += PKGI_FONT_WIDTH;
                 text++;
                 continue;
@@ -1253,7 +1233,6 @@ pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
             }
         }
 
-
         ret = httpSendRequest(transID, NULL, 0, NULL);
         if (ret < 0)
         {
@@ -1291,7 +1270,6 @@ pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
     }
 
     return result;
-
 }
 
 int pkgi_http_response_length(pkgi_http* http, int64_t* length)
