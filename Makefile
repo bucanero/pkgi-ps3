@@ -83,7 +83,7 @@ sFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.S)))
 BINFILES	:=  $(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.bin)))
 PNGFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.png)))
-FCGFILES	:=	$(foreach dir,$(SHADERS),$(notdir $(wildcard $(dir)/*.fcg)))
+JPGFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.jpg)))
 
 VPOFILES	:=	$(VCGFILES:.vcg=.vpo)
 FPOFILES	:=	$(FCGFILES:.fcg=.fpo)
@@ -99,7 +99,7 @@ endif
 
 export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
 					$(addsuffix .o,$(PNGFILES)) \
-					$(addsuffix .o,$(FPOFILES)) \
+					$(addsuffix .o,$(JPGFILES)) \
 					$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) \
 					$(sFILES:.s=.o) $(SFILES:.S=.o)
 
@@ -170,7 +170,7 @@ $(OUTPUT).elf:	$(OFILES)
 	@$(bin2o)
 
 #---------------------------------------------------------------------------------
-%.fpo.o	:	%.fpo
+%.jpg.o	:	%.jpg
 #---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	@$(bin2o)
