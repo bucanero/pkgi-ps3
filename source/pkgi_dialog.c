@@ -3,6 +3,8 @@
 #include "pkgi_utils.h"
 #include "pkgi.h"
 
+#include <sysutil/msg.h>
+
 typedef enum {
     DialogNone,
     DialogMessage,
@@ -22,6 +24,9 @@ static int dialog_cancelled;
 static int32_t dialog_width;
 static int32_t dialog_height;
 static int32_t dialog_delta;
+
+volatile int msg_dialog_action = 0;
+
 
 void pkgi_dialog_init(void)
 {
@@ -43,6 +48,22 @@ void pkgi_dialog_allow_close(int allow)
 {
     pkgi_dialog_lock();
     dialog_allow_close = allow;
+    pkgi_dialog_unlock();
+}
+
+void pkgi_dialog_details(const char* title, const char* text)
+{
+    pkgi_dialog_lock();
+
+    pkgi_strncpy(dialog_title, sizeof(dialog_title), title);
+    pkgi_strncpy(dialog_text, sizeof(dialog_text), text);
+    dialog_extra[0] = 0;
+    dialog_eta[0] = 0;
+
+    dialog_cancelled = 0;
+    dialog_type = DialogMessage;
+    dialog_delta = 1;
+
     pkgi_dialog_unlock();
 }
 
@@ -303,4 +324,49 @@ void pkgi_do_dialog(pkgi_input* input)
             pkgi_draw_text_z((VITA_WIDTH - pkgi_text_width(text)) / 2, PKGI_DIALOG_VMARGIN + h - 2 * font_height, PKGI_DIALOG_TEXT_Z, PKGI_COLOR_TEXT_DIALOG, text);
         }
     }
+}
+
+void msg_dialog_event(msgButton button, void *userdata)
+{
+    switch(button) {
+
+        case MSG_DIALOG_BTN_YES:
+            msg_dialog_action = 1;
+            break;
+        case MSG_DIALOG_BTN_NO:
+        case MSG_DIALOG_BTN_ESCAPE:
+        case MSG_DIALOG_BTN_NONE:
+            msg_dialog_action = 2;
+            break;
+        default:
+		    break;
+    }
+}
+
+void wait_dialog() 
+{
+    while(!msg_dialog_action)
+    {
+        pkgi_swap();
+    }
+
+    msgDialogAbort();
+    pkgi_sleep(100);
+}
+
+void draw_msgDialog_OK(const char * str)
+{
+    msg_dialog_action = 0;
+    msgType mdialogok = MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_OK;
+    msgDialogOpen2(mdialogok, str, msg_dialog_event, (void*) 0x0000aaab, NULL );
+    wait_dialog();
+}
+
+int draw_msgDialog_YesNo(const char * str)
+{
+    msg_dialog_action = 0;
+    msgType mdialogyesno = MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_YESNO  | MSG_DIALOG_DEFAULT_CURSOR_NO;
+    msgDialogOpen2(mdialogyesno, str, msg_dialog_event, (void*)  0x0000aaaa, NULL );
+    wait_dialog();
+    return msg_dialog_action;
 }

@@ -218,11 +218,13 @@ static void pkgi_do_main(pkgi_input* input)
     if (input)
     {
         if (input->active & PKGI_BUTTON_START) {
+            input->pressed &= ~PKGI_BUTTON_START;
             if (draw_msgDialog_YesNo("Exit to XMB?") == 1)
                 state = StateTerminate;
         }
 
         if (input->active & PKGI_BUTTON_SELECT) {
+            input->pressed &= ~PKGI_BUTTON_SELECT;
             draw_msgDialog_OK("             \xE2\x98\x85  PKGi PS3 v" PKGI_VERSION "  \xE2\x98\x85          \n\n"
                               "  original PS Vita version by mmozeiko    \n\n"
                               "  ported to PlayStation 3 by Bucanero     ");
@@ -301,7 +303,7 @@ static void pkgi_do_main(pkgi_input* input)
         }
     }
     
-    int y = font_height + PKGI_MAIN_HLINE_EXTRA;
+    int y = font_height*3/2 + PKGI_MAIN_HLINE_EXTRA;
     int line_height = font_height + PKGI_MAIN_ROW_PADDING;
     for (uint32_t i = first_item; i < db_count; i++)
     {
@@ -398,7 +400,7 @@ static void pkgi_do_main(pkgi_input* input)
 
         if (item->presence == PresenceInstalled)
         {
-            LOG("[%.9s] %s - alreay installed", item->content + 7, item->name);
+            LOG("[%.9s] %s - already installed", item->content + 7, item->name);
             pkgi_dialog_error("Already installed");
         }
         else if (item->presence == PresenceIncomplete || (item->presence == PresenceMissing && pkgi_check_free_space(item->size)))
@@ -418,6 +420,22 @@ static void pkgi_do_main(pkgi_input* input)
         allow_refresh = 1;
 #endif
         pkgi_menu_start(search_active, &config, allow_refresh);
+    }
+    else if (input && (input->active & PKGI_BUTTON_S))
+    {
+        input->pressed &= ~PKGI_BUTTON_S;
+
+        DbItem* item = pkgi_db_get(selected_item);
+        char extra[256];
+
+        pkgi_snprintf(extra, sizeof(extra), "ID: %s\nDescription: %s\nURL: (%s) RAP: (%s) SHA256: (%s)", 
+            item->content,
+            item->description,
+            (pkgi_validate_url(item->url) ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF),
+            (item->rap ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF),
+            (item->digest ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF) );
+
+        pkgi_dialog_details(item->name, extra);
     }
 }
 
@@ -451,7 +469,7 @@ static void pkgi_do_head(void)
     pkgi_draw_fill_rect(0, font_height, VITA_WIDTH, PKGI_MAIN_HLINE_HEIGHT, PKGI_COLOR_HLINE);
 
     char battery[256];
-    pkgi_snprintf(battery, sizeof(battery), "CPU: %u\0xf8C RSX: %u\0xf8C", pkgi_get_temperature(0), pkgi_get_temperature(1));
+    pkgi_snprintf(battery, sizeof(battery), "CPU: %u""\xf8""C RSX: %u""\xf8""C", pkgi_get_temperature(0), pkgi_get_temperature(1));
 
     uint32_t color;
     if (pkgi_temperature_is_high())
@@ -482,7 +500,7 @@ static void pkgi_do_head(void)
 
 static void pkgi_do_tail(void)
 {
-    pkgi_draw_fill_rect(0, bottom_y, VITA_WIDTH, PKGI_MAIN_HLINE_HEIGHT, PKGI_COLOR_HLINE);
+    pkgi_draw_fill_rect(0, bottom_y - font_height/2, VITA_WIDTH, PKGI_MAIN_HLINE_HEIGHT, PKGI_COLOR_HLINE);
 
     uint32_t count = pkgi_db_count();
     uint32_t total = pkgi_db_total();
@@ -501,22 +519,22 @@ static void pkgi_do_tail(void)
     char size[64];
     pkgi_friendly_size(size, sizeof(size), pkgi_get_free_space());
 
-    char free[64];
-    pkgi_snprintf(free, sizeof(free), "Free: %s", size);
+    char free_str[64];
+    pkgi_snprintf(free_str, sizeof(free_str), "Free: %s", size);
 
-    int rightw = pkgi_text_width(free);
-    pkgi_draw_text(VITA_WIDTH - PKGI_MAIN_HLINE_EXTRA - rightw, bottom_y, PKGI_COLOR_TEXT_TAIL, free);
+    int rightw = pkgi_text_width(free_str);
+    pkgi_draw_text(VITA_WIDTH - PKGI_MAIN_HLINE_EXTRA - rightw, bottom_y, PKGI_COLOR_TEXT_TAIL, free_str);
 
     int left = pkgi_text_width(text) + PKGI_MAIN_TEXT_PADDING;
     int right = rightw + PKGI_MAIN_TEXT_PADDING;
 
     if (pkgi_menu_is_open())
     {
-        pkgi_snprintf(text, sizeof(text), "%s select  " PKGI_UTF8_T " close  %s cancel", pkgi_get_ok_str(), pkgi_get_cancel_str());
+        pkgi_snprintf(text, sizeof(text), "%s Select  " PKGI_UTF8_T " Close  %s Cancel", pkgi_get_ok_str(), pkgi_get_cancel_str());
     }
     else
     {
-        pkgi_snprintf(text, sizeof(text), "%s install  " PKGI_UTF8_T " menu", pkgi_get_ok_str());
+        pkgi_snprintf(text, sizeof(text), "%s Install  " PKGI_UTF8_T " Menu  " PKGI_UTF8_S " Details", pkgi_get_ok_str());
     }
 
     pkgi_clip_set(left, bottom_y, VITA_WIDTH - right - left, VITA_HEIGHT - bottom_y);
@@ -642,20 +660,20 @@ int main()
     
     font_height = pkgi_text_height("M");
     avail_height = VITA_HEIGHT - 2 * (font_height + PKGI_MAIN_HLINE_EXTRA);
-    bottom_y = VITA_HEIGHT - font_height - PKGI_MAIN_ROW_PADDING;
+    bottom_y = VITA_HEIGHT - PKGI_MAIN_ROW_PADDING;
 
     state = StateRefreshing;
     pkgi_start_thread("refresh_thread", &pkgi_refresh_thread);
 
-    pkgi_texture background = pkgi_load_png(background);
+    pkgi_texture background = pkgi_load_image_buffer(background, jpg);
 
     pkgi_input input;
     input.active = 0;
     input.down = 0;
     input.pressed = 0;
-    while (pkgi_update(&input))
+    while (pkgi_update(&input) && (state != StateTerminate))
     {
-        pkgi_draw_texture(background, -50, -10);
+        pkgi_draw_background(background);
 
         if (state == StateUpdateDone)
         {

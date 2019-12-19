@@ -1,13 +1,11 @@
 #include "pkgi.h"
 #include "pkgi_style.h"
-#include "font-16x32.h"
 
 #include <sys/stat.h>
 #include <sys/thread.h>
 #include <sys/mutex.h>
 #include <sys/memory.h>
 #include <sysutil/osk.h>
-#include <sysutil/msg.h>
 
 #include <http/https.h>
 #include <io/pad.h>
@@ -78,8 +76,6 @@ static oskCallbackReturnParam OutputReturnedParam;
 
 volatile int osk_event = 0;
 volatile int osk_unloaded = 0;
-
-volatile int dialog_action = 0;
 
 static uint16_t g_ime_title[SCE_IME_DIALOG_MAX_TITLE_LENGTH];
 static uint16_t g_ime_text[SCE_IME_DIALOG_MAX_TEXT_LENGTH];
@@ -522,63 +518,8 @@ void pkgi_dialog_input_get_text(char* text, uint32_t size)
     LOG("input: %s", text);
 }
 
-
-void msg_dialog_event(msgButton button, void *userdata)
-{
-    switch(button) {
-
-        case MSG_DIALOG_BTN_YES:
-            dialog_action = 1;
-            break;
-        case MSG_DIALOG_BTN_NO:
-        case MSG_DIALOG_BTN_ESCAPE:
-        case MSG_DIALOG_BTN_NONE:
-            dialog_action = 2;
-            break;
-        default:
-		    break;
-    }
-}
-
-void wait_dialog() 
-{
-    while(!dialog_action)
-    {
-        sysUtilCheckCallback();
-        ya2d_screenFlip();
-    }
-
-    msgDialogAbort();
-    usleep(100000);
-}
-
-void draw_msgDialog_OK(char * str)
-{
-    dialog_action = 0;
-    msgType mdialogok = MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_OK;
-    msgDialogOpen2(mdialogok, str, msg_dialog_event, (void*) 0x0000aaab, NULL );
-    wait_dialog();
-}
-
-int draw_msgDialog_YesNo(const char * str)
-{
-    dialog_action = 0;
-    msgType mdialogyesno = MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_YESNO  | MSG_DIALOG_DEFAULT_CURSOR_NO;
-    msgDialogOpen2(mdialogyesno, str, msg_dialog_event, (void*)  0x0000aaaa, NULL );
-    wait_dialog();
-    return dialog_action;
-}
-
 void pkgi_start(void)
 {
-//    sceSysmoduleLoadModuleInternal(SCE_SYSMODULE_INTERNAL_PROMOTER_UTIL);
-//    sceSysmoduleLoadModule(SCE_SYSMODULE_NET);
-//    sceSysmoduleLoadModule(SCE_SYSMODULE_HTTP);
-//    sceSysmoduleLoadModule(SCE_SYSMODULE_SSL);
-/*
-    sceNetInit(&net);
-    sceNetCtlInit();
-*/
     pkgi_start_debug_log();
     
     netInitialize();
@@ -630,7 +571,6 @@ void pkgi_start(void)
 
     SetFontSize(PKGI_FONT_WIDTH, PKGI_FONT_HEIGHT);
     SetFontZ(PKGI_FONT_Z);
-
 
 //    sysModuleLoad(SYSMODULE_GCM_SYS);
 //    sysModuleLoad(SYSMODULE_NET);
@@ -991,20 +931,21 @@ pkgi_texture pkgi_load_png_raw(const void* data, uint32_t size)
 
 void pkgi_draw_texture(pkgi_texture texture, int x, int y)
 {
-	ya2d_Texture *tex = texture;
-    ya2d_drawTexture(tex, x, y);
+    ya2d_drawTexture((ya2d_Texture*) texture, x, y);
 }
 
-void pkgi_draw_texture_z(pkgi_texture texture, int x, int y, int z)
+void pkgi_draw_background(pkgi_texture texture) {
+    ya2d_drawTextureZ((ya2d_Texture*) texture, -70, -30, YA2D_DEFAULT_Z, 0.54f);
+}
+
+void pkgi_draw_texture_z(pkgi_texture texture, int x, int y, int z, float scale)
 {
-	ya2d_Texture *tex = texture;
-    ya2d_drawTextureZ(tex, x, y, z);
+    ya2d_drawTextureZ((ya2d_Texture*) texture, x, y, z, scale);
 }
 
 void pkgi_free_texture(pkgi_texture texture)
 {
-	ya2d_Texture *tex = texture;
-    ya2d_freeTexture(tex);
+    ya2d_freeTexture((ya2d_Texture*) texture);
 }
 
 
@@ -1078,22 +1019,45 @@ void pkgi_draw_text_z(int x, int y, int z, uint32_t color, const char* text)
     }    
 }
 
+#define TEXT_SHADOW 2
+
 void pkgi_draw_text(int x, int y, uint32_t color, const char* text)
 {
-    SetFontColor(RGBA_COLOR(color, 255), 0);
+    SetFontColor(RGBA_COLOR(0, 128), 0);
+    DrawString((float)x+TEXT_SHADOW, (float)y+TEXT_SHADOW, (char *)text);
+
+    SetFontColor(RGBA_COLOR(color, 200), 0);
     DrawString((float)x, (float)y, (char *)text);
+    
+//    set_ttf_window(x, y, w, h1, WIN_AUTO_LF);
+//    set_ttf_window(0, 0, 848, 512, 0);
+//    Z_ttf = PKGI_FONT_Z;
+//    display_ttf_string(x, y, text, RGBA_COLOR(color, 255), 0, PKGI_FONT_WIDTH, PKGI_FONT_HEIGHT);
 }
 
 
 int pkgi_text_width(const char* text)
 {
-    return (strlen(text) * PKGI_FONT_WIDTH);
+    return (strlen(text) * PKGI_FONT_WIDTH) + TEXT_SHADOW+1;
 }
 
 int pkgi_text_height(const char* text)
 {
 //    PKGI_UNUSED(text);
-    return PKGI_FONT_HEIGHT;
+    return PKGI_FONT_HEIGHT + TEXT_SHADOW+1;
+}
+
+int pkgi_validate_url(const char* url)
+{
+    if (url[0] == 0)
+    {
+        return 0;
+    }
+    if (pkgi_strstr(url, "http://") == url)
+    {
+        return 1;
+    }
+    return 0;
 }
 
 
@@ -1101,9 +1065,9 @@ pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
 {
     LOG("http get");
 
-    if (pkgi_strstr(url, "http://") != url)
+    if (!pkgi_validate_url(url))
     {
-        LOG("unsupported URL type %s", url);
+        LOG("unsupported URL (%s)", url);
         return NULL;
     }
 

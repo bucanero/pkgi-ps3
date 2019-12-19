@@ -144,6 +144,9 @@ static int create_pdb_files(void)
 	pkgi_snprintf(title_str, sizeof(title_str), "\xE2\x98\x85 Download \x22%s\x22", db_item->name);
 	write_pdb_string(PDB_HDR_TITLE, title_str, fpPDB);
 	
+	// 000000D9 - Content id 
+	write_pdb_string(PDB_HDR_CONTENT, db_item->content, fpPDB);
+	
 	pkgi_write(fpPDB, pkg_d0end_data, pkg_d0end_data_size);
 	pkgi_close(fpPDB);
 	

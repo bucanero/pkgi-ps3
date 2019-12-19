@@ -2,6 +2,20 @@
 
 All notable changes to the `pkgi-ps3` project will be documented in this file. This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]()
+
+### Added
+
+* Added analog pad support
+* Added CPU/RSX temperature status
+* Added "Details" screen
+* Added automatic download after version update check 
+
+### Fixed
+
+* Improved empty `.pkg` file generation using async IO.
+* Improved UI
+
 ## [v1.0.5](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.0.5) - 2019-12-14
 
 ### Added
@@ -12,7 +26,7 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 ### Fixed
 
-* The app now creates `/dev_hdd0/exdata` if folder doesn't exists
+* The app now creates `/dev_hdd0/exdata`, if folder doesn't exists
 * Fixed unresponsive `background download` dialog while creating a PKG file
 * Fixed a bug when the URL was missing
 

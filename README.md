@@ -126,8 +126,8 @@ You need to have installed:
 
 Run `make` to create a release build. After than run `make pkg` to create a `.pkg` install file. 
 
-You can also set the environment variable `PS3LOAD=tcp:x.x.x.x` to the PS3's IP address
-; that will allow to use `make run` and send `pkgi-ps3.self` directly to the PS3Load listener.
+You can also set the environment variable `PS3LOAD=tcp:x.x.x.x` to the PS3's IP address;
+that will allow to use `make run` and send `pkgi-ps3.self` directly to the PS3Load listener.
 
 To enable debugging logging pass `-DPKGI_ENABLE_LOGGING=ON` argument to make. Then application will send debug messages to
 UDP multicast address 239.255.0.100:30000. To receive them you can use [socat][] on your PC:
