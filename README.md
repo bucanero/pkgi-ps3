@@ -7,6 +7,8 @@
 
 The `pkgi-ps3` homebrew app allows to download and install `.pkg` files directly on your PS3.
 
+![image](https://user-images.githubusercontent.com/1153055/71187586-1acaf400-225e-11ea-9531-b18af20be10d.png)
+
 **Comments, ideas, suggestions?** You can contact [me](https://github.com/bucanero/) on [Twitter](https://twitter.com/dparrino) and on [my website](http://www.bucanero.com.ar/).
 
 # Features
