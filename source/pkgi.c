@@ -219,13 +219,13 @@ static void pkgi_do_main(pkgi_input* input)
     {
         if (input->active & PKGI_BUTTON_START) {
             input->pressed &= ~PKGI_BUTTON_START;
-            if (draw_msgDialog_YesNo("Exit to XMB?") == 1)
+            if (pkgi_msgDialog_YesNo("Exit to XMB?") == 1)
                 state = StateTerminate;
         }
 
         if (input->active & PKGI_BUTTON_SELECT) {
             input->pressed &= ~PKGI_BUTTON_SELECT;
-            draw_msgDialog_OK("             \xE2\x98\x85  PKGi PS3 v" PKGI_VERSION "  \xE2\x98\x85          \n\n"
+            pkgi_msgDialog_OK("             \xE2\x98\x85  PKGi PS3 v" PKGI_VERSION "  \xE2\x98\x85          \n\n"
                               "  original PS Vita version by mmozeiko    \n\n"
                               "  ported to PlayStation 3 by Bucanero     ");
         }
@@ -426,16 +426,15 @@ static void pkgi_do_main(pkgi_input* input)
         input->pressed &= ~PKGI_BUTTON_S;
 
         DbItem* item = pkgi_db_get(selected_item);
-        char extra[256];
+        char item_info[256];
 
-        pkgi_snprintf(extra, sizeof(extra), "ID: %s\nDescription: %s\nURL: (%s) RAP: (%s) SHA256: (%s)", 
+        pkgi_snprintf(item_info, sizeof(item_info), "ID: %s\n\nURL: (%s) RAP: (%s) SHA256: (%s)", 
             item->content,
-            item->description,
             (pkgi_validate_url(item->url) ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF),
             (item->rap ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF),
             (item->digest ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF) );
 
-        pkgi_dialog_details(item->name, extra);
+        pkgi_dialog_details(item->name, item_info, item->description);
     }
 }
 
@@ -616,19 +615,25 @@ static void pkgi_check_for_update(void)
                 *end = 0;
                 LOG("latest version is %s", start);
 
-                const char* current = PKGI_VERSION;
-                if (current[0] == '0')
-                {
-                    current++;
-                }
-
-                if (pkgi_stricmp(current, start) != 0)
+                if (pkgi_stricmp(PKGI_VERSION, start) != 0)
                 {
                     LOG("new version available");
 
-                    char text[256];
-                    pkgi_snprintf(text, sizeof(text), "New pkgi version v%s available!", start);
-                    pkgi_dialog_message(text);
+                    DbItem update_item;
+                    update_item.content = "UP0001-NP00PKGI3_00-0000000000000000";
+                    update_item.name    = "PKGi PS3 Update";
+                    update_item.url     = "http://update.pkgi.tk/pkgi-ps3.pkg";
+
+                    pkgi_dialog_start_progress(update_item.name, "Preparing...", 0);
+                    
+                    if (pkgi_download(&update_item, 0) && install(update_item.content))
+                    {
+                        char text[256];
+                        pkgi_snprintf(text, sizeof(text), "Successfully downloaded PKGi PS3 v%s", start);
+                        pkgi_dialog_message(text);
+                        pkgi_dialog_set_progress_title(update_item.name);
+                        LOG("update downloaded!");
+                    }
                 }
             }
             else

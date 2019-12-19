@@ -10,6 +10,7 @@ typedef enum {
     DialogMessage,
     DialogError,
     DialogProgress,
+    DialogDetails
 } DialogType;
 
 static DialogType dialog_type;
@@ -51,17 +52,17 @@ void pkgi_dialog_allow_close(int allow)
     pkgi_dialog_unlock();
 }
 
-void pkgi_dialog_details(const char* title, const char* text)
+void pkgi_dialog_details(const char* title, const char* text, const char* extra)
 {
     pkgi_dialog_lock();
 
     pkgi_strncpy(dialog_title, sizeof(dialog_title), title);
     pkgi_strncpy(dialog_text, sizeof(dialog_text), text);
-    dialog_extra[0] = 0;
+    pkgi_strncpy(dialog_extra, sizeof(dialog_extra), extra);
     dialog_eta[0] = 0;
 
     dialog_cancelled = 0;
-    dialog_type = DialogMessage;
+    dialog_type = DialogDetails;
     dialog_delta = 1;
 
     pkgi_dialog_unlock();
@@ -147,7 +148,7 @@ void pkgi_do_dialog(pkgi_input* input)
 
     if (dialog_allow_close)
     {
-        if ((dialog_type == DialogMessage || dialog_type == DialogError) && (input->pressed & pkgi_ok_button()))
+        if ((dialog_type == DialogMessage || dialog_type == DialogError || dialog_type == DialogDetails) && (input->pressed & pkgi_ok_button()))
         {
             dialog_delta = -1;
         }
@@ -293,6 +294,18 @@ void pkgi_do_dialog(pkgi_input* input)
             pkgi_draw_text_z((VITA_WIDTH - pkgi_text_width(text)) / 2, PKGI_DIALOG_VMARGIN + h - 2 * font_height, PKGI_DIALOG_TEXT_Z, PKGI_COLOR_TEXT_DIALOG, text);
         }
     }
+    else if (local_type == DialogDetails)
+    {
+        pkgi_draw_text_z(PKGI_DIALOG_HMARGIN + PKGI_DIALOG_PADDING, PKGI_DIALOG_VMARGIN + PKGI_DIALOG_PADDING + font_height*2, PKGI_DIALOG_TEXT_Z, PKGI_COLOR_TEXT_DIALOG, local_text);
+        pkgi_draw_text_z(PKGI_DIALOG_HMARGIN + PKGI_DIALOG_PADDING, PKGI_DIALOG_VMARGIN + PKGI_DIALOG_PADDING + font_height*5, PKGI_DIALOG_TEXT_Z, PKGI_COLOR_TEXT_DIALOG, local_extra);
+
+        if (local_allow_close)
+        {
+            char text[256];
+            pkgi_snprintf(text, sizeof(text), "press %s to close", pkgi_ok_button() == PKGI_BUTTON_X ? PKGI_UTF8_X : PKGI_UTF8_O);
+            pkgi_draw_text_z((VITA_WIDTH - pkgi_text_width(text)) / 2, PKGI_DIALOG_VMARGIN + h - 2 * font_height, PKGI_DIALOG_TEXT_Z, PKGI_COLOR_TEXT_DIALOG, text);
+        }
+    }
     else
     {
         uint32_t color;
@@ -354,7 +367,7 @@ void wait_dialog()
     pkgi_sleep(100);
 }
 
-void draw_msgDialog_OK(const char * str)
+void pkgi_msgDialog_OK(const char * str)
 {
     msg_dialog_action = 0;
     msgType mdialogok = MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_OK;
@@ -362,7 +375,7 @@ void draw_msgDialog_OK(const char * str)
     wait_dialog();
 }
 
-int draw_msgDialog_YesNo(const char * str)
+int pkgi_msgDialog_YesNo(const char * str)
 {
     msg_dialog_action = 0;
     msgType mdialogyesno = MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_YESNO  | MSG_DIALOG_DEFAULT_CURSOR_NO;
