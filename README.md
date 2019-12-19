@@ -46,7 +46,7 @@ where:
 | `contentid` | is the full content id of the item, for example: `UP0000-NPXX99999_00-0000112223333000`.
 | `flags` | is currently an unused number, set it to 0.
 | `name` | is a string for the item's name.
-| `description` | is a string for the item's description. Currently unused, can be left empty.
+| `description` | is a string for the item's description.
 | `rap` | the 16 hex bytes for a RAP file, if needed by the item (`.rap` file will be created on `/dev_hdd0/exdata`). Leave empty to skip the `.rap` file.
 | `url` | is the HTTP URL where to download the `.pkg`.
 | `size` | is the size in bytes of the `.pkg` file, or 0 if unknown.
