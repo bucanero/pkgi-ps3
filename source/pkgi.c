@@ -101,16 +101,13 @@ static void pkgi_download_thread(void)
 
     LOG("download thread start");
 
-    char message[256];
-
     // short delay to allow download dialog to animate smoothly
     pkgi_sleep(300);
 
     pkgi_lock_process();
     if (pkgi_download(item, config.dl_mode_background) && install(item->content))
     {
-        pkgi_snprintf(message, sizeof(message), "Successfully installed %s", item->name);
-        pkgi_dialog_message(message);
+        pkgi_dialog_message(item->name, "Successfully downloaded");
         LOG("download completed!");
     }
     pkgi_unlock_process();
@@ -311,7 +308,7 @@ static void pkgi_do_main(pkgi_input* input)
 
         if (i == selected_item)
         {
-            pkgi_draw_fill_rect(0, y, VITA_WIDTH, font_height + PKGI_MAIN_ROW_PADDING - 1, PKGI_COLOR_SELECTED_BACKGROUND);
+            pkgi_draw_fill_rect_z(0, y, PKGI_FONT_Z, VITA_WIDTH, font_height + PKGI_MAIN_ROW_PADDING - 1, PKGI_COLOR_SELECTED_BACKGROUND);
         }
         uint32_t color = PKGI_COLOR_TEXT;
 
@@ -352,7 +349,7 @@ static void pkgi_do_main(pkgi_input* input)
         pkgi_clip_remove();
 
         pkgi_clip_set(col_name, y, VITA_WIDTH - PKGI_MAIN_SCROLL_WIDTH - PKGI_MAIN_SCROLL_PADDING - PKGI_MAIN_COLUMN_PADDING - sizew - col_name, line_height);
-        pkgi_draw_text(col_name, y, color, item->name);
+        pkgi_draw_text_ttf(0, 0, PKGI_FONT_Z, color, item->name);
         pkgi_clip_remove();
 
         y += font_height + PKGI_MAIN_ROW_PADDING;
@@ -406,7 +403,7 @@ static void pkgi_do_main(pkgi_input* input)
         else if (item->presence == PresenceIncomplete || (item->presence == PresenceMissing && pkgi_check_free_space(item->size)))
         {
             LOG("[%.9s] %s - starting to install", item->content + 7, item->name);
-            pkgi_dialog_start_progress("Downloading", "Preparing...", 0);
+            pkgi_dialog_start_progress("Downloading...", "Preparing...", 0);
             pkgi_start_thread("download_thread", &pkgi_download_thread);
         }
     }
@@ -630,8 +627,7 @@ static void pkgi_check_for_update(void)
                     {
                         char text[256];
                         pkgi_snprintf(text, sizeof(text), "Successfully downloaded PKGi PS3 v%s", start);
-                        pkgi_dialog_message(text);
-                        pkgi_dialog_set_progress_title(update_item.name);
+                        pkgi_dialog_message(update_item.name, text);
                         LOG("update downloaded!");
                     }
                 }

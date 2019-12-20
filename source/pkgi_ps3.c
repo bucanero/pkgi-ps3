@@ -18,6 +18,7 @@
 
 #include <ya2d/ya2d.h>
 
+#include "ttf_render.h"
 
 #define OSKDIALOG_FINISHED          0x503
 #define OSKDIALOG_UNLOADED          0x504
@@ -518,6 +519,19 @@ void pkgi_dialog_input_get_text(char* text, uint32_t size)
     LOG("input: %s", text);
 }
 
+void load_ttf_fonts()
+{
+	LOG("loading TTF fonts");
+	
+	TTFUnloadFont();
+	TTFLoadFont(0, "/dev_flash/data/font/SCE-PS3-SR-R-LATIN2.TTF", NULL, 0);
+	TTFLoadFont(1, "/dev_flash/data/font/SCE-PS3-DH-R-CGB.TTF", NULL, 0);
+	TTFLoadFont(2, "/dev_flash/data/font/SCE-PS3-SR-R-JPN.TTF", NULL, 0);
+	TTFLoadFont(3, "/dev_flash/data/font/SCE-PS3-YG-R-KOR.TTF", NULL, 0);
+	
+	ya2d_texturePointer = (u32*) init_ttf_table((u16*) ya2d_texturePointer);
+}
+
 void pkgi_start(void)
 {
     pkgi_start_debug_log();
@@ -571,6 +585,8 @@ void pkgi_start(void)
 
     SetFontSize(PKGI_FONT_WIDTH, PKGI_FONT_HEIGHT);
     SetFontZ(PKGI_FONT_Z);
+
+    load_ttf_fonts();
 
 //    sysModuleLoad(SYSMODULE_GCM_SYS);
 //    sysModuleLoad(SYSMODULE_NET);
@@ -656,6 +672,8 @@ int pkgi_update(pkgi_input* input)
 
 	ya2d_screenClear();
 	ya2d_screenBeginDrawing();
+	reset_ttf_frame();
+    set_ttf_window(0, 0, VITA_WIDTH, VITA_HEIGHT, 0);
 
     uint64_t time = pkgi_time_msec();
     input->delta = time - g_time;
@@ -951,13 +969,12 @@ void pkgi_free_texture(pkgi_texture texture)
 
 void pkgi_clip_set(int x, int y, int w, int h)
 {
-//    vita2d_enable_clipping();
-//    vita2d_set_clip_rectangle(x, y, x + w - 1, y + h - 1);
+    set_ttf_window(x, y, w, h*2, 0);
 }
 
 void pkgi_clip_remove(void)
 {
-//    vita2d_disable_clipping();
+    set_ttf_window(0, 0, VITA_WIDTH, VITA_HEIGHT, 0);
 }
 
 void pkgi_draw_fill_rect(int x, int y, int w, int h, uint32_t color)
@@ -1019,32 +1036,39 @@ void pkgi_draw_text_z(int x, int y, int z, uint32_t color, const char* text)
     }    
 }
 
-#define TEXT_SHADOW 2
+
+void pkgi_draw_text_ttf(int x, int y, int z, uint32_t color, const char* text)
+{
+    Z_ttf = z;
+    display_ttf_line(0, x+PKGI_FONT_SHADOW, y+PKGI_FONT_SHADOW, text, RGBA_COLOR(0, 128), 0, PKGI_FONT_WIDTH+6, PKGI_FONT_HEIGHT+2);
+    display_ttf_line(0, x, y, text, RGBA_COLOR(color, 255), 0, PKGI_FONT_WIDTH+6, PKGI_FONT_HEIGHT+2);
+}
+
+int pkgi_text_width_ttf(const char* text)
+{
+    return (display_ttf_line(0, 0, 0, text, 0, 0, PKGI_FONT_WIDTH+6, PKGI_FONT_HEIGHT+2));
+}
+
 
 void pkgi_draw_text(int x, int y, uint32_t color, const char* text)
 {
     SetFontColor(RGBA_COLOR(0, 128), 0);
-    DrawString((float)x+TEXT_SHADOW, (float)y+TEXT_SHADOW, (char *)text);
+    DrawString((float)x+PKGI_FONT_SHADOW, (float)y+PKGI_FONT_SHADOW, (char *)text);
 
     SetFontColor(RGBA_COLOR(color, 200), 0);
     DrawString((float)x, (float)y, (char *)text);
-    
-//    set_ttf_window(x, y, w, h1, WIN_AUTO_LF);
-//    set_ttf_window(0, 0, 848, 512, 0);
-//    Z_ttf = PKGI_FONT_Z;
-//    display_ttf_string(x, y, text, RGBA_COLOR(color, 255), 0, PKGI_FONT_WIDTH, PKGI_FONT_HEIGHT);
 }
 
 
 int pkgi_text_width(const char* text)
 {
-    return (strlen(text) * PKGI_FONT_WIDTH) + TEXT_SHADOW+1;
+    return (strlen(text) * PKGI_FONT_WIDTH) + PKGI_FONT_SHADOW+1;
 }
 
 int pkgi_text_height(const char* text)
 {
 //    PKGI_UNUSED(text);
-    return PKGI_FONT_HEIGHT + TEXT_SHADOW+1;
+    return PKGI_FONT_HEIGHT + PKGI_FONT_SHADOW+1;
 }
 
 int pkgi_validate_url(const char* url)

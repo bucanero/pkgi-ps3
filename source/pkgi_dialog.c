@@ -68,12 +68,12 @@ void pkgi_dialog_details(const char* title, const char* text, const char* extra)
     pkgi_dialog_unlock();
 }
 
-void pkgi_dialog_message(const char* text)
+void pkgi_dialog_message(const char* title, const char* text)
 {
     pkgi_dialog_lock();
 
+    pkgi_strncpy(dialog_title, sizeof(dialog_title), title);
     pkgi_strncpy(dialog_text, sizeof(dialog_text), text);
-    dialog_title[0] = 0;
     dialog_extra[0] = 0;
     dialog_eta[0] = 0;
 
@@ -232,16 +232,16 @@ void pkgi_do_dialog(pkgi_input* input)
             color = PKGI_COLOR_TEXT_DIALOG;
         }
 
-        int width = pkgi_text_width(local_title);
+        int width = pkgi_text_width_ttf(local_title);
         if (width > w + 2 * PKGI_DIALOG_PADDING)
         {
-            pkgi_clip_set(PKGI_DIALOG_HMARGIN + PKGI_DIALOG_PADDING, PKGI_DIALOG_VMARGIN + PKGI_DIALOG_PADDING, w - 2 * PKGI_DIALOG_PADDING, h - 2 * PKGI_DIALOG_PADDING);
-            pkgi_draw_text_z((VITA_WIDTH - width) / 2, PKGI_DIALOG_VMARGIN + font_height, PKGI_DIALOG_TEXT_Z, color, local_title);
+            pkgi_clip_set(PKGI_DIALOG_HMARGIN + PKGI_DIALOG_PADDING, PKGI_DIALOG_VMARGIN + font_height, w - 2 * PKGI_DIALOG_PADDING, h - 2 * PKGI_DIALOG_PADDING);
+            pkgi_draw_text_ttf(0, 0, PKGI_DIALOG_TEXT_Z, color, local_title);
             pkgi_clip_remove();
         }
         else
         {
-            pkgi_draw_text_z((VITA_WIDTH - width) / 2, PKGI_DIALOG_VMARGIN + font_height, PKGI_DIALOG_TEXT_Z, color, local_title);
+            pkgi_draw_text_ttf((VITA_WIDTH - width) / 2, PKGI_DIALOG_VMARGIN + font_height, PKGI_DIALOG_TEXT_Z, color, local_title);
         }
     }
 
