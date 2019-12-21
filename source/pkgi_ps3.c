@@ -673,7 +673,6 @@ int pkgi_update(pkgi_input* input)
 	ya2d_screenClear();
 	ya2d_screenBeginDrawing();
 	reset_ttf_frame();
-    set_ttf_window(0, 0, VITA_WIDTH, VITA_HEIGHT, 0);
 
     uint64_t time = pkgi_time_msec();
     input->delta = time - g_time;

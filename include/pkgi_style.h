@@ -1,9 +1,7 @@
 #pragma once
 
 #define VITA_WIDTH  848
-//960
 #define VITA_HEIGHT 512
-//544
 
 #define PKGI_COLOR(R, G, B)		(((R)<<16) | ((G)<<8) | (B))
 #define RGBA_COLOR(C, ALPHA)	((C<<8) | ALPHA)
