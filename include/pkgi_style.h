@@ -9,10 +9,10 @@
 #define RGBA_COLOR(C, ALPHA)	((C<<8) | ALPHA)
 
 
-#define PKGI_UTF8_O "\xfa" // 0x25cb
-#define PKGI_UTF8_X "\xfb" // 0x2573
-#define PKGI_UTF8_T "\xfc" // 0x25b3
-#define PKGI_UTF8_S "\xfd" // 0x25a1
+#define PKGI_UTF8_O "\xfa" // "\xe2\x97\x8b" // 0x25cb
+#define PKGI_UTF8_X "\xfb" // "\xe2\x95\xb3" // 0x2573
+#define PKGI_UTF8_T "\xfc" // "\xe2\x96\xb3" // 0x25b3
+#define PKGI_UTF8_S "\xfd" // "\xe2\x96\xa1" // 0x25a1
 
 
 #define PKGI_UTF8_INSTALLED "\x04"//"\xe2\x97\x8f" // 0x25cf
@@ -41,6 +41,7 @@
 #define PKGI_COLOR_TEXT_TAIL            PKGI_COLOR(255, 255, 255)
 #define PKGI_COLOR_TEXT_DIALOG          PKGI_COLOR(255, 255, 255)
 #define PKGI_COLOR_TEXT_ERROR           PKGI_COLOR(255, 50, 50)
+#define PKGI_COLOR_TEXT_SHADOW          PKGI_COLOR(0, 0, 0)
 #define PKGI_COLOR_HLINE                PKGI_COLOR(200, 200, 200)
 #define PKGI_COLOR_SCROLL_BAR           PKGI_COLOR(255, 255, 255)
 #define PKGI_COLOR_BATTERY_LOW          PKGI_COLOR(255, 50, 50)
@@ -54,6 +55,7 @@
 #define PKGI_FONT_Z      1000
 #define PKGI_FONT_WIDTH  10
 #define PKGI_FONT_HEIGHT 16
+#define PKGI_FONT_SHADOW 1
 
 #define PKGI_MAIN_COLUMN_PADDING    10
 #define PKGI_MAIN_HLINE_EXTRA       5

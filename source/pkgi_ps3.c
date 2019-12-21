@@ -1040,7 +1040,7 @@ void pkgi_draw_text_z(int x, int y, int z, uint32_t color, const char* text)
 void pkgi_draw_text_ttf(int x, int y, int z, uint32_t color, const char* text)
 {
     Z_ttf = z;
-    display_ttf_line(0, x+PKGI_FONT_SHADOW, y+PKGI_FONT_SHADOW, text, RGBA_COLOR(0, 128), 0, PKGI_FONT_WIDTH+6, PKGI_FONT_HEIGHT+2);
+    display_ttf_line(0, x+PKGI_FONT_SHADOW, y+PKGI_FONT_SHADOW, text, RGBA_COLOR(PKGI_COLOR_TEXT_SHADOW, 128), 0, PKGI_FONT_WIDTH+6, PKGI_FONT_HEIGHT+2);
     display_ttf_line(0, x, y, text, RGBA_COLOR(color, 255), 0, PKGI_FONT_WIDTH+6, PKGI_FONT_HEIGHT+2);
 }
 
@@ -1052,7 +1052,7 @@ int pkgi_text_width_ttf(const char* text)
 
 void pkgi_draw_text(int x, int y, uint32_t color, const char* text)
 {
-    SetFontColor(RGBA_COLOR(0, 128), 0);
+    SetFontColor(RGBA_COLOR(PKGI_COLOR_TEXT_SHADOW, 128), 0);
     DrawString((float)x+PKGI_FONT_SHADOW, (float)y+PKGI_FONT_SHADOW, (char *)text);
 
     SetFontColor(RGBA_COLOR(color, 200), 0);
@@ -1062,12 +1062,11 @@ void pkgi_draw_text(int x, int y, uint32_t color, const char* text)
 
 int pkgi_text_width(const char* text)
 {
-    return (strlen(text) * PKGI_FONT_WIDTH) + PKGI_FONT_SHADOW+1;
+    return (strlen(text) * PKGI_FONT_WIDTH) + PKGI_FONT_SHADOW;
 }
 
 int pkgi_text_height(const char* text)
 {
-//    PKGI_UNUSED(text);
     return PKGI_FONT_HEIGHT + PKGI_FONT_SHADOW+1;
 }
 
