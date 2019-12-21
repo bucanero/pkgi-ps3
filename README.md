@@ -93,10 +93,13 @@ REGION|TITLE|name|url|rap|contentid|DATE|PKG FILENAME|size|checksum
 
 # Usage
 
-Using the application is pretty straight forward. Select the item you want to install and press **(X)**. To sort/filter/search press **triangle**.
-It will open the context menu. Press **triangle** again to confirm the new settings, or press **(O)** to cancel any changes.
+Using the application is pretty straight-forward: 
 
-Press left or right trigger buttons **(L1/R1)** to move pages up or down.
+ - Move **UP/DOWN** to select the item you want to install, and press ![X button](https://github.com/bucanero/pkgi-ps3/raw/master/data/CROSS.png).
+ - To see the item's details, press ![Square](https://github.com/bucanero/pkgi-ps3/raw/master/data/SQUARE.png).
+ - To sort/filter/search press ![Triangle](https://github.com/bucanero/pkgi-ps3/raw/master/data/TRIANGLE.png).
+It will open the context menu. Press ![Triangle](https://github.com/bucanero/pkgi-ps3/raw/master/data/TRIANGLE.png) again to confirm the new settings, or press ![O button](https://github.com/bucanero/pkgi-ps3/raw/master/data/CIRCLE.png) to cancel any changes.
+- Press left or right trigger buttons **(L1/R1)** to move pages up or down.
 
 # Q&A
 
