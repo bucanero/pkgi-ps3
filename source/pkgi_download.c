@@ -6,6 +6,7 @@
 #include "pdb_data.h"
 
 #include <sys/stat.h>
+#include <sys/file.h>
 #include <lv2/sysfs.h>
 
 #define BUFF_SIZE  0x200000 // 2MB
@@ -17,6 +18,9 @@
 #define PDB_HDR_TITLE		"\x00\x00\x00\x69"
 #define PDB_HDR_SIZE		"\x00\x00\x00\xCE"
 #define PDB_HDR_CONTENT		"\x00\x00\x00\xD9"
+#define PDB_HDR_UNUSED		"\x00\x00\x00\x00"
+#define PDB_HDR_DLSIZE		"\x00\x00\x00\xD0"
+
 
 static char root[256];
 static char resume_file[256];
@@ -49,7 +53,8 @@ static char dialog_eta[256];
 static uint32_t info_start;
 static uint32_t info_update;
 
-static uint32_t	task_id = 10000002;
+static uint32_t	queue_task_id 	= 10000002;
+static uint32_t	install_task_id = 80000002;
 
 
 // Async IO stuff
@@ -65,28 +70,27 @@ uint8_t write_status[AIO_NUMBER];
 uint8_t buffer_to_write;
 
 
-
-uint32_t get_task_dir_id(void)
+uint32_t get_task_dir_id(const char* dir, uint32_t tid)
 {
 	char path[128] = "";
 	int found = 0;
     struct stat sb;
 	
 	while (!found) {
-	    pkgi_snprintf(path, sizeof(path), "/dev_hdd0/vsh/task/%d", task_id);
+	    pkgi_snprintf(path, sizeof(path), "%s/%d", dir, tid);
 
         if ((stat(path, &sb) == 0) && S_ISDIR(sb.st_mode)) {
 	    	// there is already a directory with the ID, try again...
-		    task_id++;
+		    tid++;
 		} else {
 		    found = 1;
 		}
     }
 
-	return task_id;
+	return tid;
 }
 
-static void write_pdb_string(const char* header, const char* pdbstr, void* fp)
+static void write_pdb_string(void* fp, const char* header, const char* pdbstr)
 {
 	pkgi_write(fp, header, 4);
     
@@ -96,14 +100,14 @@ static void write_pdb_string(const char* header, const char* pdbstr, void* fp)
 	pkgi_write(fp, pdbstr, pdbstr_len);
 }
 
-static int create_pdb_files(void)
+static int create_queue_pdb_files(void)
 {
 	// Create files	
 	char szPDBFile[256] = "";
 	char szIconFile[256] = "";
 	
-	pkgi_snprintf(szPDBFile, sizeof(szPDBFile), "/dev_hdd0/vsh/task/%d/d0.pdb", task_id);
-	pkgi_snprintf(szIconFile, sizeof(szIconFile), "/dev_hdd0/vsh/task/%d/ICON_FILE", task_id);
+	pkgi_snprintf(szPDBFile, sizeof(szPDBFile), PKGI_QUEUE_FOLDER "/%d/d0.pdb", queue_task_id);
+	pkgi_snprintf(szIconFile, sizeof(szIconFile), PKGI_QUEUE_FOLDER "/%d/ICON_FILE", queue_task_id);
 	
 	// write - ICON_FILE
 	if (!pkgi_save(szIconFile, iconfile_data, iconfile_data_size))
@@ -128,24 +132,24 @@ static int create_pdb_files(void)
 	pkgi_write(fpPDB, (char*) &total_size, 8);
 
 	// 000000CB - PKG file name
-	write_pdb_string(PDB_HDR_FILENAME, root, fpPDB);
+	write_pdb_string(fpPDB, PDB_HDR_FILENAME, root);
 
 	// 000000CC - date/time
-	write_pdb_string(PDB_HDR_DATETIME, "Mon, 11 Dec 2017 11:45:10 GMT", fpPDB);
+	write_pdb_string(fpPDB, PDB_HDR_DATETIME, "Mon, 11 Dec 2017 11:45:10 GMT");
 
 	// 000000CA - PKG Link download URL
-	write_pdb_string(PDB_HDR_URL, db_item->url, fpPDB);
+	write_pdb_string(fpPDB, PDB_HDR_URL, db_item->url);
 
 	// 0000006A - Icon location / path (PNG w/o extension) 
-	write_pdb_string(PDB_HDR_ICON, szIconFile, fpPDB);
+	write_pdb_string(fpPDB, PDB_HDR_ICON, szIconFile);
 
 	// 00000069 - Display title	
 	char title_str[256] = "";
 	pkgi_snprintf(title_str, sizeof(title_str), "\xE2\x98\x85 Download \x22%s\x22", db_item->name);
-	write_pdb_string(PDB_HDR_TITLE, title_str, fpPDB);
+	write_pdb_string(fpPDB, PDB_HDR_TITLE, title_str);
 	
 	// 000000D9 - Content id 
-	write_pdb_string(PDB_HDR_CONTENT, db_item->content, fpPDB);
+	write_pdb_string(fpPDB, PDB_HDR_CONTENT, db_item->content);
 	
 	pkgi_write(fpPDB, pkg_d0end_data, pkg_d0end_data_size);
 	pkgi_close(fpPDB);
@@ -153,6 +157,69 @@ static int create_pdb_files(void)
 	return 1;
 }
 
+int create_install_pdb_files(char *path, char *title, char *path_icon, uint64_t size)
+{
+    void *fp1;
+    void *fp2;
+    
+    char temp_buffer[256];
+
+    pkgi_snprintf(temp_buffer, sizeof(temp_buffer), "%s/%s", path, "d0.pdb");
+    fp1 = pkgi_create(temp_buffer);
+
+    pkgi_snprintf(temp_buffer, sizeof(temp_buffer), "%s/%s", path, "d1.pdb");
+    fp2 = pkgi_create(temp_buffer);
+
+    if(!fp1 || !fp2) {
+	    LOG("Failed to create file %s", temp_buffer);
+	    return 0;
+    }
+    
+	pkgi_write(fp1, install_data_pdb, install_data_pdb_size);
+	pkgi_write(fp2, install_data_pdb, install_data_pdb_size);
+
+	// 000000D0 - Downloaded size (in bytes)
+	pkgi_write(fp1, PDB_HDR_DLSIZE "\x00\x00\x00\x08\x00\x00\x00\x08", 12);
+	pkgi_write(fp1, (char*) &size, 8);
+
+	pkgi_write(fp2, PDB_HDR_DLSIZE "\x00\x00\x00\x08\x00\x00\x00\x08", 12);
+	pkgi_write(fp2, (char*) &size, 8);
+
+	// 000000CE - Package expected size (in bytes)
+	pkgi_write(fp1, PDB_HDR_SIZE "\x00\x00\x00\x08\x00\x00\x00\x08", 12);
+	pkgi_write(fp1, (char*) &size, 8);
+
+	pkgi_write(fp2, PDB_HDR_SIZE "\x00\x00\x00\x08\x00\x00\x00\x08", 12);
+	pkgi_write(fp2, (char*) &size, 8);
+
+	// 00000069 - Display title	
+    pkgi_snprintf(temp_buffer, sizeof(temp_buffer), "\xE2\x98\x85 Install \x22%s\x22", title);
+	write_pdb_string(fp1, PDB_HDR_TITLE, temp_buffer);
+	write_pdb_string(fp2, PDB_HDR_TITLE, temp_buffer);
+
+	// 000000CB - PKG file name
+	write_pdb_string(fp1, PDB_HDR_FILENAME, title);
+	write_pdb_string(fp2, PDB_HDR_FILENAME, title);
+
+	// 00000000 - Icon location / path (PNG w/o extension) 
+	write_pdb_string(fp2, PDB_HDR_UNUSED, path_icon);
+
+	// 0000006A - Icon location / path (PNG w/o extension) 
+	write_pdb_string(fp1, PDB_HDR_ICON, path_icon);
+	write_pdb_string(fp2, PDB_HDR_ICON, path_icon);
+
+	pkgi_write(fp1, pkg_d0end_data, pkg_d0end_data_size);
+	pkgi_write(fp2, pkg_d0end_data, pkg_d0end_data_size);
+
+	pkgi_close(fp1);
+	pkgi_close(fp2);
+
+	pkgi_snprintf(temp_buffer, sizeof(temp_buffer), "%s/%s", path, "f0.pdb");
+	fp1 = pkgi_create(temp_buffer);
+	if (fp1) pkgi_close(fp1);
+
+    return 1;
+}
 
 static void calculate_eta(uint32_t speed)
 {
@@ -249,7 +316,7 @@ static int create_dummy_pkg(void)
 	static int id_w[2] = {-1, -1};
 	
 	char dst[256] ="";
-	pkgi_snprintf(dst, sizeof(dst), "/dev_hdd0/vsh/task/%d/%s", task_id, root);
+	pkgi_snprintf(dst, sizeof(dst), PKGI_QUEUE_FOLDER "/%d/%s", queue_task_id, root);
 
     if(sysFsAioInit(dst)!= 0)  {
 		LOG("Error : AIO_FAILED to copy_async / sysFsAioInit(dst)");
@@ -331,7 +398,8 @@ error:
 static int queue_pkg_task()
 {
 	char pszPKGDir[256] ="";
-	pkgi_snprintf(pszPKGDir, sizeof(pszPKGDir), "/dev_hdd0/vsh/task/%d", get_task_dir_id());
+	queue_task_id = get_task_dir_id(PKGI_QUEUE_FOLDER, queue_task_id);
+	pkgi_snprintf(pszPKGDir, sizeof(pszPKGDir), PKGI_QUEUE_FOLDER "/%d", queue_task_id);
 
 	if(!pkgi_mkdirs(pszPKGDir))
 	{
@@ -383,7 +451,7 @@ static int queue_pkg_task()
 		return 0;
 	}
     
-	if(!create_pdb_files())
+	if(!create_queue_pdb_files())
 	{
 		pkgi_dialog_error("Could not create task files to HDD.");
 		return 0;
@@ -659,7 +727,6 @@ int pkgi_download(const DbItem* item, const int background_dl)
     info_start = pkgi_time_msec();
     info_update = info_start + 1000;
 
-
 	if (background_dl)
 	{
     	if (!queue_pkg_task()) goto finish;
@@ -684,4 +751,46 @@ finish:
     }
 
     return result;
+}
+
+
+int pkgi_install(const char *titleid)
+{
+	char self_path[256];
+	char szIconFile[256];
+	char filename[256];
+
+    pkgi_snprintf(filename, sizeof(filename), "%s.pkg", titleid);
+
+    pkgi_snprintf(self_path, sizeof(self_path), PKGI_PKG_FOLDER "/%s.pkg", titleid);
+	uint64_t fsize = pkgi_get_size(self_path);
+    
+	install_task_id = get_task_dir_id(PKGI_INSTALL_FOLDER, install_task_id);
+    pkgi_snprintf(self_path, sizeof(self_path), PKGI_INSTALL_FOLDER "/%d", install_task_id);
+
+	if (!pkgi_mkdirs(self_path))
+	{
+		pkgi_dialog_error("Could not create install directory on HDD.");
+		return 0;
+	}
+
+    pkgi_snprintf(szIconFile, sizeof(szIconFile), PKGI_INSTALL_FOLDER "/%d/ICON_FILE", install_task_id);
+
+	// write - ICON_FILE
+	if (!pkgi_save(szIconFile, iconfile_data, iconfile_data_size))
+	{
+	    LOG("Error saving %s", szIconFile);
+	    return 0;
+    }
+
+    if (!create_install_pdb_files(self_path, filename, szIconFile, fsize)) {
+        return 0;
+    }
+
+    pkgi_snprintf(filename, sizeof(filename), "%s/%s.pkg", self_path, titleid);
+    pkgi_snprintf(self_path, sizeof(self_path), PKGI_INSTALL_FOLDER "/%s.pkg", titleid);
+    
+    int ret = sysLv2FsRename(self_path, filename);
+
+	return (ret == 0);
 }

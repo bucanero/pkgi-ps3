@@ -8,6 +8,7 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 * Added TTF fonts to support Japanese characters
 * Added SSL support (the app can download `https` links)
+* Added package install bubble for Direct downloads
 
 ### Fixed
 

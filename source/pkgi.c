@@ -105,8 +105,12 @@ static void pkgi_download_thread(void)
     pkgi_sleep(300);
 
     pkgi_lock_process();
-    if (pkgi_download(item, config.dl_mode_background) && install(item->content))
+    if (pkgi_download(item, config.dl_mode_background))
     {
+        if (!config.dl_mode_background)
+        {
+            install(item->content);
+        }
         pkgi_dialog_message(item->name, "Successfully downloaded");
         LOG("download completed!");
     }

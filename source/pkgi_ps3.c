@@ -807,26 +807,6 @@ int pkgi_is_installed(const char* titleid)
     return (res == 0);
 }
 
-int pkgi_install(const char* titleid)
-{
-    char path[128];
-    snprintf(path, sizeof(path), "%s/%s", pkgi_get_temp_folder(), titleid);
-
-    LOG("calling scePromoterUtilityPromotePkgWithRif on %s", path);
-    
-    int res = 0;
-//    int res = scePromoterUtilityPromotePkgWithRif(path, 1);
-    if (res == 0)
-    {
-        LOG("scePromoterUtilityPromotePkgWithRif succeeded");
-    }
-    else
-    {
-        LOG("scePromoterUtilityPromotePkgWithRif failed");
-    }
-    return (res == 0);
-}
-
 uint32_t pkgi_time_msec()
 {
     return ya2d_millis();
