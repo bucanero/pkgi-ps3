@@ -157,7 +157,7 @@ static int create_queue_pdb_files(void)
 	return 1;
 }
 
-int create_install_pdb_files(char *path, char *title, char *path_icon, uint64_t size)
+int create_install_pdb_files(char *path, char *path_icon, uint64_t size)
 {
     void *fp1;
     void *fp2;
@@ -193,13 +193,13 @@ int create_install_pdb_files(char *path, char *title, char *path_icon, uint64_t 
 	pkgi_write(fp2, (char*) &size, 8);
 
 	// 00000069 - Display title	
-    pkgi_snprintf(temp_buffer, sizeof(temp_buffer), "\xE2\x98\x85 Install \x22%s\x22", title);
+    pkgi_snprintf(temp_buffer, sizeof(temp_buffer), "\xE2\x98\x85 Install \x22%s\x22", db_item->name);
 	write_pdb_string(fp1, PDB_HDR_TITLE, temp_buffer);
 	write_pdb_string(fp2, PDB_HDR_TITLE, temp_buffer);
 
 	// 000000CB - PKG file name
-	write_pdb_string(fp1, PDB_HDR_FILENAME, title);
-	write_pdb_string(fp2, PDB_HDR_FILENAME, title);
+	write_pdb_string(fp1, PDB_HDR_FILENAME, root);
+	write_pdb_string(fp2, PDB_HDR_FILENAME, root);
 
 	// 00000000 - Icon location / path (PNG w/o extension) 
 	write_pdb_string(fp2, PDB_HDR_UNUSED, path_icon);
@@ -215,8 +215,7 @@ int create_install_pdb_files(char *path, char *title, char *path_icon, uint64_t 
 	pkgi_close(fp2);
 
 	pkgi_snprintf(temp_buffer, sizeof(temp_buffer), "%s/%s", path, "f0.pdb");
-	fp1 = pkgi_create(temp_buffer);
-	if (fp1) pkgi_close(fp1);
+	pkgi_save(temp_buffer, down, 0);
 
     return 1;
 }
@@ -756,41 +755,39 @@ finish:
 
 int pkgi_install(const char *titleid)
 {
-	char self_path[256];
-	char szIconFile[256];
+	char pkg_path[256];
 	char filename[256];
 
-    pkgi_snprintf(filename, sizeof(filename), "%s.pkg", titleid);
-
-    pkgi_snprintf(self_path, sizeof(self_path), PKGI_PKG_FOLDER "/%s.pkg", titleid);
-	uint64_t fsize = pkgi_get_size(self_path);
+    pkgi_snprintf(pkg_path, sizeof(pkg_path), PKGI_PKG_FOLDER "/%s", root);
+	uint64_t fsize = pkgi_get_size(pkg_path);
     
 	install_task_id = get_task_dir_id(PKGI_INSTALL_FOLDER, install_task_id);
-    pkgi_snprintf(self_path, sizeof(self_path), PKGI_INSTALL_FOLDER "/%d", install_task_id);
+    pkgi_snprintf(pkg_path, sizeof(pkg_path), PKGI_INSTALL_FOLDER "/%d", install_task_id);
 
-	if (!pkgi_mkdirs(self_path))
+	if (!pkgi_mkdirs(pkg_path))
 	{
 		pkgi_dialog_error("Could not create install directory on HDD.");
 		return 0;
 	}
 
-    pkgi_snprintf(szIconFile, sizeof(szIconFile), PKGI_INSTALL_FOLDER "/%d/ICON_FILE", install_task_id);
+	LOG("Creating .pdb files [%s]", titleid);
 
 	// write - ICON_FILE
-	if (!pkgi_save(szIconFile, iconfile_data, iconfile_data_size))
+    pkgi_snprintf(filename, sizeof(filename), PKGI_INSTALL_FOLDER "/%d/ICON_FILE", install_task_id);
+	if (!pkgi_save(filename, iconfile_data, iconfile_data_size))
 	{
-	    LOG("Error saving %s", szIconFile);
+	    LOG("Error saving %s", filename);
 	    return 0;
     }
 
-    if (!create_install_pdb_files(self_path, filename, szIconFile, fsize)) {
+    if (!create_install_pdb_files(pkg_path, filename, fsize)) {
         return 0;
     }
 
-    pkgi_snprintf(filename, sizeof(filename), "%s/%s.pkg", self_path, titleid);
-    pkgi_snprintf(self_path, sizeof(self_path), PKGI_INSTALL_FOLDER "/%s.pkg", titleid);
+    pkgi_snprintf(filename, sizeof(filename), "%s/%s", pkg_path, root);
+    pkgi_snprintf(pkg_path, sizeof(pkg_path), PKGI_INSTALL_FOLDER "/%s", root);
     
-    int ret = sysLv2FsRename(self_path, filename);
+    int ret = sysLv2FsRename(pkg_path, filename);
 
 	return (ret == 0);
 }
