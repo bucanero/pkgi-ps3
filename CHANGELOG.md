@@ -7,6 +7,11 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 ### Added
 
 * Added TTF fonts to support Japanese characters
+* Added SSL support (the app can download `https` links)
+
+### Fixed
+
+* Fixed UI issue where texts could go beyond the screen limits
 
 ## [v1.0.8](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.0.8) - 2019-12-19
 

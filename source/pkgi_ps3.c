@@ -59,6 +59,14 @@ typedef struct
     pkgi_texture square;
 } t_tex_buttons;
 
+typedef struct
+{
+    void* http_pool;
+    void* ssl_pool;
+    httpsData* caList;
+    void* cert_buffer;
+} t_http_pools;
+
 
 static sys_mutex_t g_dialog_lock;
 static uint32_t cpu_temp_c[2];
@@ -84,6 +92,8 @@ static uint16_t g_ime_input[SCE_IME_DIALOG_MAX_TEXT_LENGTH + 1];
 
 static pkgi_http g_http[4];
 static t_tex_buttons tex_buttons;
+static t_http_pools http_pools;
+
 
 int pkgi_snprintf(char* buffer, uint32_t size, const char* msg, ...)
 {
@@ -532,32 +542,82 @@ void load_ttf_fonts()
 	ya2d_texturePointer = (u32*) init_ttf_table((u16*) ya2d_texturePointer);
 }
 
+void init_http_pool(void)
+{
+    int ret;
+	s32 cert_size=0;
+
+    LOG("initializing HTTP");
+    http_pools.http_pool = malloc(0x10000);
+    if(http_pools.http_pool) {
+        ret = httpInit(http_pools.http_pool, 0x10000);
+        if(ret < 0) {
+            LOG("Error: httpInit failed (%x)", ret);
+        }
+    }
+
+    LOG("initializing HTTPS");
+	http_pools.ssl_pool = malloc(0x40000);
+    if(http_pools.ssl_pool) {
+		ret = sslInit(http_pools.ssl_pool, 0x40000);
+		if (ret < 0) {
+			LOG("Error : sslInit failed (%x)", ret);
+        }
+    }
+
+	ret = sslCertificateLoader(SSL_LOAD_CERT_ALL, NULL, 0, &cert_size);
+	if (ret < 0) {
+		LOG("Error : sslCertificateLoader failed (%x)", ret);
+	}
+
+	http_pools.cert_buffer = malloc(cert_size);
+	if (http_pools.cert_buffer==NULL) {
+		LOG("Error : out of memory (cert_buffer)");
+	}
+
+	ret = sslCertificateLoader(SSL_LOAD_CERT_ALL, http_pools.cert_buffer, cert_size, NULL);
+	if (ret < 0) {
+		LOG("Error : sslCertificateLoader failed (%x)", ret);
+	}
+
+    http_pools.caList = (httpsData *)malloc(sizeof(httpsData));
+    if (http_pools.caList) {
+    	(&http_pools.caList[0])->ptr = http_pools.cert_buffer;
+	    (&http_pools.caList[0])->size = cert_size;
+	}
+
+	ret = httpsInit(1, (httpsData *) http_pools.caList);
+	if (ret < 0) {
+		LOG("Error : httpsInit failed (%x)", ret);
+	}
+    return;
+}
+
 void pkgi_start(void)
 {
     pkgi_start_debug_log();
     
     netInitialize();
 
-//    LOG("initializing SSL");
-//    sceSslInit(1024 * 1024);
-//    sceHttpInit(1024 * 1024);
+    LOG("initializing SSL");
+//    sysModuleLoad(SYSMODULE_NET);
+    sysModuleLoad(SYSMODULE_HTTP);
+    sysModuleLoad(SYSMODULE_HTTPS);
+    sysModuleLoad(SYSMODULE_SSL);
 
-//    sceHttpsDisableOption(SCE_HTTPS_FLAG_SERVER_VERIFY);
+    init_http_pool();
 
-//    sceKernelCreateLwMutex(&g_dialog_lock, "dialog_lock", 2, 0, NULL);
+    sys_mutex_attr_t mutex_attr;
+    mutex_attr.attr_protocol = SYS_MUTEX_PROTOCOL_FIFO;
+    mutex_attr.attr_recursive = SYS_MUTEX_ATTR_NOT_RECURSIVE;
+    mutex_attr.attr_pshared = SYS_MUTEX_ATTR_PSHARED;
+    mutex_attr.attr_adaptive = SYS_MUTEX_ATTR_ADAPTIVE;
+    strcpy(mutex_attr.name, "dialog");
 
-//    sceShellUtilInitEvents(0);
-//    sceShellUtilLock(SCE_SHELL_UTIL_LOCK_TYPE_USB_CONNECTION);
-
-//    SceAppUtilInitParam init = { 0 };
-//    SceAppUtilBootParam boot = { 0 };
-//    sceAppUtilInit(&init, &boot);
-
-//    SceCommonDialogConfigParam config;
-//    sceCommonDialogConfigParamInit(&config);
-//    sceAppUtilSystemParamGetInt(SCE_SYSTEM_PARAM_ID_LANG, (int*)&config.language);
-//    sceAppUtilSystemParamGetInt(SCE_SYSTEM_PARAM_ID_ENTER_BUTTON, (int*)&config.enterButtonAssign);
-//    sceCommonDialogSetConfigParam(&config);
+    int ret = sysMutexCreate(&g_dialog_lock, &mutex_attr);
+    if (ret != 0) {
+        LOG("mutex create error (%x)", ret);
+    }
 
 //    if (config.enterButtonAssign == SCE_SYSTEM_PARAM_ENTER_BUTTON_CIRCLE)
     if (false)
@@ -588,35 +648,8 @@ void pkgi_start(void)
 
     load_ttf_fonts();
 
-//    sysModuleLoad(SYSMODULE_GCM_SYS);
-//    sysModuleLoad(SYSMODULE_NET);
-    sysModuleLoad(SYSMODULE_HTTP);
-    sysModuleLoad(SYSMODULE_HTTPS);
-//    sysModuleLoad(SYSMODULE_SYSUTIL);
-
-    LOG("initializing HTTP");
-    void *http_p = http_p = malloc(0x10000);
-    if(http_p) {
-        if(httpInit(http_p, 0x10000) < 0) {
-            LOG("Error: httpInit failed");
-        }
-    }
-
     g_time = pkgi_time_msec();
-
-    sys_mutex_attr_t mutex_attr;
-    mutex_attr.attr_protocol = SYS_MUTEX_PROTOCOL_FIFO;
-    mutex_attr.attr_recursive = SYS_MUTEX_ATTR_NOT_RECURSIVE;
-    mutex_attr.attr_pshared = SYS_MUTEX_ATTR_PSHARED;
-    mutex_attr.attr_adaptive = SYS_MUTEX_ATTR_ADAPTIVE;
-    strcpy(mutex_attr.name, "dialog");
-
-    int res = sysMutexCreate(&g_dialog_lock, &mutex_attr);
-    if (res !=0) {
-        LOG("mutex create error %d", res);
-    }
 }
-
 
 int pkgi_update(pkgi_input* input)
 {
@@ -690,38 +723,27 @@ void pkgi_end(void)
 {
     pkgi_stop_debug_log();
 
-
     pkgi_free_texture(tex_buttons.circle);
     pkgi_free_texture(tex_buttons.cross);
     pkgi_free_texture(tex_buttons.triangle);
     pkgi_free_texture(tex_buttons.square);
 
-//    vita2d_fini();
-//    vita2d_free_pgf(g_font);
 	ya2d_deinit();
 
+    httpsEnd();
+    sslEnd();
     httpEnd();
 
+    if (http_pools.cert_buffer) free(http_pools.cert_buffer);
+    if (http_pools.caList)      free(http_pools.caList);
+    if (http_pools.ssl_pool)    free(http_pools.ssl_pool);
+    if (http_pools.http_pool)   free(http_pools.http_pool);
+
     sysMutexDestroy(g_dialog_lock);
-//    scePromoterUtilityExit();
 
-//    sceAppUtilShutdown();
-
-//    sceKernelDeleteLwMutex(&g_dialog_lock);
-
-//    sceHttpTerm();
-    //sceSslTerm();
-//    sceNetCtlTerm();
-//    sceNetTerm();
-
+    sysModuleUnload(SYSMODULE_SSL);
     sysModuleUnload(SYSMODULE_HTTPS);
     sysModuleUnload(SYSMODULE_HTTP);
-//    sysModuleUnload(SYSMODULE_NET);
-
-//    sceSysmoduleUnloadModule(SCE_SYSMODULE_SSL);
-//    sceSysmoduleUnloadModule(SCE_SYSMODULE_HTTP);
-//    sceSysmoduleUnloadModule(SCE_SYSMODULE_NET);
-//    sceSysmoduleUnloadModuleInternal(SCE_SYSMODULE_INTERNAL_PROMOTER_UTIL);
 
 //    sceKernelExitProcess(0);
 }
@@ -819,11 +841,8 @@ void pkgi_start_thread(const char* name, pkgi_thread_entry* start)
 {
 	s32 ret;
 	sys_ppu_thread_t id;
-//	u64 prio = 1500;
-//	size_t stacksize = 1024*1024; //0xF000;
-//	void *threadarg = (void*)0x1337;
 
-	ret = sysThreadCreate(&id, (void (*)(void *))start, (void*)0x1337, 1500, 1024*1024, THREAD_JOINABLE, (char*)name);
+	ret = sysThreadCreate(&id, (void (*)(void *))start, NULL, 1500, 1024*1024, THREAD_JOINABLE, (char*)name);
 	LOG("sysThreadCreate: %s (0x%08x)",name, id);
 
     if (ret != 0)
@@ -835,7 +854,6 @@ void pkgi_start_thread(const char* name, pkgi_thread_entry* start)
 void pkgi_sleep(uint32_t msec)
 {
     usleep(msec * 1000);
-    //sceKernelDelayThread(msec * 1000);
 }
 
 int pkgi_load(const char* name, void* data, uint32_t max)
@@ -1079,9 +1097,12 @@ int pkgi_validate_url(const char* url)
     {
         return 1;
     }
+    if (pkgi_strstr(url, "https://") == url)
+    {
+        return 1;
+    }
     return 0;
 }
-
 
 pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
 {
@@ -1175,7 +1196,6 @@ pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
         }
         httpClientSetConnTimeout(clientID, 10 * 1000 * 1000);
         httpClientSetUserAgent(clientID, PKGI_USER_AGENT);
-
 
     	ret = httpUtilParseUri(&uri, url, NULL, 0, &pool_size);
         if (ret < 0)

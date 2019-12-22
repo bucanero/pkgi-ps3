@@ -125,7 +125,7 @@ You need to have installed:
 
 - [PS3 toolchain](https://github.com/bucanero/ps3toolchain)
 - [PSL1GHT](https://github.com/bucanero/PSL1GHT) library
-- [tiny3D lib & libfont](https://github.com/wargio/tiny3d) (from Estwald)
+- [tiny3D lib & libfont](https://github.com/Estwald/PSDK3v2/tree/master/libraries-src/Tiny3D) (from Estwald)
 - [YA2D lib](https://github.com/bucanero/ya2d_ps3) (an extended version from my repo)
 - [dbglogger lib](https://github.com/bucanero/psl1ght-libs/tree/master/dbglogger) (my own debug logging library)
 
