@@ -6,8 +6,9 @@ typedef struct Config {
     DbSort sort;
     DbSortOrder order;
     uint32_t filter;
-    int no_version_check;
+    int version_check;
     int dl_mode_background;
+    int music;
 } Config;
 
 void pkgi_load_config(Config* config, char* update_url, uint32_t update_len);

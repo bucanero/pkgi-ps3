@@ -4,11 +4,15 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 ## [Unreleased]()
 
+## [v1.1.0](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.1.0) - 2019-12-23
+
 ### Added
 
 * Added TTF fonts to support Japanese characters
 * Added SSL support (the app can download `https` links)
 * Added package install bubble for Direct downloads
+* Added background music
+* Added settings options for music and auto-update
 
 ### Fixed
 

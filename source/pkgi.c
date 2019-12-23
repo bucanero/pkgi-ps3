@@ -220,13 +220,13 @@ static void pkgi_do_main(pkgi_input* input)
     {
         if (input->active & PKGI_BUTTON_START) {
             input->pressed &= ~PKGI_BUTTON_START;
-            if (pkgi_msgDialog_YesNo("Exit to XMB?") == 1)
+            if (pkgi_msgDialog(MDIALOG_YESNO, "Exit to XMB?") == 1)
                 state = StateTerminate;
         }
 
         if (input->active & PKGI_BUTTON_SELECT) {
             input->pressed &= ~PKGI_BUTTON_SELECT;
-            pkgi_msgDialog_OK("             \xE2\x98\x85  PKGi PS3 v" PKGI_VERSION "  \xE2\x98\x85          \n\n"
+            pkgi_msgDialog(MDIALOG_OK, "             \xE2\x98\x85  PKGi PS3 v" PKGI_VERSION "  \xE2\x98\x85          \n\n"
                               "  original PS Vita version by mmozeiko    \n\n"
                               "  ported to PlayStation 3 by Bucanero     ");
         }
@@ -389,7 +389,7 @@ static void pkgi_do_main(pkgi_input* input)
             uint32_t height = max_items * avail_height / db_count;
             uint32_t start = first_item * (avail_height - (height < min_height ? min_height : 0)) / db_count;
             height = max32(height, min_height);
-            pkgi_draw_fill_rect(VITA_WIDTH - PKGI_MAIN_SCROLL_WIDTH - 1, font_height + PKGI_MAIN_HLINE_EXTRA + start, PKGI_MAIN_SCROLL_WIDTH, height, PKGI_COLOR_SCROLL_BAR);
+            pkgi_draw_fill_rect_z(VITA_WIDTH - PKGI_MAIN_SCROLL_WIDTH - 1, font_height + PKGI_MAIN_HLINE_EXTRA + start, PKGI_FONT_Z, PKGI_MAIN_SCROLL_WIDTH, height, PKGI_COLOR_SCROLL_BAR);
         }
     }
 
@@ -500,7 +500,7 @@ static void pkgi_do_head(void)
 
 static void pkgi_do_tail(void)
 {
-    pkgi_draw_fill_rect(0, bottom_y - font_height/2, VITA_WIDTH, PKGI_MAIN_HLINE_HEIGHT, PKGI_COLOR_HLINE);
+    pkgi_draw_fill_rect_z(0, bottom_y - font_height/2, PKGI_FONT_Z, VITA_WIDTH, PKGI_MAIN_HLINE_HEIGHT, PKGI_COLOR_HLINE);
 
     uint32_t count = pkgi_db_count();
     uint32_t total = pkgi_db_total();
@@ -657,9 +657,12 @@ static void pkgi_check_for_update(void)
 int main()
 {
     pkgi_start();
-    LOG("started");
 
     pkgi_load_config(&config, refresh_url, sizeof(refresh_url));
+    if (config.music)
+    {
+        pkgi_start_music();
+    }
     
     pkgi_dialog_init();
     
@@ -682,7 +685,7 @@ int main()
 
         if (state == StateUpdateDone)
         {
-            if (!config.no_version_check)
+            if (config.version_check)
             {
                 pkgi_start_thread("update_thread", &pkgi_check_for_update);
             }

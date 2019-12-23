@@ -20,6 +20,10 @@
 
 #include "ttf_render.h"
 
+#include <mikmod.h>
+#include "mikmod_loader.h"
+
+
 #define OSKDIALOG_FINISHED          0x503
 #define OSKDIALOG_UNLOADED          0x504
 #define OSKDIALOG_INPUT_ENTERED     0x505
@@ -93,6 +97,9 @@ static uint16_t g_ime_input[SCE_IME_DIALOG_MAX_TEXT_LENGTH + 1];
 static pkgi_http g_http[4];
 static t_tex_buttons tex_buttons;
 static t_http_pools http_pools;
+
+static MREADER *mem_reader;
+static MODULE *module;
 
 
 int pkgi_snprintf(char* buffer, uint32_t size, const char* msg, ...)
@@ -191,6 +198,57 @@ int pkgi_ok_button(void)
 int pkgi_cancel_button(void)
 {
     return g_cancel_button;
+}
+
+static void music_update_thread(void)
+{
+    while (module)
+    {
+        MikMod_Update();
+        usleep(1000);
+    }
+    return;
+}
+
+void pkgi_start_music(void)
+{
+    MikMod_InitThreads();
+    
+    /* register the driver and S3M module loader */
+    MikMod_RegisterDriver(&drv_psl1ght);    
+    MikMod_RegisterLoader(&load_s3m);
+    
+    /* init the library */
+    md_mode |= DMODE_SOFT_MUSIC | DMODE_STEREO | DMODE_HQMIXER | DMODE_16BITS;
+    
+    if (MikMod_Init("")) {
+        LOG("Could not initialize sound: %s", MikMod_strerror(MikMod_errno));
+        return;
+    }
+    
+    LOG("Init %s", MikMod_InfoDriver());
+    LOG("Loader %s", MikMod_InfoLoader());
+    
+    mem_reader = new_mikmod_mem_reader(haiku_s3m_bin, haiku_s3m_bin_size);
+    module = Player_LoadGeneric(mem_reader, 64, 0);
+    module->wrap = TRUE;
+
+    if (module) {
+        /* start module */
+        LOG("Playing %s", module->songname);
+        Player_Start(module);
+        pkgi_start_thread("music_thread", &music_update_thread);
+    } else
+        LOG("Could not load module: %s", MikMod_strerror(MikMod_errno));
+}
+
+void end_music()
+{
+    Player_Stop();
+    Player_Free(module);
+    
+    delete_mikmod_mem_reader(mem_reader);
+    MikMod_Exit();
 }
 
 static int sys_game_get_temperature(int sel, u32 *temperature) 
@@ -724,6 +782,8 @@ void pkgi_swap(void)
 
 void pkgi_end(void)
 {
+    if (module) end_music();
+
     pkgi_stop_debug_log();
 
     pkgi_free_texture(tex_buttons.circle);

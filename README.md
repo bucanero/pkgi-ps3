@@ -111,13 +111,13 @@ It will open the context menu. Press ![Triangle](https://github.com/bucanero/pkg
 
   You can use [PSDLE][] to find `.pkg` URLs for the games you own. Then either use the original URL, or host the file on your own web server.
 
-3. Where to remove interrupted/failed downloads to free up the space?
+3. Where to remove interrupted/failed downloads to free up disk space?
 
-  In the `/dev_hdd0/packages` folder - each download will be in separate `.pkg` file by its title id. Simply delete the file and start again.
+  Check the `/dev_hdd0/tmp/pkgi` folder - each download will be in separate `.pkg` file by its title id. Simply delete the file and start again.
 
 4. Download speed is too slow!
 
-  Optimization is still pending. If `direct` download is slow, you can use `background download` mode to download files using the internal Download Manager.
+  Optimization is still pending. If `direct` download is slow, you can use `background download` mode to download files using the internal PS3 Download Manager.
 
 # Building
 

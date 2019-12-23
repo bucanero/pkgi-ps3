@@ -22,6 +22,8 @@ typedef enum {
     MenuFilter,
     MenuRefresh,
     MenuMode,
+    MenuUpdate,
+    MenuMusic
 } MenuType;
 
 typedef struct {
@@ -48,8 +50,11 @@ static const MenuEntry menu_entries[] =
     { MenuFilter, "USA", DbFilterRegionUSA },
 
     { MenuText, "DL mode:", 0 },
-    { MenuMode, "Direct", 0 },
     { MenuMode, "Background", 1 },
+
+    { MenuText, "Options:", 0 },
+    { MenuMusic, "Music", 1 },
+    { MenuUpdate, "Updates", 1 },
 
     { MenuRefresh, "Refresh...", 0 },
 };
@@ -187,7 +192,15 @@ int pkgi_do_menu(pkgi_input* input)
         }
         else if (type == MenuMode)
         {
-            menu_config.dl_mode_background = menu_entries[menu_selected].value;
+            menu_config.dl_mode_background ^= menu_entries[menu_selected].value;
+        }
+        else if (type == MenuMusic)
+        {
+            menu_config.music ^= menu_entries[menu_selected].value;
+        }
+        else if (type == MenuUpdate)
+        {
+            menu_config.version_check ^= menu_entries[menu_selected].value;
         }
     }
 
@@ -252,8 +265,18 @@ int pkgi_do_menu(pkgi_input* input)
         }
         else if (type == MenuMode)
         {
+            pkgi_snprintf(text, sizeof(text), PKGI_UTF8_CLEAR " %s",
+                menu_config.dl_mode_background == entry->value ? entry->text : "Direct");            
+        }
+        else if (type == MenuMusic)
+        {
             pkgi_snprintf(text, sizeof(text), "%s %s",
-                menu_config.dl_mode_background == entry->value ? PKGI_UTF8_CHECK_ON : " ", entry->text);            
+                menu_config.music == entry->value ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF, entry->text);            
+        }
+        else if (type == MenuUpdate)
+        {
+            pkgi_snprintf(text, sizeof(text), "%s %s",
+                menu_config.version_check == entry->value ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF, entry->text);            
         }
         
         pkgi_draw_text_z(x, y, PKGI_MENU_TEXT_Z, color, text);

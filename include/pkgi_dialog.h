@@ -1,5 +1,8 @@
 #pragma once
 
+#define MDIALOG_OK      0 
+#define MDIALOG_YESNO   1 
+
 typedef struct pkgi_input pkgi_input;
 
 void pkgi_dialog_init(void);
@@ -19,5 +22,4 @@ void pkgi_dialog_close(void);
 
 void pkgi_do_dialog(pkgi_input* input);
 
-void pkgi_msgDialog_OK(const char * str);
-int pkgi_msgDialog_YesNo(const char * str);
+int pkgi_msgDialog(int tdialog, const char * str);

@@ -367,19 +367,15 @@ void wait_dialog()
     pkgi_sleep(100);
 }
 
-void pkgi_msgDialog_OK(const char * str)
+int pkgi_msgDialog(int tdialog, const char * str)
 {
     msg_dialog_action = 0;
-    msgType mdialogok = MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_OK;
-    msgDialogOpen2(mdialogok, str, msg_dialog_event, (void*) 0x0000aaab, NULL );
-    wait_dialog();
-}
 
-int pkgi_msgDialog_YesNo(const char * str)
-{
-    msg_dialog_action = 0;
-    msgType mdialogyesno = MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_YESNO  | MSG_DIALOG_DEFAULT_CURSOR_NO;
-    msgDialogOpen2(mdialogyesno, str, msg_dialog_event, (void*)  0x0000aaaa, NULL );
+    msgType mtype = MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_OK;
+    if (tdialog == MDIALOG_YESNO)
+        mtype = MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_YESNO  | MSG_DIALOG_DEFAULT_CURSOR_NO;
+
+    msgDialogOpen2(mtype, str, msg_dialog_event, (void*)  0x0000aaaa, NULL );
     wait_dialog();
     return msg_dialog_action;
 }

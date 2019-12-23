@@ -38,7 +38,7 @@ INCLUDES	:=	include
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS		:=	-lya2d -lfont -ltiny3d -lsimdmath -lgcm_sys -lio -lsysutil -lrt -llv2 -lpngdec -lsysmodule -lm -lsysfs  -ljpgdec -ldbglogger -lnet -lhttp -lhttputil -lssl -lfreetype -lz
+LIBS		:=	-lya2d -lfont -ltiny3d -lsimdmath -lgcm_sys -lio -lsysutil -lrt -llv2 -lpngdec -lsysmodule -lm -lsysfs  -ljpgdec -ldbglogger -lnet -lhttp -lhttputil -lssl -lfreetype -lz -lmikmod -laudio
 
 
 #---------------------------------------------------------------------------------
@@ -84,9 +84,6 @@ SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.S)))
 BINFILES	:=  $(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.bin)))
 PNGFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.png)))
 JPGFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.jpg)))
-
-VPOFILES	:=	$(VCGFILES:.vcg=.vpo)
-FPOFILES	:=	$(FCGFILES:.fcg=.fpo)
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C

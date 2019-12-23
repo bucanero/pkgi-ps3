@@ -6,7 +6,7 @@
 #include <dbglogger.h>
 
 #define PKGI_UPDATE_URL     "https://api.github.com/repos/bucanero/pkgi-ps3/releases/latest"
-#define PKGI_VERSION        "1.0.8"
+#define PKGI_VERSION        "1.1.0"
 
 // values compatible with psp2/ctrl.h header
 #define PKGI_BUTTON_SELECT 0x00000001
@@ -142,7 +142,7 @@ typedef void* pkgi_texture;
        pkgi_load_##type##_raw((void*) name##_##type , name##_##type##_size); \
     })
 
-
+void pkgi_start_music(void);
 
 pkgi_texture pkgi_load_png_raw(const void* data, uint32_t size);
 pkgi_texture pkgi_load_jpg_raw(const void* data, uint32_t size);
@@ -163,4 +163,3 @@ void pkgi_draw_text_ttf(int x, int y, int z, uint32_t color, const char* text);
 int pkgi_text_width(const char* text);
 int pkgi_text_width_ttf(const char* text);
 int pkgi_text_height(const char* text);
-
