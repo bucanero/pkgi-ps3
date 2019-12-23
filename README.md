@@ -113,7 +113,7 @@ It will open the context menu. Press ![Triangle](https://github.com/bucanero/pkg
 
 3. Where to remove interrupted/failed downloads to free up disk space?
 
-  Check the `/dev_hdd0/tmp/pkgi` folder - each download will be in separate `.pkg` file by its title id. Simply delete the file and start again.
+  Check the `/dev_hdd0/tmp/pkgi` folder - each download will be in a separate `.pkg` file by its title id. Simply delete the file and start again.
 
 4. Download speed is too slow!
 
