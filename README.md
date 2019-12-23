@@ -127,14 +127,15 @@ You need to have installed:
 - [PSL1GHT](https://github.com/bucanero/PSL1GHT) library
 - [tiny3D lib & libfont](https://github.com/Estwald/PSDK3v2/tree/master/libraries-src/Tiny3D) (from Estwald)
 - [YA2D lib](https://github.com/bucanero/ya2d_ps3) (an extended version from my repo)
+- [MikMod lib](https://github.com/ps3dev/ps3libraries/blob/master/scripts/011-libmikmod-3.1.11.sh)
 - [dbglogger lib](https://github.com/bucanero/psl1ght-libs/tree/master/dbglogger) (my own debug logging library)
 
-Run `make` to create a release build. After than run `make pkg` to create a `.pkg` install file. 
+Run `make` to create a release build. After that, run `make pkg` to create a `.pkg` install file. 
 
 You can also set the environment variable `PS3LOAD=tcp:x.x.x.x` to the PS3's IP address;
-that will allow to use `make run` and send `pkgi-ps3.self` directly to the PS3Load listener.
+that will allow you to use `make run` and send `pkgi-ps3.self` directly to the PS3Load listener.
 
-To enable debugging logging pass `-DPKGI_ENABLE_LOGGING=ON` argument to make. Then application will send debug messages to
+To enable debug logging, build PKGi PS3 with `make PKGI_ENABLE_LOGGING`. The application will send debug messages to
 UDP multicast address 239.255.0.100:30000. To receive them you can use [socat][] on your PC:
 
     $ socat udp4-recv:30000,ip-add-membership=239.255.0.100:0.0.0.0 -

@@ -3,8 +3,6 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-#include <dbglogger.h>
-
 #define PKGI_UPDATE_URL     "https://api.github.com/repos/bucanero/pkgi-ps3/releases/latest"
 #define PKGI_VERSION        "1.1.0"
 
@@ -42,15 +40,12 @@ typedef struct pkgi_input {
 
 #define PKGI_COUNTOF(arr) (sizeof(arr)/sizeof(0[arr]))
 
-#define PKGI_ENABLE_LOGGING 1
-
-
 #ifdef PKGI_ENABLE_LOGGING
+#include <dbglogger.h>
 #define LOG dbglogger_log
 #else
 #define LOG(...)
 #endif
-
 
 int pkgi_snprintf(char* buffer, uint32_t size, const char* msg, ...);
 void pkgi_vsnprintf(char* buffer, uint32_t size, const char* msg, va_list args);

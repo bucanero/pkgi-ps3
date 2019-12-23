@@ -50,7 +50,9 @@ CXXFLAGS	=	$(CFLAGS)
 
 LDFLAGS		=	$(MACHDEP) -Wl,-Map,$(notdir $@).map
 
-
+ifdef PKGI_ENABLE_LOGGING
+CFLAGS		+=	-DPKGI_ENABLE_LOGGING
+endif
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
 # include and lib
