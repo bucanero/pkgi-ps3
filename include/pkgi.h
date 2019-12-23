@@ -28,9 +28,8 @@
 #define PKGI_UNUSED(x) (void)(x)
 
 #define PKGI_APP_FOLDER "/dev_hdd0/game/NP00PKGI3/USRDIR"
-#define PKGI_PKG_FOLDER "/dev_hdd0/packages"
 #define PKGI_RAP_FOLDER "/dev_hdd0/exdata"
-#define PKGI_TMP_FOLDER "/dev_hdd0/tmp"
+#define PKGI_TMP_FOLDER "/dev_hdd0/tmp/pkgi"
 #define PKGI_QUEUE_FOLDER "/dev_hdd0/vsh/task"
 #define PKGI_INSTALL_FOLDER "/dev_hdd0/vsh/game_pkg"
 
@@ -118,7 +117,7 @@ int pkgi_http_response_length(pkgi_http* http, int64_t* length);
 int pkgi_http_read(pkgi_http* http, void* buffer, uint32_t size);
 void pkgi_http_close(pkgi_http* http);
 
-int pkgi_mkdirs(char* path);
+int pkgi_mkdirs(const char* path);
 void pkgi_rm(const char* file);
 int64_t pkgi_get_size(const char* path);
 

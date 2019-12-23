@@ -648,6 +648,9 @@ void pkgi_start(void)
 
     load_ttf_fonts();
 
+    pkgi_mkdirs(PKGI_TMP_FOLDER);
+    pkgi_mkdirs(PKGI_RAP_FOLDER);
+
     g_time = pkgi_time_msec();
 }
 
@@ -1338,8 +1341,10 @@ void pkgi_http_close(pkgi_http* http)
     http->used = 0;
 }
 
-int pkgi_mkdirs(char* path)
+int pkgi_mkdirs(const char* dir)
 {
+    char path[256];
+    pkgi_snprintf(path, sizeof(path), "%s", dir);
     LOG("pkgi_mkdirs for %s", path);
     char* ptr = path;
     ptr++;

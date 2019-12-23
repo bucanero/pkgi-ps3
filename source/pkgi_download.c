@@ -598,7 +598,7 @@ static int download_pkg_file(void)
     int result = 0;
 
     pkgi_strncpy(item_name, sizeof(item_name), root);
-    pkgi_snprintf(item_path, sizeof(item_path), "%s/%s", PKGI_PKG_FOLDER, root);
+    pkgi_snprintf(item_path, sizeof(item_path), "%s/%s", pkgi_get_temp_folder(), root);
 
     if (download_resume)
     {
@@ -669,16 +669,6 @@ static int create_rap(const char* contentid, const uint8_t* rap)
     pkgi_dialog_update_progress("Creating RAP file", NULL, NULL, 1.f);
 
     char path[256];
-    pkgi_snprintf(path, sizeof(path), "%s", PKGI_RAP_FOLDER);
-
-    if (!pkgi_mkdirs(path))
-    {
-        char error[256];
-        pkgi_snprintf(error, sizeof(error), "Cannot create folder %s", PKGI_RAP_FOLDER);
-        pkgi_dialog_error(error);
-        return 0;
-    }
-
     pkgi_snprintf(path, sizeof(path), "%s/%s.rap", PKGI_RAP_FOLDER, contentid);
 
     if (!pkgi_save(path, rap, PKGI_RAP_SIZE))
@@ -758,7 +748,7 @@ int pkgi_install(const char *titleid)
 	char pkg_path[256];
 	char filename[256];
 
-    pkgi_snprintf(pkg_path, sizeof(pkg_path), PKGI_PKG_FOLDER "/%s", root);
+    pkgi_snprintf(pkg_path, sizeof(pkg_path), "%s/%s", pkgi_get_temp_folder(), root);
 	uint64_t fsize = pkgi_get_size(pkg_path);
     
 	install_task_id = get_task_dir_id(PKGI_INSTALL_FOLDER, install_task_id);
@@ -785,7 +775,7 @@ int pkgi_install(const char *titleid)
     }
 
     pkgi_snprintf(filename, sizeof(filename), "%s/%s", pkg_path, root);
-    pkgi_snprintf(pkg_path, sizeof(pkg_path), PKGI_PKG_FOLDER "/%s", root);
+    pkgi_snprintf(pkg_path, sizeof(pkg_path), "%s/%s", pkgi_get_temp_folder(), root);
     
     LOG("move (%s) -> (%s)", pkg_path, filename);
     
