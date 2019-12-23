@@ -785,7 +785,9 @@ int pkgi_install(const char *titleid)
     }
 
     pkgi_snprintf(filename, sizeof(filename), "%s/%s", pkg_path, root);
-    pkgi_snprintf(pkg_path, sizeof(pkg_path), PKGI_INSTALL_FOLDER "/%s", root);
+    pkgi_snprintf(pkg_path, sizeof(pkg_path), PKGI_PKG_FOLDER "/%s", root);
+    
+    LOG("move (%s) -> (%s)", pkg_path, filename);
     
     int ret = sysLv2FsRename(pkg_path, filename);
 
