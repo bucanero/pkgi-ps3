@@ -78,6 +78,6 @@
 #define PKGI_MENU_Z            900
 #define PKGI_MENU_TEXT_Z       800
 #define PKGI_MENU_WIDTH        150
-#define PKGI_MENU_HEIGHT       450
+#define PKGI_MENU_HEIGHT       470
 #define PKGI_MENU_LEFT_PADDING 20
 #define PKGI_MENU_TOP_PADDING  50
