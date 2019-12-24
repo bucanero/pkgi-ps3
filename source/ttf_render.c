@@ -304,8 +304,8 @@ static void DrawTextBox_ttf(float x, float y, float z, float w, float h, u32 rgb
 }
 
 
-#define UX 30
-#define UY 24
+#define TTF_UX 30
+#define TTF_UY 24
 
 
 int display_ttf_string(int posx, int posy, const char *string, u32 color, u32 bkcolor, int sw, int sh)
@@ -391,10 +391,10 @@ int display_ttf_string(int posx, int posy, const char *string, u32 color, u32 bk
 
         if(!(ttf_font_datas[l].flags & 1)) { 
 
-            if(f_face[0]) FT_Set_Pixel_Sizes(face[0], UX, UY);
-            if(f_face[1]) FT_Set_Pixel_Sizes(face[1], UX, UY);
-            if(f_face[2]) FT_Set_Pixel_Sizes(face[2], UX, UY);
-            if(f_face[3]) FT_Set_Pixel_Sizes(face[3], UX, UY);
+            if(f_face[0]) FT_Set_Pixel_Sizes(face[0], TTF_UX, TTF_UY);
+            if(f_face[1]) FT_Set_Pixel_Sizes(face[1], TTF_UX, TTF_UY);
+            if(f_face[2]) FT_Set_Pixel_Sizes(face[2], TTF_UX, TTF_UY);
+            if(f_face[3]) FT_Set_Pixel_Sizes(face[3], TTF_UX, TTF_UY);
 
             FT_GlyphSlot slot = NULL;
 
@@ -417,7 +417,7 @@ int display_ttf_string(int posx, int posy, const char *string, u32 color, u32 bk
             if(ttf_char!=0) {
                 ww = ww2 = 0;
 
-                int y_correction = UY - 1 - slot->bitmap_top;
+                int y_correction = TTF_UY - 1 - slot->bitmap_top;
                 if(y_correction < 0) y_correction = 0;
 
                 ttf_font_datas[l].flags = 1;
@@ -464,7 +464,7 @@ int display_ttf_string(int posx, int posy, const char *string, u32 color, u32 bk
         if(ccolor) {
             tiny3d_SetTextureWrap(0, tiny3d_TextureOffset(bitmap), 32, 32, 32 * 2,
                 TINY3D_TEX_FORMAT_A4R4G4B4, TEXTWRAP_CLAMP, TEXTWRAP_CLAMP, TEXTURE_LINEAR);
-    
+
             if (bkcolor != 0) DrawBox_ttf((float) (Win_X_ttf + posx), (float) (Win_Y_ttf + posy) + ((float) ttf_font_datas[l].y_start * sh) * 0.03125f,
             Z_ttf, (float) sw, (float) sh, bkcolor);
             DrawTextBox_ttf((float) (Win_X_ttf + posx), (float) (Win_Y_ttf + posy) + ((float) ttf_font_datas[l].y_start * sh) * 0.03125f,
