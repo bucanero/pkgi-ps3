@@ -13,10 +13,10 @@ The `pkgi-ps3` homebrew app allows to download and install `.pkg` files directly
 
 # Features
 
-* **easy** way to list available downloads, including searching, filtering, and sorting.
-* **standalone**, no PC required, everything happens directly on the PS3.
-* **automatic** downloads, just choose an item, and it will be downloaded by the app to your HDD (`direct mode`) or queued for background download (`background mode`) using the internal Download Manager.
-* **resumes** interrupted downloads. You can stop download at any time, switch applications, and come back to resume the download at any time.
+* **easy to use:** list available downloads, including searching, filtering, and sorting.
+* **standalone:** no PC required, everything happens directly on the PS3.
+* **automatic downloads:** just choose an item, and it will be downloaded by the app to your HDD (`direct mode`) or queued for background download (`background mode`) using the internal Download Manager.
+* **resumes interrupted downloads:** you can stop a download at any time, switch applications, and come back to resume the download later.
 
 ### Notes:
 * **queuing** up multiple downloads is only supported when using `background download` mode.
@@ -72,6 +72,8 @@ The `dbformat.txt` definition file is a 2-line text file:
 
 All the columns are optional. Your database might have more (or less) columns, so any unrecognized column will be skipped.
 
+### Example
+
 Example `dbformat.txt`, for a database using semi-colon (`;`) as separator:
 
 ```
@@ -81,6 +83,7 @@ name;TITLE ID;REGION;description;AUTHOR;TYPE;url;rap;size
 
 **Result:** only the `name,description,url,rap,size` fields will be used.
 
+### Example
 
 Example `dbformat.txt`, for a database using character pipe (`|`) as separator:
 
@@ -100,6 +103,12 @@ Using the application is pretty straight-forward:
  - To sort/filter/search press ![Triangle](https://github.com/bucanero/pkgi-ps3/raw/master/data/TRIANGLE.png).
 It will open the context menu. Press ![Triangle](https://github.com/bucanero/pkgi-ps3/raw/master/data/TRIANGLE.png) again to confirm the new settings, or press ![O button](https://github.com/bucanero/pkgi-ps3/raw/master/data/CIRCLE.png) to cancel any changes.
 - Press left or right trigger buttons **(L1/R1)** to move pages up or down.
+
+### Notes
+
+- **HEN users:** content `.rap` will be activated automatically when launched.
+- **CFW users:** update to COBRA 8.2 firmware for automatic `.rap` import, or use reactPSN/psnpatch on older CFWs after installing the content.
+
 
 # Q&A
 
