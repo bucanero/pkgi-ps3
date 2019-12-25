@@ -50,14 +50,14 @@ static void pkgi_refresh_thread(void)
 {
     LOG("starting update");
     
-    const char* url = refresh_url;
-#ifdef PKGI_REFRESH_URL
-    if (url[0] == 0)
+    const char* url = NULL;
+    
+    if (pkgi_menu_result() == MenuResultRefresh)
     {
-        url = PKGI_REFRESH_URL;
+        url = refresh_url;
     }
-#endif
-    if (pkgi_db_update(url, error_state, sizeof(error_state)))
+
+    if (pkgi_db_update("pkgi.txt", url, error_state, sizeof(error_state)))
     {
         first_item = 0;
         selected_item = 0;
@@ -123,6 +123,8 @@ static void pkgi_download_thread(void)
 
     item->presence = PresenceUnknown;
     state = StateMain;
+
+    pkgi_thread_exit();
 }
 
 static uint32_t friendly_size(uint64_t size)
@@ -417,9 +419,7 @@ static void pkgi_do_main(pkgi_input* input)
 
         config_temp = config;
         int allow_refresh = refresh_url[0] != 0;
-#ifdef PKGI_REFRESH_URL
-        allow_refresh = 1;
-#endif
+
         pkgi_menu_start(search_active, &config, allow_refresh);
     }
     else if (input && (input->active & PKGI_BUTTON_S))
@@ -569,7 +569,7 @@ static void reposition(void)
     }
 }
 
-static void pkgi_check_for_update(void)
+static void pkgi_update_check_thread(void)
 {
     LOG("checking latest pkgi version at %s", PKGI_UPDATE_URL);
 
@@ -652,6 +652,7 @@ static void pkgi_check_for_update(void)
     {
         LOG("http request to %s failed", PKGI_UPDATE_URL);
     }
+    pkgi_thread_exit();
 }
 
 int main()
@@ -687,7 +688,7 @@ int main()
         {
             if (config.version_check)
             {
-                pkgi_start_thread("update_thread", &pkgi_check_for_update);
+                pkgi_start_thread("update_thread", &pkgi_update_check_thread);
             }
 
             pkgi_db_configure(NULL, &config);

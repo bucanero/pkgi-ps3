@@ -131,7 +131,7 @@ static char* generate_contentid(void)
     return cid;
 }
 
-int pkgi_db_update(const char* update_url, char* error, uint32_t error_size)
+int pkgi_db_update(const char* db_file, const char* update_url, char* error, uint32_t error_size)
 {
     db_total = 0;
     db_size = 0;
@@ -185,19 +185,11 @@ int pkgi_db_update(const char* update_url, char* error, uint32_t error_size)
         }
         dbf.total_columns = column;
         dbf.type = types;
-    } 
-    
-    pkgi_snprintf(path, sizeof(path), "%s/pkgi.txt", pkgi_get_config_folder());
-
-    LOG("loading update from %s", path);
-    
-    loaded = pkgi_load(path, db_data, sizeof(db_data) - 1);
-
-    if (loaded > 0)
-    {
-        db_size = loaded;
     }
-    else if (update_url[0] != 0)
+
+    pkgi_snprintf(path, sizeof(path), "%s/%s", pkgi_get_config_folder(), db_file);
+    
+    if (update_url)
     {
         LOG("loading update from %s", update_url);
 
@@ -218,7 +210,7 @@ int pkgi_db_update(const char* update_url, char* error, uint32_t error_size)
             {
                 if (length > (int64_t)sizeof(db_data) - 1)
                 {
-                    pkgi_snprintf(error, sizeof(error_size), "list is too large... check for newer pkgi version!");
+                    pkgi_snprintf(error, error_size, "list is too large... check for newer pkgi version!");
                 }
                 else if (length != 0)
                 {
@@ -237,7 +229,7 @@ int pkgi_db_update(const char* update_url, char* error, uint32_t error_size)
                     }
                     else if (read < 0)
                     {
-                        pkgi_snprintf(error, sizeof(error_size), "HTTP error 0x%08x", read);
+                        pkgi_snprintf(error, error_size, "HTTP error 0x%08x", read);
                         db_size = 0;
                         break;
                     }
@@ -246,7 +238,7 @@ int pkgi_db_update(const char* update_url, char* error, uint32_t error_size)
 
                 if (error[0] == 0 && db_size == 0)
                 {
-                    pkgi_snprintf(error, sizeof(error_size), "list is empty... check for newer pkgi version!");
+                    pkgi_snprintf(error, error_size, "list is empty... check the DB server");
                 }
             }
 
@@ -256,11 +248,23 @@ int pkgi_db_update(const char* update_url, char* error, uint32_t error_size)
             {
                 return 0;
             }
+            else
+            {
+                pkgi_save(path, db_data, db_size);
+            }
         }
+    }
+
+    LOG("loading update from %s", path);
+    
+    loaded = pkgi_load(path, db_data, sizeof(db_data) - 1);
+    if (loaded > 0)
+    {
+        db_size = loaded;
     }
     else
     {
-        pkgi_snprintf(error, error_size, "ERROR: pkgi.txt file missing or bad config.txt file?");
+        pkgi_snprintf(error, error_size, "ERROR: %s file missing or bad config.txt file", db_file);
         return 0;
     }
 
@@ -291,7 +295,7 @@ int pkgi_db_update(const char* update_url, char* error, uint32_t error_size)
             column++;
         }
 
-        if (column == dbf.total_columns) {
+        if (column == dbf.total_columns && pkgi_validate_url(dbf.data[TypeUrl].data)) {
             // contentid can't be empty, let's generate one
             db[db_count].content = (dbf.data[TypeContentId].data[0] == 0 ? generate_contentid() : dbf.data[TypeContentId].data);
             db[db_count].flags = (uint32_t)pkgi_strtoll(dbf.data[TypeFlags].data);

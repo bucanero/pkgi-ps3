@@ -207,7 +207,7 @@ static void music_update_thread(void)
         MikMod_Update();
         usleep(1000);
     }
-    return;
+    pkgi_thread_exit();
 }
 
 void pkgi_start_music(void)
@@ -268,7 +268,7 @@ static void pkgi_temperature_thread(void)
         sys_game_get_temperature(1, &cpu_temp_c[1]);
         usleep(10 * 1000 * 1000);
     }
-    return;
+    pkgi_thread_exit();
 }
 
 int pkgi_dialog_lock(void)
