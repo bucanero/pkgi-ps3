@@ -47,7 +47,7 @@ struct pkgi_http
     int used;
     int local;
 
-    FILE* fd;
+    void* fd;
     uint64_t size;
     uint64_t offset;
 
@@ -148,6 +148,23 @@ char* pkgi_strrchr(const char* str, char ch)
 uint32_t pkgi_strlen(const char *str)
 {
     return strlen(str);
+}
+
+int64_t pkgi_strtoll(const char* str)
+{
+    int64_t res = 0;
+    const char* s = str;
+    if (*s && *s == '-')
+    {
+        s++;
+    }
+    while (*s)
+    {
+        res = res * 10 + (*s - '0');
+        s++;
+    }
+
+    return str[0] == '-' ? -res : res;
 }
 
 void *pkgi_malloc(uint32_t size)
@@ -854,20 +871,23 @@ int pkgi_is_incomplete(const char* titleid)
     return (res == 0);
 }
 
-int pkgi_is_installed(const char* titleid)
-{    
-    int res = -1;
-    char path[128];
-    snprintf(path, sizeof(path), "/dev_hdd0/game/%s", titleid);
-
+int pkgi_dir_exists(const char* path)
+{
     LOG("checking if folder %s exists", path);
 
     struct stat sb;
     if ((stat(path, &sb) == 0) && S_ISDIR(sb.st_mode)) {
-        res = 0;
+        return 1;
     }
-    
-    return (res == 0);
+    return 0;
+}
+
+int pkgi_is_installed(const char* titleid)
+{    
+    char path[128];
+    snprintf(path, sizeof(path), "/dev_hdd0/game/%s", titleid);
+
+    return (pkgi_dir_exists(path));
 }
 
 uint32_t pkgi_time_msec()
@@ -1162,7 +1182,7 @@ pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
     {
         if (g_http[i].used == 0)
         {
-            http = g_http + i;
+            http = &g_http[i];
             break;
         }
     }
@@ -1173,121 +1193,108 @@ pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
         return NULL;
     }
 
-    pkgi_http* result = NULL;
-
     char path[256];
 
     if (content)
     {
-        strcpy(path, pkgi_get_temp_folder());
-        strcat(path, strrchr(url, '/'));
+        pkgi_snprintf(path, sizeof(path), "%s%s.pkg", pkgi_get_temp_folder(), strrchr(url, '/'));
 
-        http->fd = fopen(path, "rb");
-        if (http->fd < 0)
+        int64_t fsize = pkgi_get_size(path);
+        if (fsize < 0)
         {
-            LOG("%s not found, trying shorter path", path);
+            LOG("trying shorter name (%s)", content);
             pkgi_snprintf(path, sizeof(path), "%s/%s.pkg", pkgi_get_temp_folder(), content);
+            fsize = pkgi_get_size(path);
         }
 
-        http->fd = fopen(path, "rb");
+        if (fsize > 0)
+        {
+            LOG("%s found, using it", path);
+
+            http->fd = pkgi_open(path);
+            http->used = 1;
+            http->local = 1;
+            http->offset = 0;
+            http->size = fsize;
+
+            return(http);
+        }
+        else
+        {
+            LOG("%s not found, downloading url", path);
+        }
     }
     else
     {
         http->fd = NULL;
     }
 
-    if (http->fd)
+    httpClientId clientID;
+    httpTransId transID = 0;
+    httpUri uri;
+    int ret;
+    void *uri_p = NULL;
+    s32 pool_size = 0;
+
+    LOG("starting http GET request for %s", url);
+
+    ret = httpCreateClient(&clientID);
+    if (ret < 0)
     {
-        LOG("%s found, using it", path);
-
-        struct stat st;
-        if (stat(path, &st) < 0)
-        {
-            LOG("cannot get size of file %s", path);
-            fclose(http->fd);
-            return NULL;
-        }
-
-        http->used = 1;
-        http->local = 1;
-        http->offset = 0;
-        http->size = st.st_size;
-
-        result = http;
+        LOG("httpCreateClient failed: 0x%08x", ret);
+        goto bail;
     }
-    else
+    httpClientSetConnTimeout(clientID, 10 * 1000 * 1000);
+    httpClientSetUserAgent(clientID, PKGI_USER_AGENT);
+
+    ret = httpUtilParseUri(&uri, url, NULL, 0, &pool_size);
+    if (ret < 0)
     {
-        if (content)
-        {
-            LOG("%s not found, downloading url", path);
-        }
+        LOG("httpUtilParseUri failed: 0x%08x", ret);
+        goto bail;
+    }
 
-        httpClientId clientID;
-        httpTransId transID = 0;
-        httpUri uri;
-        int ret;
-        void *uri_p = NULL;
-        s32 pool_size = 0;
+    uri_p = malloc(pool_size);
+    if (!uri_p) goto bail;
 
-        LOG("starting http GET request for %s", url);
-
-        ret = httpCreateClient(&clientID);
-        if (ret < 0)
-        {
-            LOG("httpCreateClient failed: 0x%08x", ret);
-            goto bail;
-        }
-        httpClientSetConnTimeout(clientID, 10 * 1000 * 1000);
-        httpClientSetUserAgent(clientID, PKGI_USER_AGENT);
-
-    	ret = httpUtilParseUri(&uri, url, NULL, 0, &pool_size);
-        if (ret < 0)
-        {
-            LOG("httpUtilParseUri failed: 0x%08x", ret);
-            goto bail;
-        }
-
-        uri_p = malloc(pool_size);
-        if (!uri_p) goto bail;
-
-        ret = httpUtilParseUri(&uri, url, uri_p, pool_size, NULL);
-        if (ret < 0)
-        {
-            LOG("httpUtilParseUri failed: 0x%08x", ret);
-            goto bail;
-        }
+    ret = httpUtilParseUri(&uri, url, uri_p, pool_size, NULL);
+    if (ret < 0)
+    {
+        LOG("httpUtilParseUri failed: 0x%08x", ret);
+        goto bail;
+    }
         
-        ret = httpCreateTransaction(&transID, clientID, HTTP_METHOD_GET, &uri);
-        if (ret < 0)
-        {
-            LOG("httpCreateTransaction failed: 0x%08x", ret);
-            goto bail;
-        }
+    ret = httpCreateTransaction(&transID, clientID, HTTP_METHOD_GET, &uri);
+    if (ret < 0)
+    {
+        LOG("httpCreateTransaction failed: 0x%08x", ret);
+        goto bail;
+    }
         
-        free(uri_p); 
-        uri_p = NULL;
+    free(uri_p);
+    uri_p = NULL;
 
-        if (offset != 0)
-        {
-            char range[64];
-            pkgi_snprintf(range, sizeof(range), "bytes=%llu-", offset);
-            httpHeader reqHead;
-            reqHead.name = "Range";
-            reqHead.value = range;
-            ret = httpRequestAddHeader(transID, &reqHead);
-            if (ret < 0)
-            {
-                LOG("httpRequestAddHeader failed: 0x%08x", ret);
-                goto bail;
-            }
-        }
-
-        ret = httpSendRequest(transID, NULL, 0, NULL);
+    if (offset != 0)
+    {
+        char range[64];
+        pkgi_snprintf(range, sizeof(range), "bytes=%llu-", offset);
+        httpHeader reqHead;
+        reqHead.name = "Range";
+        reqHead.value = range;
+        ret = httpRequestAddHeader(transID, &reqHead);
         if (ret < 0)
         {
-            LOG("httpSendRequest failed: 0x%08x", ret);
+            LOG("httpRequestAddHeader failed: 0x%08x", ret);
             goto bail;
         }
+    }
+
+    ret = httpSendRequest(transID, NULL, 0, NULL);
+    if (ret < 0)
+    {
+        LOG("httpSendRequest failed: 0x%08x", ret);
+        goto bail;
+    }
 
 /*
         int code;
@@ -1306,19 +1313,19 @@ pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
         }
 */
 
-        http->used = 1;
-        http->local = 0;
-        http->client = clientID;
-        http->transaction = transID;
+    http->used = 1;
+    http->local = 0;
+    http->client = clientID;
+    http->transaction = transID;
 
-        return(http);
+    return(http);
 
-    bail:
-        if (transID) httpDestroyTransaction(transID);        
-        if (clientID) httpDestroyClient(clientID);
-    }
+bail:
+    if (uri_p) free(uri_p);
+    if (transID) httpDestroyTransaction(transID);
+    if (clientID) httpDestroyClient(clientID);
 
-    return result;
+    return NULL;
 }
 
 int pkgi_http_response_length(pkgi_http* http, int64_t* length)
@@ -1366,7 +1373,7 @@ int pkgi_http_read(pkgi_http* http, void* buffer, uint32_t size)
 {
     if (http->local)
     {
-        int read = fread(buffer, 1, size, http->fd);
+        int read = pkgi_read(http->fd, buffer, size);
         http->offset += read;
         return read;
     }
@@ -1391,7 +1398,7 @@ void pkgi_http_close(pkgi_http* http)
     LOG("http close");
     if (http->local)
     {
-        fclose(http->fd);
+        pkgi_close(http->fd);
     }
     else
     {
@@ -1416,14 +1423,10 @@ int pkgi_mkdirs(const char* dir)
         }
         char last = *ptr;
         *ptr = 0;
-        LOG("mkdir %s", path);
 
-        struct stat sb;
-        if ((stat(path, &sb) == 0) && S_ISDIR(sb.st_mode)) {
-            LOG("mkdir %s exists!", path);
-        } 
-        else
+        if (!pkgi_dir_exists(path))
         {
+            LOG("mkdir %s", path);
             int err = mkdir(path, 0777);
             if (err < 0)
             {
@@ -1483,13 +1486,13 @@ void* pkgi_create(const char* path)
     return (void*)fd;
 }
 
-void* pkgi_openrw(const char* path)
+void* pkgi_open(const char* path)
 {
-    LOG("fopen openrw on %s", path);
-    FILE* fd = fopen(path, "bw+");
+    LOG("fopen open rb on %s", path);
+    FILE* fd = fopen(path, "rb");
     if (!fd)
     {
-        LOG("cannot openrw %s, err=0x%08x", path, fd);
+        LOG("cannot open %s, err=0x%08x", path, fd);
         return NULL;
     }
     LOG("fopen returned fd=%d", fd);

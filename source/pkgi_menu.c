@@ -23,7 +23,8 @@ typedef enum {
     MenuRefresh,
     MenuMode,
     MenuUpdate,
-    MenuMusic
+    MenuMusic,
+    MenuContent
 } MenuType;
 
 typedef struct {
@@ -43,6 +44,9 @@ static const MenuEntry menu_entries[] =
     { MenuSort, "Name", SortByName },
     { MenuSort, "Size", SortBySize },
 
+    { MenuText, "Content:", 0 },
+    { MenuContent, "All", 0 },
+
     { MenuText, "Regions:", 0 },
     { MenuFilter, "Asia", DbFilterRegionASA },
     { MenuFilter, "Europe", DbFilterRegionEUR },
@@ -57,6 +61,20 @@ static const MenuEntry menu_entries[] =
     { MenuUpdate, "Updates", 1 },
 
     { MenuRefresh, "Refresh...", 0 },
+};
+
+static const MenuEntry content_entries[] = 
+{
+    { MenuFilter, "All", DbFilterAllContent },
+    { MenuFilter, "Games", DbFilterContentGame },
+    { MenuFilter, "DLCs", DbFilterContentDLC },
+    { MenuFilter, "Themes", DbFilterContentTheme },
+    { MenuFilter, "Avatars", DbFilterContentAvatar },
+    { MenuFilter, "Demos", DbFilterContentDemo },
+    { MenuFilter, "Managers", DbFilterContentManager },
+    { MenuFilter, "Emulators", DbFilterContentEmulator },
+    { MenuFilter, "Apps", DbFilterContentApp },
+    { MenuFilter, "Tools", DbFilterContentTool }
 };
 
 int pkgi_menu_is_open(void)
@@ -74,13 +92,13 @@ void pkgi_menu_get(Config* config)
     *config = menu_config;
 }
 
-void pkgi_menu_start(int search_clear, const Config* config, int allow_refresh)
+void pkgi_menu_start(int search_clear, const Config* config)
 {
     menu_search_clear = search_clear;
     menu_width = 1;
     menu_delta = 1;
     menu_config = *config;
-    menu_allow_refresh = allow_refresh;
+    menu_allow_refresh = config->allow_refresh;
 }
 
 int pkgi_do_menu(pkgi_input* input)
@@ -202,6 +220,16 @@ int pkgi_do_menu(pkgi_input* input)
         {
             menu_config.version_check ^= menu_entries[menu_selected].value;
         }
+        else if (type == MenuContent)
+        {
+            menu_config.filter ^= content_entries[menu_config.content].value;
+
+            menu_config.content++;
+            if (menu_config.content == MAX_CONTENT_TYPES)
+                menu_config.content = 0;
+
+            menu_config.filter ^= content_entries[menu_config.content].value;
+        }
     }
 
     if (menu_width != PKGI_MENU_WIDTH)
@@ -277,6 +305,10 @@ int pkgi_do_menu(pkgi_input* input)
         {
             pkgi_snprintf(text, sizeof(text), "%s %s",
                 menu_config.version_check == entry->value ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF, entry->text);            
+        }
+        else if (type == MenuContent)
+        {
+            pkgi_snprintf(text, sizeof(text), PKGI_UTF8_CLEAR " %s", content_entries[menu_config.content].text);
         }
         
         pkgi_draw_text_z(x, y, PKGI_MENU_TEXT_Z, color, text);

@@ -55,6 +55,7 @@ int pkgi_stricmp(const char* a, const char* b);
 void pkgi_strncpy(char* dst, uint32_t size, const char* src);
 char* pkgi_strrchr(const char* str, char ch);
 uint32_t pkgi_strlen(const char *str);
+int64_t pkgi_strtoll(const char* str);
 void pkgi_memcpy(void* dst, const void* src, uint32_t size);
 void pkgi_memmove(void* dst, const void* src, uint32_t size);
 int pkgi_memequ(const void* a, const void* b, uint32_t size);
@@ -118,8 +119,8 @@ int64_t pkgi_get_size(const char* path);
 
 // creates file (if it exists, truncates size to 0)
 void* pkgi_create(const char* path);
-// open existing file in read/write, fails if file does not exist
-void* pkgi_openrw(const char* path);
+// open existing file in read mode, fails if file does not exist
+void* pkgi_open(const char* path);
 // open file for writing, next write will append data to end of it
 void* pkgi_append(const char* path);
 

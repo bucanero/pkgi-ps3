@@ -24,7 +24,7 @@ static uint32_t selected_item;
 
 static int search_active;
 
-static char refresh_url[256];
+static char refresh_url[MAX_CONTENT_TYPES][256];
 
 static Config config;
 static Config config_temp;
@@ -49,15 +49,13 @@ static const char* pkgi_get_cancel_str(void)
 static void pkgi_refresh_thread(void)
 {
     LOG("starting update");
-    
-    const char* url = NULL;
-    
+
     if (pkgi_menu_result() == MenuResultRefresh)
     {
-        url = refresh_url;
+        pkgi_db_update((char*) &refresh_url, sizeof(refresh_url[0]), error_state, sizeof(error_state));
     }
 
-    if (pkgi_db_update("pkgi.txt", url, error_state, sizeof(error_state)))
+    if (pkgi_db_reload(error_state, sizeof(error_state)))
     {
         first_item = 0;
         selected_item = 0;
@@ -418,9 +416,8 @@ static void pkgi_do_main(pkgi_input* input)
         input->pressed &= ~PKGI_BUTTON_T;
 
         config_temp = config;
-        int allow_refresh = refresh_url[0] != 0;
 
-        pkgi_menu_start(search_active, &config, allow_refresh);
+        pkgi_menu_start(search_active, &config);
     }
     else if (input && (input->active & PKGI_BUTTON_S))
     {
@@ -659,7 +656,7 @@ int main()
 {
     pkgi_start();
 
-    pkgi_load_config(&config, refresh_url, sizeof(refresh_url));
+    pkgi_load_config(&config, (char*) &refresh_url, sizeof(refresh_url[0]));
     if (config.music)
     {
         pkgi_start_music();
@@ -769,7 +766,7 @@ int main()
                 else if (mres == MenuResultAccept)
                 {
                     pkgi_menu_get(&config);
-                    pkgi_save_config(&config, refresh_url);
+                    pkgi_save_config(&config, (char*) &refresh_url, sizeof(refresh_url[0]));
                 }
                 else if (mres == MenuResultRefresh)
                 {

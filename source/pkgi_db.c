@@ -7,8 +7,9 @@
 
 #include <stddef.h>
 
-#define MAX_DB_SIZE (4*1024*1024)
-#define MAX_DB_ITEMS 8192
+#define MAX_DB_SIZE (6*1024*1024)
+#define MAX_DB_ITEMS 16384
+#define MAX_DB_COLUMNS 64
 
 static char db_data[MAX_DB_SIZE];
 static uint32_t db_total;
@@ -17,7 +18,7 @@ static uint32_t db_size;
 static DbItem db[MAX_DB_ITEMS];
 static uint32_t db_count;
 
-static DbItem* db_item[MAX_DB_SIZE];
+static DbItem* db_item[MAX_DB_ITEMS];
 static uint32_t db_item_count;
 
 typedef enum {
@@ -68,25 +69,6 @@ static const ColumnType default_format[] =
     TypeSize,
     TypeChecksum
 };
- 
-
-
-static int64_t pkgi_strtoll(const char* str)
-{
-    int64_t res = 0;
-    const char* s = str;
-    if (*s && *s == '-')
-    {
-        s++;
-    }
-    while (*s)
-    {
-        res = res * 10 + (*s - '0');
-        s++;
-    }
-
-    return str[0] == '-' ? -res : res;
-}
 
 static uint8_t hexvalue(char ch)
 {
@@ -131,17 +113,80 @@ static char* generate_contentid(void)
     return cid;
 }
 
-int pkgi_db_update(const char* db_file, const char* update_url, char* error, uint32_t error_size)
+int update_database(const char* update_url, const char* path, char* error, uint32_t error_size)
 {
-    db_total = 0;
-    db_size = 0;
-    db_count = 0;
-    db_item_count = 0;
+    LOG("downloading update from %s", update_url);
+
+    pkgi_http* http = pkgi_http_get(update_url, NULL, 0);
+    if (!http)
+    {
+        pkgi_snprintf(error, error_size, "failed to download list from\n%s", update_url);
+        return 0;
+    }
+    else
+    {
+        int64_t length;
+        if (!pkgi_http_response_length(http, &length))
+        {
+            pkgi_snprintf(error, error_size, "failed to download list from\n%s", update_url);
+        }
+        else
+        {
+            if (length > (int64_t)sizeof(db_data) - 1)
+            {
+                pkgi_snprintf(error, error_size, "list is too large... check for newer pkgi version!");
+            }
+            else if (length != 0)
+            {
+                db_total = (uint32_t)length;
+            }
+
+            error[0] = 0;
+
+            for (;;)
+            {
+                uint32_t want = (uint32_t)min64(1 << 16, sizeof(db_data) - 1 - db_size);
+                int read = pkgi_http_read(http, db_data + db_size, want);
+                if (read == 0)
+                {
+                        break;
+                }
+                else if (read < 0)
+                {
+                    pkgi_snprintf(error, error_size, "HTTP error 0x%08x", read);
+                    db_size = 0;
+                    break;
+                }
+                db_size += read;
+            }
+
+            if (error[0] == 0 && db_size == 0)
+            {
+                pkgi_snprintf(error, error_size, "list is empty... check the DB server");
+            }
+        }
+
+        pkgi_http_close(http);
+
+        if (db_size == 0)
+        {
+            return 0;
+        }
+        else
+        {
+            pkgi_save(path, db_data, db_size);
+        }
+    }
+    return 1;
+}
+
+int load_database(uint8_t db_id)
+{
     uint8_t column = 0;
     dbFormat dbf = { ',', 8, (ColumnType*)default_format, entries };
 
     char path[256];
-    pkgi_snprintf(path, sizeof(path), "%s/dbformat.txt", pkgi_get_config_folder());  
+    pkgi_snprintf(path, sizeof(path), "%s/dbformat.txt", pkgi_get_config_folder());
 
     LOG("loading format from %s", path);
 
@@ -150,10 +195,10 @@ int pkgi_db_update(const char* db_file, const char* update_url, char* error, uin
         char* ptr = db_data;
         char* end = db_data + loaded + 1;
         column = 0;
-        ColumnType types[64];
-    
+        ColumnType types[MAX_DB_COLUMNS];
+
         dbf.delimiter = *ptr++;
-        
+
         if (ptr < end && *ptr == '\r')
         {
             ptr++;
@@ -168,7 +213,7 @@ int pkgi_db_update(const char* db_file, const char* update_url, char* error, uin
             const char* column_name = ptr;
             types[column] = TypeUnknown;
 
-            while (ptr < end && *ptr != dbf.delimiter && *ptr != '\n' && *ptr != '\r' && column < 64)
+            while (ptr < end && *ptr != dbf.delimiter && *ptr != '\n' && *ptr != '\r' && column < MAX_DB_COLUMNS)
             {
                 ptr++;
             }
@@ -187,91 +232,24 @@ int pkgi_db_update(const char* db_file, const char* update_url, char* error, uin
         dbf.type = types;
     }
 
-    pkgi_snprintf(path, sizeof(path), "%s/%s", pkgi_get_config_folder(), db_file);
+    pkgi_snprintf(path, sizeof(path), "%s/pkgi%s.txt", pkgi_get_config_folder(), pkgi_content_tag(db_id));
+
+    LOG("loading database from %s", path);
     
-    if (update_url)
-    {
-        LOG("loading update from %s", update_url);
-
-        pkgi_http* http = pkgi_http_get(update_url, NULL, 0);
-        if (!http)
-        {
-            pkgi_snprintf(error, error_size, "failed to download list");
-            return 0;
-        }
-        else
-        {
-            int64_t length;
-            if (!pkgi_http_response_length(http, &length))
-            {
-                pkgi_snprintf(error, error_size, "failed to download list");
-            }
-            else
-            {
-                if (length > (int64_t)sizeof(db_data) - 1)
-                {
-                    pkgi_snprintf(error, error_size, "list is too large... check for newer pkgi version!");
-                }
-                else if (length != 0)
-                {
-                    db_total = (uint32_t)length;
-                }
-
-                error[0] = 0;
-
-                for (;;)
-                {
-                    uint32_t want = (uint32_t)min64(1 << 16, sizeof(db_data) - 1 - db_size);
-                    int read = pkgi_http_read(http, db_data + db_size, want);
-                    if (read == 0)
-                    {
-                        break;
-                    }
-                    else if (read < 0)
-                    {
-                        pkgi_snprintf(error, error_size, "HTTP error 0x%08x", read);
-                        db_size = 0;
-                        break;
-                    }
-                    db_size += read;
-                }
-
-                if (error[0] == 0 && db_size == 0)
-                {
-                    pkgi_snprintf(error, error_size, "list is empty... check the DB server");
-                }
-            }
-
-            pkgi_http_close(http);
-
-            if (db_size == 0)
-            {
-                return 0;
-            }
-            else
-            {
-                pkgi_save(path, db_data, db_size);
-            }
-        }
-    }
-
-    LOG("loading update from %s", path);
-    
-    loaded = pkgi_load(path, db_data, sizeof(db_data) - 1);
+    loaded = pkgi_load(path, db_data+db_size, sizeof(db_data) - 1);
     if (loaded > 0)
     {
-        db_size = loaded;
+        db_size += loaded;
     }
     else
     {
-        pkgi_snprintf(error, error_size, "ERROR: %s file missing or bad config.txt file", db_file);
         return 0;
     }
 
     LOG("parsing items");
 
     db_data[db_size] = '\n';
-    char* ptr = db_data;
+    char* ptr = db_data + db_size - loaded;
     char* end = db_data + db_size + 1;
 
     if (db_size > 3 && (uint8_t)ptr[0] == 0xef && (uint8_t)ptr[1] == 0xbb && (uint8_t)ptr[2] == 0xbf)
@@ -282,7 +260,8 @@ int pkgi_db_update(const char* db_file, const char* update_url, char* error, uin
     while (ptr < end && *ptr)
     {
         column = 0;
-        while (ptr < end && column < dbf.total_columns) {
+        while (ptr < end && column < dbf.total_columns)
+        {
             const char* content = ptr;
 
             while (ptr < end && *ptr != dbf.delimiter && *ptr != '\n' && *ptr != '\r')
@@ -295,10 +274,14 @@ int pkgi_db_update(const char* db_file, const char* update_url, char* error, uin
             column++;
         }
 
-        if (column == dbf.total_columns && pkgi_validate_url(dbf.data[TypeUrl].data)) {
+        if (column == dbf.total_columns && pkgi_validate_url(dbf.data[TypeUrl].data))
+        {
             // contentid can't be empty, let's generate one
             db[db_count].content = (dbf.data[TypeContentId].data[0] == 0 ? generate_contentid() : dbf.data[TypeContentId].data);
-            db[db_count].flags = (uint32_t)pkgi_strtoll(dbf.data[TypeFlags].data);
+            db[db_count].type = (uint32_t)pkgi_strtoll(dbf.data[TypeFlags].data);
+            if (db[db_count].type == 0)
+                db[db_count].type = db_id;
+
             db[db_count].name = dbf.data[TypeName].data;
             db[db_count].description = dbf.data[TypeDescription].data;
             db[db_count].rap = pkgi_hexbytes(dbf.data[TypeRap].data, PKGI_RAP_SIZE);
@@ -307,7 +290,7 @@ int pkgi_db_update(const char* db_file, const char* update_url, char* error, uin
             db[db_count].digest = pkgi_hexbytes(dbf.data[TypeChecksum].data, SHA256_DIGEST_SIZE);
             db_item[db_count] = db + db_count;
             db_count++;
-        }        
+        }
 
         if (db_count == MAX_DB_ITEMS)
         {
@@ -324,9 +307,59 @@ int pkgi_db_update(const char* db_file, const char* update_url, char* error, uin
         }
     }
 
+    LOG("finished parsing, %u total items", (db_count - db_item_count));
+
     db_item_count = db_count;
 
-    LOG("finished parsing, %u total items", db_count);
+    return 1;
+}
+
+int pkgi_db_update(const char* update_url, uint32_t update_len, char* error, uint32_t error_size)
+{
+    char path[256];
+    int i;
+
+    for (i = 0; i < MAX_CONTENT_TYPES; i++)
+    {
+        const char* tmp_url = update_url + update_len*i;
+
+        if (tmp_url[0] != 0)
+        {
+            pkgi_snprintf(path, sizeof(path), "%s/pkgi%s.txt", pkgi_get_config_folder(), pkgi_content_tag(i));
+            update_database(tmp_url, path, error, error_size);
+        }
+    }
+
+    return 1;
+}
+
+int pkgi_db_reload(char* error, uint32_t error_size)
+{
+    db_total = 0;
+    db_size = 0;
+    db_count = 0;
+    db_item_count = 0;
+
+    char path[256];
+    int i;
+
+    for (i = 0; i < MAX_CONTENT_TYPES; i++)
+    {
+        pkgi_snprintf(path, sizeof(path), "%s/pkgi%s.txt", pkgi_get_config_folder(), pkgi_content_tag(i));
+
+        if (pkgi_get_size(path) > 0)
+        {
+            load_database(i);
+        }
+    }
+
+    LOG("finished db update, %u total items", db_count);
+
+    if (db_count == 0)
+    {
+        pkgi_snprintf(error, error_size, "ERROR: pkgi.txt file(s) missing or bad config.txt file");
+        return 0;
+    }
     return 1;
 }
 
@@ -337,13 +370,24 @@ static void swap(uint32_t a, uint32_t b)
     db_item[b] = temp;
 }
 
-static int matches(GameRegion region, uint32_t filter)
+static int matches(GameRegion region, ContentType content, uint32_t filter)
 {
-    return (region == RegionASA && (filter & DbFilterRegionASA))
+    return ((region == RegionASA && (filter & DbFilterRegionASA))
         || (region == RegionEUR && (filter & DbFilterRegionEUR))
         || (region == RegionJPN && (filter & DbFilterRegionJPN))
         || (region == RegionUSA && (filter & DbFilterRegionUSA))
-        || (region == RegionUnknown);
+        || (region == RegionUnknown))
+
+        && ((content == ContentGame && (filter & DbFilterContentGame))
+        || (content == ContentDLC && (filter & DbFilterContentDLC))
+        || (content == ContentTheme && (filter & DbFilterContentTheme))
+        || (content == ContentAvatar && (filter & DbFilterContentAvatar))
+        || (content == ContentDemo && (filter & DbFilterContentDemo))
+        || (content == ContentManager && (filter & DbFilterContentManager))
+        || (content == ContentEmulator && (filter & DbFilterContentEmulator))
+        || (content == ContentApp && (filter & DbFilterContentApp))
+        || (content == ContentTool && (filter & DbFilterContentTool))
+        || (content == ContentUnknown));
 }
 
 static int lower(const DbItem* a, const DbItem* b, DbSort sort, DbSortOrder order, uint32_t filter)
@@ -369,8 +413,8 @@ static int lower(const DbItem* a, const DbItem* b, DbSort sort, DbSortOrder orde
         cmp = a->size < b->size;
     }
 
-    int matches_a = matches(reg_a, filter);
-    int matches_b = matches(reg_b, filter);
+    int matches_a = matches(reg_a, pkgi_get_content_type(a->type), filter);
+    int matches_b = matches(reg_b, pkgi_get_content_type(b->type), filter);
 
     if (matches_a == matches_b)
     {
@@ -464,7 +508,8 @@ void pkgi_db_configure(const char* search, const Config* config)
             uint32_t middle = (low + high) / 2;
 
             GameRegion region = pkgi_get_region(db_item[middle]->content);
-            if (matches(region, config->filter))
+            ContentType ctype = pkgi_get_content_type(db_item[middle]->type);
+            if (matches(region, ctype, config->filter))
             {
                 low = middle + 1;
             }
@@ -521,4 +566,12 @@ GameRegion pkgi_get_region(const char* content)
     default:
         return RegionUnknown;
     }
+}
+
+ContentType pkgi_get_content_type(uint32_t content)
+{
+    if (content < MAX_CONTENT_TYPES)
+        return (ContentType)content;
+
+    return ContentUnknown;
 }

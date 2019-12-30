@@ -115,6 +115,8 @@ void pkgi_load_config(Config* config, char* refresh_url, uint32_t refresh_len)
     config->version_check = 1;
     config->dl_mode_background = 0;
     config->music = 1;
+    config->content = 0;
+    config->allow_refresh = 0;
 
     char data[4096];
     char path[256];
@@ -156,9 +158,14 @@ void pkgi_load_config(Config* config, char* refresh_url, uint32_t refresh_len)
 
             text = skipws(text, end);
 
-            if (pkgi_stricmp(key, "url") == 0)
+            if (pkgi_stricontains(key, "url"))
             {
-                pkgi_strncpy(refresh_url, refresh_len, value);
+                for (int i = 0; i < MAX_CONTENT_TYPES; i++)
+                    if (pkgi_stricmp(key+3, pkgi_content_tag(i)) == 0)
+                    {
+                        pkgi_strncpy(refresh_url + refresh_len*i, refresh_len, value);
+                        config->allow_refresh = 1;
+                    }
             }
             else if (pkgi_stricmp(key, "sort") == 0)
             {
@@ -184,11 +191,40 @@ void pkgi_load_config(Config* config, char* refresh_url, uint32_t refresh_len)
             {
                 config->music = 0;
             }
+            else if (pkgi_stricmp(key, "content") == 0)
+            {
+                config->content = (uint8_t)pkgi_strtoll(value);
+            }
         }
     }
     else
     {
         LOG("config.txt cannot be loaded, using default values");
+    }
+    if (config->content == 0)
+    {
+        config->filter |= DbFilterAllContent;
+    }
+    else
+    {
+        config->filter |= (128 << config->content);
+    }
+}
+
+const char* pkgi_content_tag(ContentType content)
+{
+    switch (content)
+    {
+    case ContentGame: return "_games";
+    case ContentDLC: return "_dlcs";
+    case ContentTheme: return "_themes";
+    case ContentAvatar: return "_avatars";
+    case ContentDemo: return "_demos";
+    case ContentManager: return "_managers";
+    case ContentEmulator: return "_emulators";
+    case ContentApp: return "_apps";
+    case ContentTool: return "_tools";
+    default: return "";
     }
 }
 
@@ -214,14 +250,20 @@ static const char* order_str(DbSortOrder order)
     }
 }
 
-void pkgi_save_config(const Config* config, const char* update_url)
+void pkgi_save_config(const Config* config, const char* update_url, uint32_t update_len)
 {
     char data[4096];
     int len = 0;
-    if (update_url && update_url[0] != 0)
+
+    for (int i = 0; i < MAX_CONTENT_TYPES; i++)
     {
-        len += pkgi_snprintf(data + len, sizeof(data) - len, "url %s\n", update_url);
+        const char* tmp_url = update_url + update_len*i;
+        if (update_url && tmp_url[0] != 0)
+        {
+            len += pkgi_snprintf(data + len, sizeof(data) - len, "url%s %s\n", pkgi_content_tag(i), tmp_url);
+        }
     }
+    len += pkgi_snprintf(data + len, sizeof(data) - len, "content %d\n", config->content);
     len += pkgi_snprintf(data + len, sizeof(data) - len, "sort %s\n", sort_str(config->sort));
     len += pkgi_snprintf(data + len, sizeof(data) - len, "order %s\n", order_str(config->order));
     len += pkgi_snprintf(data + len, sizeof(data) - len, "filter ");
