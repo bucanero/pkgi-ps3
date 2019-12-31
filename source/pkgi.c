@@ -108,8 +108,12 @@ static void pkgi_download_thread(void)
         if (!config.dl_mode_background)
         {
             install(item->content);
+            pkgi_dialog_message(item->name, "Successfully downloaded");
         }
-        pkgi_dialog_message(item->name, "Successfully downloaded");
+        else
+        {
+            pkgi_dialog_message(item->name, "Task successfully queued");
+        }
         LOG("download completed!");
     }
     pkgi_unlock_process();

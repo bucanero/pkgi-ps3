@@ -4,6 +4,12 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 ## [Unreleased]()
 
+### Added
+
+* Added content categorization and filtering
+* Added support for loading multiple database files
+* Added support for online db update/sync
+
 ## [v1.1.0](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.1.0) - 2019-12-23
 
 ### Added

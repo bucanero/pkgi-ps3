@@ -53,10 +53,8 @@ static const MenuEntry menu_entries[] =
     { MenuFilter, "Japan", DbFilterRegionJPN },
     { MenuFilter, "USA", DbFilterRegionUSA },
 
-    { MenuText, "DL mode:", 0 },
-    { MenuMode, "Background", 1 },
-
     { MenuText, "Options:", 0 },
+    { MenuMode, "Back. DL", 1 },
     { MenuMusic, "Music", 1 },
     { MenuUpdate, "Updates", 1 },
 
@@ -294,7 +292,7 @@ int pkgi_do_menu(pkgi_input* input)
         else if (type == MenuMode)
         {
             pkgi_snprintf(text, sizeof(text), PKGI_UTF8_CLEAR " %s",
-                menu_config.dl_mode_background == entry->value ? entry->text : "Direct");            
+                menu_config.dl_mode_background == entry->value ? entry->text : "Direct DL");            
         }
         else if (type == MenuMusic)
         {

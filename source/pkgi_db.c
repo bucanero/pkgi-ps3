@@ -115,6 +115,8 @@ static char* generate_contentid(void)
 
 int update_database(const char* update_url, const char* path, char* error, uint32_t error_size)
 {
+    db_total = 0;
+    db_size = 0;
     LOG("downloading update from %s", update_url);
 
     pkgi_http* http = pkgi_http_get(update_url, NULL, 0);

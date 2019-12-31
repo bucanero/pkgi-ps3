@@ -440,7 +440,7 @@ static int queue_pkg_task()
     info_start = pkgi_time_msec();
     info_update = pkgi_time_msec() + 500;
 
-    pkgi_dialog_set_progress_title("Saving PKG...");
+    pkgi_dialog_set_progress_title("Saving background task...");
     pkgi_strncpy(item_name, sizeof(item_name), root);
     download_resume = 0;
     
@@ -700,7 +700,7 @@ int pkgi_download(const DbItem* item, const int background_dl)
     else
     {
         LOG("cannot load resume file, starting download from scratch");
-        pkgi_dialog_set_progress_title("Downloading...");
+        pkgi_dialog_set_progress_title(background_dl ? "Adding background task..." : "Downloading...");
         download_resume = 0;
         sha256_init(&sha);
     }
