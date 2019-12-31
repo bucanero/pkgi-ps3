@@ -35,7 +35,7 @@ See the [latest changes here](CHANGELOG.md).
 You need to create a `pkgi.txt` file in `/dev_hdd0/game/NP00PKGI3/USRDIR` that contains the items available for installation.
 The text database format is user customizable. Check [this section](#user-defined-db-format) to learn how to define your own custom db format.
 
-### Additional databases
+### Multiple databases
 
 You can also load additional database files:
 
@@ -91,7 +91,7 @@ UP0001-NP00PKGI3_00-0000000000000000,0,PKGi PS3 v0.1.0,,,http://bucanero.helioho
 | 5	| Demo
 | 6	| Backup Manager
 | 7	| Emulator
-| 8	| App
+| 8	| Application
 | 9	| Tool
 
 ## User-defined DB format

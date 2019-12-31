@@ -22,15 +22,15 @@ static DbItem* db_item[MAX_DB_ITEMS];
 static uint32_t db_item_count;
 
 typedef enum {
-    TypeContentId,
-    TypeFlags,
-    TypeName,
-    TypeDescription,
-    TypeRap,
-    TypeUrl,
-    TypeSize,
-    TypeChecksum,
-    TypeUnknown
+    ColumnUnknown,
+    ColumnContentId,
+    ColumnContentType,
+    ColumnName,
+    ColumnDescription,
+    ColumnRap,
+    ColumnUrl,
+    ColumnSize,
+    ColumnChecksum
 } ColumnType;
 
 typedef struct {
@@ -48,26 +48,26 @@ typedef struct {
 
 static ColumnEntry entries[] =
 {
-    { TypeContentId, "contentid", "" },
-    { TypeFlags, "flags", "" },
-    { TypeName, "name", "" },
-    { TypeDescription, "description", "" },
-    { TypeRap, "rap", "" },
-    { TypeUrl, "url", "" },
-    { TypeSize, "size", "" },
-    { TypeChecksum, "checksum", "" },
+    { ColumnContentId, "contentid", "" },
+    { ColumnContentType, "type", "" },
+    { ColumnName, "name", "" },
+    { ColumnDescription, "description", "" },
+    { ColumnRap, "rap", "" },
+    { ColumnUrl, "url", "" },
+    { ColumnSize, "size", "" },
+    { ColumnChecksum, "checksum", "" },
 };
 
 static const ColumnType default_format[] =
 {
-    TypeContentId,
-    TypeFlags,
-    TypeName,
-    TypeDescription,
-    TypeRap,
-    TypeUrl,
-    TypeSize,
-    TypeChecksum
+    ColumnContentId,
+    ColumnContentType,
+    ColumnName,
+    ColumnDescription,
+    ColumnRap,
+    ColumnUrl,
+    ColumnSize,
+    ColumnChecksum
 };
 
 static uint8_t hexvalue(char ch)
@@ -213,7 +213,7 @@ int load_database(uint8_t db_id)
         while (ptr < end && *ptr)
         {
             const char* column_name = ptr;
-            types[column] = TypeUnknown;
+            types[column] = ColumnUnknown;
 
             while (ptr < end && *ptr != dbf.delimiter && *ptr != '\n' && *ptr != '\r' && column < MAX_DB_COLUMNS)
             {
@@ -276,18 +276,18 @@ int load_database(uint8_t db_id)
             column++;
         }
 
-        if (column == dbf.total_columns && pkgi_validate_url(dbf.data[TypeUrl].data))
+        if (column == dbf.total_columns && pkgi_validate_url(dbf.data[ColumnUrl].data))
         {
-            uint32_t ctype = (uint32_t)pkgi_strtoll(dbf.data[TypeFlags].data);
+            uint32_t ctype = (uint32_t)pkgi_strtoll(dbf.data[ColumnContentType].data);
             // contentid can't be empty, let's generate one
-            db[db_count].content = (dbf.data[TypeContentId].data[0] == 0 ? generate_contentid() : dbf.data[TypeContentId].data);
+            db[db_count].content = (dbf.data[ColumnContentId].data[0] == 0 ? generate_contentid() : dbf.data[ColumnContentId].data);
             db[db_count].type = pkgi_get_content_type(ctype == 0 ? db_id : ctype);
-            db[db_count].name = dbf.data[TypeName].data;
-            db[db_count].description = dbf.data[TypeDescription].data;
-            db[db_count].rap = pkgi_hexbytes(dbf.data[TypeRap].data, PKGI_RAP_SIZE);
-            db[db_count].url = dbf.data[TypeUrl].data;
-            db[db_count].size = pkgi_strtoll(dbf.data[TypeSize].data);
-            db[db_count].digest = pkgi_hexbytes(dbf.data[TypeChecksum].data, SHA256_DIGEST_SIZE);
+            db[db_count].name = dbf.data[ColumnName].data;
+            db[db_count].description = dbf.data[ColumnDescription].data;
+            db[db_count].rap = pkgi_hexbytes(dbf.data[ColumnRap].data, PKGI_RAP_SIZE);
+            db[db_count].url = dbf.data[ColumnUrl].data;
+            db[db_count].size = pkgi_strtoll(dbf.data[ColumnSize].data);
+            db[db_count].digest = pkgi_hexbytes(dbf.data[ColumnChecksum].data, SHA256_DIGEST_SIZE);
             db_item[db_count] = db + db_count;
             db_count++;
         }
