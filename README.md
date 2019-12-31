@@ -140,7 +140,7 @@ It will open the context menu. Press ![Triangle](https://github.com/bucanero/pkg
 
 ### Notes
 
-- **HEN users:** content `.rap` will be activated automatically when launched.
+- **HEN users:** the item's `.rap` will be activated automatically when launched.
 - **CFW users:** update to COBRA 8.2 firmware for automatic `.rap` import, or use reactPSN/psnpatch on older CFWs after installing the content.
 
 
