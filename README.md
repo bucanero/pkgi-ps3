@@ -26,6 +26,10 @@ The `pkgi-ps3` homebrew app allows to download and install `.pkg` files directly
 
 Get the [latest version here][pkgi_latest].
 
+### Changelog
+
+See the [latest changes here](CHANGELOG.md).
+
 # Setup instructions
 
 You need to create a `pkgi.txt` file in `/dev_hdd0/game/NP00PKGI3/USRDIR` that contains the items available for installation.
@@ -44,11 +48,11 @@ where:
 | Column | Description |
 |--------|-------------|
 | `contentid` | is the full content id of the item, for example: `UP0000-NPXX99999_00-0000112223333000`.
-| `flags` | is currently an unused number, set it to 0.
+| `type` | is a number for the item's content type. See the table below for details. (set it to 0 if unknown)
 | `name` | is a string for the item's name.
 | `description` | is a string for the item's description.
-| `rap` | the 16 hex bytes for a RAP file, if needed by the item (`.rap` file will be created on `/dev_hdd0/exdata`). Leave empty to skip the `.rap` file.
-| `url` | is the HTTP URL where to download the `.pkg`.
+| `rap` | the 16 hex bytes for a RAP file, if needed by the item (`.rap` files will be created on `/dev_hdd0/exdata`). Leave empty to skip the `.rap` file.
+| `url` | is the HTTP/HTTPS URL where to download the `.pkg`.
 | `size` | is the size in bytes of the `.pkg` file, or 0 if unknown.
 | `checksum` | is a SHA256 digest of the `.pkg` file (as 32 hex bytes) to make sure the file is not tampered with. Leave empty to skip the check.
 
