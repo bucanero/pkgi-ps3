@@ -211,6 +211,23 @@ static void pkgi_friendly_size(char* text, uint32_t textlen, int64_t size)
     }
 }
 
+static const char* content_str(ContentType content)
+{
+    switch (content)
+    {
+    case ContentGame: return "Game";
+    case ContentDLC: return "DLC";
+    case ContentTheme: return "Theme";
+    case ContentAvatar: return "Avatar";
+    case ContentDemo: return "Demo";
+    case ContentManager: return "Manager";
+    case ContentEmulator: return "Emulator";
+    case ContentApp: return "App";
+    case ContentTool: return "Tool";
+    default: return "Unknown";
+    }
+}
+
 static void pkgi_do_main(pkgi_input* input)
 {
     int col_titleid = 0;
@@ -430,9 +447,9 @@ static void pkgi_do_main(pkgi_input* input)
         DbItem* item = pkgi_db_get(selected_item);
         char item_info[256];
 
-        pkgi_snprintf(item_info, sizeof(item_info), "ID: %s\n\nURL: (%s) RAP: (%s) SHA256: (%s)", 
+        pkgi_snprintf(item_info, sizeof(item_info), "ID: %s\n\nContent: (%s) RAP: (%s) SHA256: (%s)", 
             item->content,
-            (pkgi_validate_url(item->url) ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF),
+            content_str(item->type),
             (item->rap ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF),
             (item->digest ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF) );
 

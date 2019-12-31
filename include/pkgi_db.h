@@ -49,18 +49,6 @@ typedef enum {
     DbFilterAll = DbFilterAllRegions | DbFilterAllContent | DbFilterInstalled | DbFilterMissing,
 } DbFilter;
 
-typedef struct {
-    DbPresence presence;
-    const char* content;
-    uint32_t type;
-    const char* name;
-    const char* description;
-    const uint8_t* rap;
-    const char* url;
-    const uint8_t* digest;
-    int64_t size;
-} DbItem;
-
 typedef enum {
     ContentUnknown,
     ContentGame,
@@ -73,6 +61,18 @@ typedef enum {
     ContentApp,
     ContentTool
 } ContentType;
+
+typedef struct {
+    DbPresence presence;
+    const char* content;
+    ContentType type;
+    const char* name;
+    const char* description;
+    const uint8_t* rap;
+    const char* url;
+    const uint8_t* digest;
+    int64_t size;
+} DbItem;
 
 typedef enum {
     RegionASA,

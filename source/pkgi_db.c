@@ -278,12 +278,10 @@ int load_database(uint8_t db_id)
 
         if (column == dbf.total_columns && pkgi_validate_url(dbf.data[TypeUrl].data))
         {
+            uint32_t ctype = (uint32_t)pkgi_strtoll(dbf.data[TypeFlags].data);
             // contentid can't be empty, let's generate one
             db[db_count].content = (dbf.data[TypeContentId].data[0] == 0 ? generate_contentid() : dbf.data[TypeContentId].data);
-            db[db_count].type = (uint32_t)pkgi_strtoll(dbf.data[TypeFlags].data);
-            if (db[db_count].type == 0)
-                db[db_count].type = db_id;
-
+            db[db_count].type = pkgi_get_content_type(ctype == 0 ? db_id : ctype);
             db[db_count].name = dbf.data[TypeName].data;
             db[db_count].description = dbf.data[TypeDescription].data;
             db[db_count].rap = pkgi_hexbytes(dbf.data[TypeRap].data, PKGI_RAP_SIZE);
@@ -415,8 +413,8 @@ static int lower(const DbItem* a, const DbItem* b, DbSort sort, DbSortOrder orde
         cmp = a->size < b->size;
     }
 
-    int matches_a = matches(reg_a, pkgi_get_content_type(a->type), filter);
-    int matches_b = matches(reg_b, pkgi_get_content_type(b->type), filter);
+    int matches_a = matches(reg_a, a->type, filter);
+    int matches_b = matches(reg_b, b->type, filter);
 
     if (matches_a == matches_b)
     {
@@ -510,8 +508,7 @@ void pkgi_db_configure(const char* search, const Config* config)
             uint32_t middle = (low + high) / 2;
 
             GameRegion region = pkgi_get_region(db_item[middle]->content);
-            ContentType ctype = pkgi_get_content_type(db_item[middle]->type);
-            if (matches(region, ctype, config->filter))
+            if (matches(region, db_item[middle]->type, config->filter))
             {
                 low = middle + 1;
             }
