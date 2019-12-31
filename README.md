@@ -40,7 +40,7 @@ The text database format is user customizable. Check [this section](#user-define
 The default database file format uses a very simple CSV format where each line means one item in the list:
 
 ```
-contentid,flags,name,description,rap,url,size,checksum
+contentid,type,name,description,rap,url,size,checksum
 ```
 
 where:
