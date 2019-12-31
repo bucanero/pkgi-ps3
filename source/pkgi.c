@@ -112,7 +112,7 @@ static void pkgi_download_thread(void)
         }
         else
         {
-            pkgi_dialog_message(item->name, "Task successfully queued");
+            pkgi_dialog_message(item->name, "Task successfully queued (reboot to start)");
         }
         LOG("download completed!");
     }
@@ -232,7 +232,7 @@ static void pkgi_do_main(pkgi_input* input)
             input->pressed &= ~PKGI_BUTTON_SELECT;
             pkgi_msgDialog(MDIALOG_OK, "             \xE2\x98\x85  PKGi PS3 v" PKGI_VERSION "  \xE2\x98\x85          \n\n"
                               "  original PS Vita version by mmozeiko    \n\n"
-                              "  ported to PlayStation 3 by Bucanero     ");
+                              "    PlayStation 3 version by Bucanero     ");
         }
 
         if (input->active & PKGI_BUTTON_UP)
@@ -677,21 +677,18 @@ int main()
 
     pkgi_texture background = pkgi_load_image_buffer(background, jpg);
 
-    pkgi_input input;
-    input.active = 0;
-    input.down = 0;
-    input.pressed = 0;
+    if (config.version_check)
+    {
+        pkgi_start_thread("update_thread", &pkgi_update_check_thread);
+    }
+
+    pkgi_input input = {0, 0, 0, 0};
     while (pkgi_update(&input) && (state != StateTerminate))
     {
         pkgi_draw_background(background);
 
         if (state == StateUpdateDone)
         {
-            if (config.version_check)
-            {
-                pkgi_start_thread("update_thread", &pkgi_update_check_thread);
-            }
-
             pkgi_db_configure(NULL, &config);
             state = StateMain;
         }
@@ -701,6 +698,12 @@ int main()
         {
         case StateError:
             pkgi_do_error();
+            // leave the menu open if there's no database and we have URLs available
+            if (!pkgi_menu_is_open() && config.allow_refresh)
+            {
+                config_temp = config;
+                pkgi_menu_start(search_active, &config);
+            }            
             break;
 
         case StateRefreshing:

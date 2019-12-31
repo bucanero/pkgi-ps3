@@ -161,7 +161,6 @@ int create_install_pdb_files(char *path, char *path_icon, uint64_t size)
 {
     void *fp1;
     void *fp2;
-    
     char temp_buffer[256];
 
     pkgi_snprintf(temp_buffer, sizeof(temp_buffer), "%s/%s", path, "d0.pdb");
@@ -314,7 +313,7 @@ static int create_dummy_pkg(void)
     int fdw, i;
 	static int id_w[2] = {-1, -1};
 	
-	char dst[256] ="";
+	char dst[256];
 	pkgi_snprintf(dst, sizeof(dst), PKGI_QUEUE_FOLDER "/%d/%s", queue_task_id, root);
 
     if(sysFsAioInit(dst)!= 0)  {
@@ -327,7 +326,7 @@ static int create_dummy_pkg(void)
 		return AIO_FAILED;
 	}
 
-	char *mem = (char *) pkgi_malloc(AIO_BUFFERS * BUFF_SIZE);
+	char *mem = (char *) pkgi_malloc(BUFF_SIZE);
 	if(mem == NULL) {
 		LOG("Error : AIO_FAILED to copy_async / malloc");
 		return AIO_FAILED;
@@ -350,7 +349,7 @@ static int create_dummy_pkg(void)
 		{
 			aio_write[i].fd = fdw;
 			aio_write[i].offset = writing_pos;
-			aio_write[i].buffer_addr = (u32) (u64) &mem[buffer_to_write * BUFF_SIZE];
+			aio_write[i].buffer_addr = (u32) (u64) &mem[0];
 			aio_write[i].size = min64(BUFF_SIZE, download_size - writing_pos);
 			aio_write[i].usrdata = i;
 									
@@ -374,7 +373,7 @@ static int create_dummy_pkg(void)
 	for(i=0; i<AIO_NUMBER; i++) {
 		sysFsClose(aio_write[i].fd);
 	}
-	sysFsAioFinish("/dev_hdd0");
+	sysFsAioFinish(dst);
     pkgi_free(mem);
 	
     return 1;
@@ -396,15 +395,7 @@ error:
 
 static int queue_pkg_task()
 {
-	char pszPKGDir[256] ="";
-	queue_task_id = get_task_dir_id(PKGI_QUEUE_FOLDER, queue_task_id);
-	pkgi_snprintf(pszPKGDir, sizeof(pszPKGDir), PKGI_QUEUE_FOLDER "/%d", queue_task_id);
-
-	if(!pkgi_mkdirs(pszPKGDir))
-	{
-		pkgi_dialog_error("Could not create task directory on HDD.");
-		return 0;
-	}
+	char pszPKGDir[256];
 	
     initial_offset = 0;
     LOG("requesting %s @ %llu", db_item->url, 0);
@@ -435,6 +426,15 @@ static int queue_pkg_task()
         pkgi_dialog_error("Not enough free space on HDD");
         return 0;
     }
+
+	queue_task_id = get_task_dir_id(PKGI_QUEUE_FOLDER, queue_task_id);
+	pkgi_snprintf(pszPKGDir, sizeof(pszPKGDir), PKGI_QUEUE_FOLDER "/%d", queue_task_id);
+
+	if(!pkgi_mkdirs(pszPKGDir))
+	{
+		pkgi_dialog_error("Could not create task directory on HDD.");
+		return 0;
+	}
 
     LOG("http response length = %lld, total pkg size = %llu", http_length, download_size);
     info_start = pkgi_time_msec();
