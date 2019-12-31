@@ -211,7 +211,7 @@ static void pkgi_friendly_size(char* text, uint32_t textlen, int64_t size)
     }
 }
 
-static const char* content_str(ContentType content)
+static const char* content_type_str(ContentType content)
 {
     switch (content)
     {
@@ -449,7 +449,7 @@ static void pkgi_do_main(pkgi_input* input)
 
         pkgi_snprintf(item_info, sizeof(item_info), "ID: %s\n\nContent: (%s) RAP: (%s) SHA256: (%s)", 
             item->content,
-            content_str(item->type),
+            content_type_str(item->type),
             (item->rap ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF),
             (item->digest ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF) );
 
