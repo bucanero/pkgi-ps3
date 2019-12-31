@@ -35,9 +35,9 @@ See the [latest changes here](CHANGELOG.md).
 You need to create a `pkgi.txt` file in `/dev_hdd0/game/NP00PKGI3/USRDIR` that contains the items available for installation.
 The text database format is user customizable. Check [this section](#user-defined-db-format) to learn how to define your own custom db format.
 
-### Multiple databases
+### Additional databases
 
-You can also load multiple database files:
+You can also load additional database files:
 
 - `pkgi_games.txt`
 - `pkgi_dlcs.txt`
