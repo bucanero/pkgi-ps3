@@ -35,6 +35,22 @@ See the [latest changes here](CHANGELOG.md).
 You need to create a `pkgi.txt` file in `/dev_hdd0/game/NP00PKGI3/USRDIR` that contains the items available for installation.
 The text database format is user customizable. Check [this section](#user-defined-db-format) to learn how to define your own custom db format.
 
+### Multiple databases
+
+You can also load multiple database files:
+
+- `pkgi_games.txt`
+- `pkgi_dlcs.txt`
+- `pkgi_themes.txt`
+- `pkgi_avatars.txt`
+- `pkgi_demos.txt`
+- `pkgi_managers.txt`
+- `pkgi_emulators.txt`
+- `pkgi_apps.txt`
+- `pkgi_tools.txt`
+
+Items on each of these files will be auto-categorized to the file content type. **Note:** The app assumes that every database file has the same format, as defined in `dbformat.txt`.
+
 ## Default DB format
 
 The default database file format uses a very simple CSV format where each line means one item in the list:
@@ -48,7 +64,7 @@ where:
 | Column | Description |
 |--------|-------------|
 | `contentid` | is the full content id of the item, for example: `UP0000-NPXX99999_00-0000112223333000`.
-| `type` | is a number for the item's content type. See the table below for details. (set it to 0 if unknown)
+| `type` | is a number for the item's content type. See the [table below](#content-types) for details. (set it to 0 if unknown)
 | `name` | is a string for the item's name.
 | `description` | is a string for the item's description.
 | `rap` | the 16 hex bytes for a RAP file, if needed by the item (`.rap` files will be created on `/dev_hdd0/exdata`). Leave empty to skip the `.rap` file.
@@ -63,6 +79,20 @@ An example `pkgi.txt` file:
 EP0000-NP9999999_00-0AB00A00FR000000,0,My PKG Test,A description of my pkg,dac109e963294de6cd6f6faf3f045fe9,http://192.168.1.1/html/mypackage.pkg,2715513,afb545c6e71bd95f77994ab4a659efbb8df32208f601214156ad89b1922e73c3
 UP0001-NP00PKGI3_00-0000000000000000,0,PKGi PS3 v0.1.0,,,http://bucanero.heliohost.org/pkgi.pkg,284848,3dc8de2ed94c0f9efeafa81df9b7d58f8c169e2875133d6d2649a7d477c1ae13
 ```
+### Content types
+
+| Type value |	Content type |
+|------------|--------------|
+| 0	| Unknown
+| 1	| Game
+| 2	| DLC
+| 3	| Theme
+| 4	| Avatar
+| 5	| Demo
+| 6	| Backup Manager
+| 7	| Emulator
+| 8	| App
+| 9	| Tool
 
 ## User-defined DB format
 
