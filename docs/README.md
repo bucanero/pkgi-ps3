@@ -35,7 +35,7 @@ See the [latest changes here](CHANGELOG.md).
 You need to create a `pkgi.txt` file in `/dev_hdd0/game/NP00PKGI3/USRDIR` that contains the items available for installation.
 The text database format is user customizable. Check [this section](#user-defined-db-format) to learn how to define your own custom db format.
 
-### Multiple databases
+## Multiple databases
 
 You can also load additional database files:
 
@@ -50,6 +50,26 @@ You can also load additional database files:
 - `pkgi_tools.txt`
 
 Items on each of these files will be auto-categorized to the file content type. **Note:** The app assumes that every database file has the same format, as defined in `dbformat.txt`.
+
+## Online DB update
+
+You can refresh and sync an online database by adding the DB URL(s) to the `config.txt` file in `/dev_hdd0/game/NP00PKGI3/USRDIR`. 
+
+For example:
+
+```
+url http://www.mysite.com/mylist.csv
+url_demos http://www.demos.com/otherlist.csv
+url_emulators http://www.example.com/emulators.csv
+```
+
+Using this setup, `pkgi.txt` will be updated with `mylist.csv`, `pgi_demos.txt` with `otherlist.csv` , and `pkgi_emulators.txt` with `emulators.csv`.
+
+Next time you open the app, you'll have an additional menu option ![Triangle](https://github.com/bucanero/pkgi-ps3/raw/master/data/TRIANGLE.png) called **Refresh**. When you select it, the local databases will be syncronized with the defined URLs.
+
+# DB formats
+
+The application needs a text database that contains the items available for installation, and it must follow the [default format definition](#default-db-format), or have a [custom format definition](#user-defined-db-format) file.
 
 ## Default DB format
 
@@ -130,7 +150,7 @@ REGION|TITLE|name|url|rap|contentid|DATE|PKG FILENAME|size|checksum
 
 # Usage
 
-Using the application is pretty straight-forward: 
+Using the application is simple and straight-forward: 
 
  - Move **UP/DOWN** to select the item you want to install, and press ![X button](https://github.com/bucanero/pkgi-ps3/raw/master/data/CROSS.png).
  - To see the item's details, press ![Square](https://github.com/bucanero/pkgi-ps3/raw/master/data/SQUARE.png).
