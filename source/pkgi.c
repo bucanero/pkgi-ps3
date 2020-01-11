@@ -239,8 +239,8 @@ static void pkgi_do_main(pkgi_input* input)
     
     if (input)
     {
-        if (input->active & PKGI_BUTTON_START) {
-            input->pressed &= ~PKGI_BUTTON_START;
+        if (input->active & PKGI_BUTTON_O) {
+            input->pressed &= ~PKGI_BUTTON_O;
             if (pkgi_msgDialog(MDIALOG_YESNO, "Exit to XMB?") == 1)
                 state = StateTerminate;
         }
@@ -289,7 +289,7 @@ static void pkgi_do_main(pkgi_input* input)
             }
         }
         
-        if (input && (input->active & PKGI_BUTTON_LT))
+        if (input->active & PKGI_BUTTON_LT)
         {
             uint32_t max_items = avail_height / (font_height + PKGI_MAIN_ROW_PADDING) - 1;
             if (first_item < max_items)
@@ -310,7 +310,7 @@ static void pkgi_do_main(pkgi_input* input)
             }
         }
 
-        if (input && (input->active & PKGI_BUTTON_RT))
+        if (input->active & PKGI_BUTTON_RT)
         {
             uint32_t max_items = avail_height / (font_height + PKGI_MAIN_ROW_PADDING) - 1;
             if (first_item + max_items < db_count - 1)
@@ -552,7 +552,7 @@ static void pkgi_do_tail(void)
     }
     else
     {
-        pkgi_snprintf(text, sizeof(text), "%s Install  " PKGI_UTF8_T " Menu  " PKGI_UTF8_S " Details", pkgi_get_ok_str());
+        pkgi_snprintf(text, sizeof(text), "%s Install  " PKGI_UTF8_T " Menu  " PKGI_UTF8_S " Details  %s Exit", pkgi_get_ok_str(), pkgi_get_cancel_str());
     }
 
     pkgi_clip_set(left, bottom_y, VITA_WIDTH - right - left, VITA_HEIGHT - bottom_y);
@@ -765,6 +765,11 @@ int main()
                     pkgi_db_configure(search_active ? search_text : NULL, &config_temp);
                     reposition();
                 }
+                else if (config_temp.music != new_config.music)
+                {
+                    config_temp = new_config;
+                    (config_temp.music ? pkgi_start_music() : pkgi_stop_music());
+                }
             }
             else
             {
@@ -785,6 +790,10 @@ int main()
                     {
                         pkgi_db_configure(search_active ? search_text : NULL, &config);
                         reposition();
+                    }
+                    if (config_temp.music != config.music)
+                    {
+                        (config.music ? pkgi_start_music() : pkgi_stop_music());
                     }
                 }
                 else if (mres == MenuResultAccept)

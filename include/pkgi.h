@@ -139,6 +139,7 @@ typedef void* pkgi_texture;
     })
 
 void pkgi_start_music(void);
+void pkgi_stop_music(void);
 
 pkgi_texture pkgi_load_png_raw(const void* data, uint32_t size);
 pkgi_texture pkgi_load_jpg_raw(const void* data, uint32_t size);

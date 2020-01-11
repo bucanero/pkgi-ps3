@@ -22,7 +22,6 @@ static DbItem* db_item[MAX_DB_ITEMS];
 static uint32_t db_item_count;
 
 typedef enum {
-    ColumnUnknown,
     ColumnContentId,
     ColumnContentType,
     ColumnName,
@@ -30,7 +29,8 @@ typedef enum {
     ColumnRap,
     ColumnUrl,
     ColumnSize,
-    ColumnChecksum
+    ColumnChecksum,
+    ColumnUnknown
 } ColumnType;
 
 typedef struct {

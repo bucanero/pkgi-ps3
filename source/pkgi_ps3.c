@@ -227,7 +227,7 @@ static void music_update_thread(void)
     pkgi_thread_exit();
 }
 
-void pkgi_start_music(void)
+void init_music(void)
 {
     MikMod_InitThreads();
     
@@ -250,18 +250,27 @@ void pkgi_start_music(void)
     module = Player_LoadGeneric(mem_reader, 64, 0);
     module->wrap = TRUE;
 
+    pkgi_start_thread("music_thread", &music_update_thread);
+}
+
+void pkgi_start_music(void)
+{
     if (module) {
         /* start module */
         LOG("Playing %s", module->songname);
         Player_Start(module);
-        pkgi_start_thread("music_thread", &music_update_thread);
     } else
         LOG("Could not load module: %s", MikMod_strerror(MikMod_errno));
 }
 
-void end_music()
+void pkgi_stop_music(void)
 {
+    LOG("Stop music");
     Player_Stop();
+}
+
+void end_music(void)
+{
     Player_Free(module);
     
     delete_mikmod_mem_reader(mem_reader);
@@ -725,6 +734,8 @@ void pkgi_start(void)
 
     pkgi_mkdirs(PKGI_TMP_FOLDER);
     pkgi_mkdirs(PKGI_RAP_FOLDER);
+
+    init_music();
 
     g_time = pkgi_time_msec();
 }
