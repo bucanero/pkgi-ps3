@@ -241,13 +241,13 @@ static void pkgi_do_main(pkgi_input* input)
     {
         if (input->active & PKGI_BUTTON_O) {
             input->pressed &= ~PKGI_BUTTON_O;
-            if (pkgi_msgDialog(MDIALOG_YESNO, "Exit to XMB?") == 1)
+            if (pkgi_msg_dialog(MDIALOG_YESNO, "Exit to XMB?"))
                 state = StateTerminate;
         }
 
         if (input->active & PKGI_BUTTON_SELECT) {
             input->pressed &= ~PKGI_BUTTON_SELECT;
-            pkgi_msgDialog(MDIALOG_OK, "             \xE2\x98\x85  PKGi PS3 v" PKGI_VERSION "  \xE2\x98\x85          \n\n"
+            pkgi_msg_dialog(MDIALOG_OK, "             \xE2\x98\x85  PKGi PS3 v" PKGI_VERSION "  \xE2\x98\x85          \n\n"
                               "  original PS Vita version by mmozeiko    \n\n"
                               "    PlayStation 3 version by Bucanero     ");
         }
@@ -420,12 +420,13 @@ static void pkgi_do_main(pkgi_input* input)
 
         DbItem* item = pkgi_db_get(selected_item);
 
-        if (item->presence == PresenceInstalled)
+        if ((item->presence == PresenceInstalled) && pkgi_msg_dialog(MDIALOG_YESNO, "Item already installed, download again?"))
         {
             LOG("[%.9s] %s - already installed", item->content + 7, item->name);
-            pkgi_dialog_error("Already installed");
+            item->presence = PresenceMissing;
         }
-        else if (item->presence == PresenceIncomplete || (item->presence == PresenceMissing && pkgi_check_free_space(item->size)))
+
+        if (item->presence == PresenceIncomplete || (item->presence == PresenceMissing && pkgi_check_free_space(item->size)))
         {
             LOG("[%.9s] %s - starting to install", item->content + 7, item->name);
             pkgi_dialog_start_progress("Downloading...", "Preparing...", 0);

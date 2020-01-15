@@ -157,7 +157,7 @@ static int create_queue_pdb_files(void)
 	return 1;
 }
 
-int create_install_pdb_files(char *path, char *path_icon, uint64_t size)
+int create_install_pdb_files(const char *path, uint64_t size)
 {
     void *fp1;
     void *fp2;
@@ -201,11 +201,12 @@ int create_install_pdb_files(char *path, char *path_icon, uint64_t size)
 	write_pdb_string(fp2, PDB_HDR_FILENAME, root);
 
 	// 00000000 - Icon location / path (PNG w/o extension) 
-	write_pdb_string(fp2, PDB_HDR_UNUSED, path_icon);
+    pkgi_snprintf(temp_buffer, sizeof(temp_buffer), "%s/%s", path, "ICON_FILE");
+	write_pdb_string(fp2, PDB_HDR_UNUSED, temp_buffer);
 
 	// 0000006A - Icon location / path (PNG w/o extension) 
-	write_pdb_string(fp1, PDB_HDR_ICON, path_icon);
-	write_pdb_string(fp2, PDB_HDR_ICON, path_icon);
+	write_pdb_string(fp1, PDB_HDR_ICON, temp_buffer);
+	write_pdb_string(fp2, PDB_HDR_ICON, temp_buffer);
 
 	pkgi_write(fp1, pkg_d0end_data, pkg_d0end_data_size);
 	pkgi_write(fp2, pkg_d0end_data, pkg_d0end_data_size);
@@ -287,7 +288,6 @@ static void update_progress(void)
         info_update = info_now + 500;
     }
 }
-
 
 static void writing_callback(sysFSAio *xaio, s32 error, s32 xid, u64 size)
 {
@@ -392,8 +392,7 @@ error:
     return AIO_FAILED;
 }
 
-
-static int queue_pkg_task()
+static int queue_pkg_task(void)
 {
 	char pszPKGDir[256];
 	
@@ -458,7 +457,6 @@ static int queue_pkg_task()
 
 	return 1;
 }
-
 
 static void download_start(void)
 {
@@ -725,6 +723,7 @@ int pkgi_download(const DbItem* item, const int background_dl)
 	    if (!download_pkg_file()) goto finish;
 	    if (!check_integrity(item->digest)) goto finish;
 	}
+
     if (item->rap)
     {
         if (!create_rap(item->content, item->rap)) goto finish;
@@ -741,7 +740,6 @@ finish:
 
     return result;
 }
-
 
 int pkgi_install(const char *titleid)
 {
@@ -770,7 +768,7 @@ int pkgi_install(const char *titleid)
 	    return 0;
     }
 
-    if (!create_install_pdb_files(pkg_path, filename, fsize)) {
+    if (!create_install_pdb_files(pkg_path, fsize)) {
         return 0;
     }
 

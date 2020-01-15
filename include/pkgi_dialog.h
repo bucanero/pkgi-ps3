@@ -22,4 +22,4 @@ void pkgi_dialog_close(void);
 
 void pkgi_do_dialog(pkgi_input* input);
 
-int pkgi_msgDialog(int tdialog, const char * str);
+int pkgi_msg_dialog(int tdialog, const char * str);
