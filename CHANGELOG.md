@@ -4,6 +4,11 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 ## [Unreleased]()
 
+### Fixed
+
+* The app now allows to download items that already exist
+* Start/Stop music works without requiring to restart the application
+
 ## [v1.1.2](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.1.2) - 2019-12-31
 
 ### Added
