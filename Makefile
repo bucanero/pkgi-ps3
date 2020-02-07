@@ -50,7 +50,7 @@ CXXFLAGS	=	$(CFLAGS)
 
 LDFLAGS		=	$(MACHDEP) -Wl,-Map,$(notdir $@).map
 
-ifdef PKGI_ENABLE_LOGGING
+ifdef DEBUGLOG
 CFLAGS		+=	-DPKGI_ENABLE_LOGGING
 endif
 #---------------------------------------------------------------------------------

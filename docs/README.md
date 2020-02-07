@@ -167,20 +167,20 @@ It will open the context menu. Press ![Triangle](https://github.com/bucanero/pkg
 # Q&A
 
 1. Where to get a `rap` string? 
-
-  You can use a tool like RIF2RAP to generate a `.rap` from your existing `.rif` files. Then you can use a tool like `hexdump` to get the hex byte string.
+   
+   You can use a tool like RIF2RAP to generate a `.rap` from your existing `.rif` files. Then you can use a tool like `hexdump` to get the hex byte string.
 
 2. Where to get `.pkg` links?
-
-  You can use [PSDLE][] to find `.pkg` URLs for the games you own. Then either use the original URL, or host the file on your own web server.
+   
+   You can use [PSDLE][] to find `.pkg` URLs for the games you own. Then either use the original URL, or host the file on your own web server.
 
 3. Where to remove interrupted/failed downloads to free up disk space?
-
-  Check the `/dev_hdd0/tmp/pkgi` folder - each download will be in a separate `.pkg` file by its title id. Simply delete the file and start again.
+   
+   Check the `/dev_hdd0/tmp/pkgi` folder - each download will be in a separate `.pkg` file by its title id. Simply delete the file and start again.
 
 4. Download speed is too slow!
-
-  Optimization is still pending. If `direct` download is slow, you can use `background download` mode to download files using the internal PS3 Download Manager.
+   
+   Optimization is still pending. If `direct` download is slow, you can use `background download` mode to download files using the internal PS3 Download Manager.
 
 # Building
 
@@ -198,8 +198,8 @@ Run `make` to create a release build. After that, run `make pkg` to create a `.p
 You can also set the environment variable `PS3LOAD=tcp:x.x.x.x` to the PS3's IP address;
 that will allow you to use `make run` and send `pkgi-ps3.self` directly to the PS3Load listener.
 
-To enable debug logging, build PKGi PS3 with `make PKGI_ENABLE_LOGGING`. The application will send debug messages to
-UDP multicast address 239.255.0.100:30000. To receive them you can use [socat][] on your PC:
+To enable debug logging, build PKGi PS3 with `make DEBUGLOG=1`. The application will send debug messages to
+UDP multicast address `239.255.0.100:30000`. To receive them you can use [socat][] on your PC:
 
     $ socat udp4-recv:30000,ip-add-membership=239.255.0.100:0.0.0.0 -
 
