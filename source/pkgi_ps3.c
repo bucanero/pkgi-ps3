@@ -195,7 +195,7 @@ int pkgi_memequ(const void* a, const void* b, uint32_t size)
 static void pkgi_start_debug_log(void)
 {
 #ifdef PKGI_ENABLE_LOGGING
-    dbglogger_init_file(PKGI_APP_FOLDER "/pkgi.dbg");
+    dbglogger_init();
     LOG("PKGi PS3 logging initialized");
 #endif
 }
