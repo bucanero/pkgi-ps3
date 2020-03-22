@@ -1257,6 +1257,7 @@ pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
     }
     httpClientSetConnTimeout(clientID, 10 * 1000 * 1000);
     httpClientSetUserAgent(clientID, PKGI_USER_AGENT);
+	httpClientSetAutoRedirect(clientID, 1);
 
     ret = httpUtilParseUri(&uri, url, NULL, 0, &pool_size);
     if (ret < 0)

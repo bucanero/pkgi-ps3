@@ -8,8 +8,11 @@
 #include <stddef.h>
 
 #define MAX_DB_SIZE (6*1024*1024)
-#define MAX_DB_ITEMS 16384
-#define MAX_DB_COLUMNS 64
+#define MAX_DB_ITEMS 20000
+#define MAX_DB_COLUMNS 32
+
+#define EXTDB_ID_LENGTH 110
+#define EXTDB_ID_SHA256 "\x7d\x24\x89\x6f\x50\xf2\xb2\x3b\x7f\xbd\x12\xc4\x7c\x67\x93\xcd\xb5\x92\x55\x7c\x1c\x09\xaf\xf3\x25\xf5\x46\x5a\x35\x7f\xc9\x64"
 
 static char db_data[MAX_DB_SIZE];
 static uint32_t db_total;
@@ -66,6 +69,20 @@ static const ColumnType default_format[] =
     ColumnDescription,
     ColumnRap,
     ColumnUrl,
+    ColumnSize,
+    ColumnChecksum
+};
+
+static const ColumnType external_format[] =
+{
+    ColumnUnknown,
+    ColumnUnknown,
+    ColumnName,
+    ColumnUrl,
+    ColumnRap,
+    ColumnContentId,
+    ColumnUnknown,
+    ColumnUnknown,
     ColumnSize,
     ColumnChecksum
 };
@@ -190,14 +207,14 @@ int load_database(uint8_t db_id)
     char path[256];
     pkgi_snprintf(path, sizeof(path), "%s/dbformat.txt", pkgi_get_config_folder());
 
-    LOG("loading format from %s", path);
-
     int loaded = pkgi_load(path, db_data, sizeof(db_data) - 1);
     if (loaded > 0) {
         char* ptr = db_data;
         char* end = db_data + loaded + 1;
         column = 0;
         ColumnType types[MAX_DB_COLUMNS];
+
+        LOG("loading format from %s", path);
 
         dbf.delimiter = *ptr++;
 
@@ -241,15 +258,28 @@ int load_database(uint8_t db_id)
     loaded = pkgi_load(path, db_data+db_size, sizeof(db_data) - 1);
     if (loaded > 0)
     {
-        db_size += loaded;
+        sha256_ctx sha;
+        uint8_t check[SHA256_DIGEST_SIZE];
+
+        sha256_init(&sha);
+        sha256_update(&sha, (uint8_t*)db_data+db_size, EXTDB_ID_LENGTH);
+        sha256_finish(&sha, check);
+
+        if (pkgi_memequ(EXTDB_ID_SHA256, check, SHA256_DIGEST_SIZE))
+        {
+            dbf.delimiter = '\t';
+            dbf.total_columns = 10;
+            dbf.type = (ColumnType*) external_format;
+        }
     }
     else
     {
         return 0;
     }
 
-    LOG("parsing items");
+    LOG("parsing items (%d bytes)", loaded);
 
+    db_size += loaded;
     db_data[db_size] = '\n';
     char* ptr = db_data + db_size - loaded;
     char* end = db_data + db_size + 1;
