@@ -580,6 +580,7 @@ GameRegion pkgi_get_region(const char* content)
 {
     switch (content[0])
     {
+    case 'K':
     case 'H':
         return RegionASA;
 

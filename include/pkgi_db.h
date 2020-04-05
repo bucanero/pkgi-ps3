@@ -82,7 +82,17 @@ typedef enum {
     RegionUnknown,
 } GameRegion;
 
-typedef struct Config Config;
+typedef struct Config {
+    DbSort sort;
+    DbSortOrder order;
+    uint8_t content;
+    uint32_t filter;
+    uint8_t version_check;
+    uint8_t dl_mode_background;
+    uint8_t music;
+    uint8_t allow_refresh;
+} Config;
+
 
 int pkgi_db_reload(char* error, uint32_t error_size);
 int pkgi_db_update(const char* update_url, uint32_t update_len, char* error, uint32_t error_size);

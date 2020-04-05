@@ -45,7 +45,7 @@ LIBS		:=	-lya2d -lfont -ltiny3d -lsimdmath -lgcm_sys -lio -lsysutil -lrt -llv2 -
 # options for code generation
 #---------------------------------------------------------------------------------
 
-CFLAGS		=	-O2 -Wall -mcpu=cell $(MACHDEP) $(INCLUDE)
+CFLAGS		=	-O2 -Wall -mcpu=cell -std=gnu99 $(MACHDEP) $(INCLUDE)
 CXXFLAGS	=	$(CFLAGS)
 
 LDFLAGS		=	$(MACHDEP) -Wl,-Map,$(notdir $@).map

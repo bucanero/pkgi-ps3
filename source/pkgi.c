@@ -598,7 +598,7 @@ static void pkgi_update_check_thread(void)
         int64_t sz;
         pkgi_http_response_length(http, &sz);
 
-        char buffer[8 << 10];
+        char buffer[8192];
         uint32_t size = 0;
 
         while (size < sizeof(buffer) - 1)
@@ -674,7 +674,7 @@ static void pkgi_update_check_thread(void)
     pkgi_thread_exit();
 }
 
-int main()
+int main(int argc, const char* argv[])
 {
     pkgi_start();
 
@@ -816,4 +816,5 @@ int main()
     LOG("finished");
     pkgi_free_texture(background);
     pkgi_end();
+	return 0;
 }

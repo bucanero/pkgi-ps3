@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <stdarg.h>
+#include "pkgi_dialog.h"
 
 #define PKGI_UPDATE_URL     "https://api.github.com/repos/bucanero/pkgi-ps3/releases/latest"
 #define PKGI_VERSION        "1.1.2"
@@ -31,12 +32,6 @@
 #define PKGI_QUEUE_FOLDER "/dev_hdd0/vsh/task"
 #define PKGI_INSTALL_FOLDER "/dev_hdd0/vsh/game_pkg"
 
-typedef struct pkgi_input {
-    uint64_t delta;   // microseconds from previous frame
-    uint32_t pressed; // button pressed in last frame
-    uint32_t down;    // button is currently down
-    uint32_t active;  // button is pressed in last frame, or held down for a long time (10 frames)
-} pkgi_input;
 
 #define PKGI_COUNTOF(arr) (sizeof(arr)/sizeof(0[arr]))
 

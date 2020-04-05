@@ -1,9 +1,17 @@
 #pragma once
 
+#include <stdint.h>
+
 #define MDIALOG_OK      0 
 #define MDIALOG_YESNO   1 
 
-typedef struct pkgi_input pkgi_input;
+typedef struct pkgi_input {
+    uint64_t delta;   // microseconds from previous frame
+    uint32_t pressed; // button pressed in last frame
+    uint32_t down;    // button is currently down
+    uint32_t active;  // button is pressed in last frame, or held down for a long time (10 frames)
+} pkgi_input;
+
 
 void pkgi_dialog_init(void);
 
