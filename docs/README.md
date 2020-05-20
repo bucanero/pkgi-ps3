@@ -187,11 +187,11 @@ It will open the context menu. Press ![Triangle](https://github.com/bucanero/pkg
 You need to have installed:
 
 - [PS3 toolchain](https://github.com/bucanero/ps3toolchain)
-- [PSL1GHT](https://github.com/bucanero/PSL1GHT) library
-- [tiny3D lib & libfont](https://github.com/Estwald/PSDK3v2/tree/master/libraries-src/Tiny3D) (from Estwald)
-- [YA2D lib](https://github.com/bucanero/ya2d_ps3) (an extended version from my repo)
-- [MikMod lib](https://github.com/ps3dev/ps3libraries/blob/master/scripts/011-libmikmod-3.1.11.sh)
-- [dbglogger lib](https://github.com/bucanero/psl1ght-libs/tree/master/dbglogger) (my own debug logging library)
+- [PSL1GHT](https://github.com/bucanero/PSL1GHT) SDK
+- [Tiny3D](https://github.com/Estwald/PSDK3v2/tree/master/libraries-src/Tiny3D) library (from Estwald)
+- [YA2D](https://github.com/bucanero/ya2d_ps3) library (an extended version from my repo)
+- [MikMod](https://github.com/ps3dev/ps3libraries/blob/master/scripts/011-libmikmod-3.1.11.sh) library
+- [dbglogger](https://github.com/bucanero/psl1ght-libs/tree/master/dbglogger) library (only required for debug logging)
 
 Run `make` to create a release build. After that, run `make pkg` to create a `.pkg` install file. 
 
