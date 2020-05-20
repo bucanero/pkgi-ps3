@@ -4,6 +4,14 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 ## [Unreleased]()
 
+## [v1.1.3](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.1.3) - 2020-05-20
+
+### Added
+
+* Improved auto-update code to download `.pkg` updates directly from GitHub
+* Increased database memory limit to 32768 items
+* Changed App location to the XMB `Network` tab
+
 ### Fixed
 
 * The app now allows to download items that already exist
