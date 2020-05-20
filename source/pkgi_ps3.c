@@ -197,6 +197,8 @@ static void pkgi_start_debug_log(void)
 #ifdef PKGI_ENABLE_LOGGING
     dbglogger_init();
     LOG("PKGi PS3 logging initialized");
+
+    dbglogger_failsafe("9999");
 #endif
 }
 
@@ -684,7 +686,7 @@ void pkgi_start(void)
     netInitialize();
 
     LOG("initializing SSL");
-//    sysModuleLoad(SYSMODULE_NET);
+    sysModuleLoad(SYSMODULE_NET);
     sysModuleLoad(SYSMODULE_HTTP);
     sysModuleLoad(SYSMODULE_HTTPS);
     sysModuleLoad(SYSMODULE_SSL);
@@ -1307,23 +1309,6 @@ pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
         LOG("httpSendRequest failed: 0x%08x", ret);
         goto bail;
     }
-
-/*
-        int code;
-        
-        ret = httpResponseGetStatusCode(transID, &code);
-        if (ret < 0) goto bail;
-        
-        if (code == HTTP_STATUS_CODE_Not_Found || code == HTTP_STATUS_CODE_Forbidden) {ret=-4; goto bail;}
-*/
-
-/*
-        if ((err = sceHttpSendRequest(req, NULL, 0)) < 0)
-        {
-            LOG("sceHttpSendRequest failed: 0x%08x", err);
-            goto bail;
-        }
-*/
 
     http->used = 1;
     http->local = 0;

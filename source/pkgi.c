@@ -247,6 +247,7 @@ static void pkgi_do_main(pkgi_input* input)
 
         if (input->active & PKGI_BUTTON_SELECT) {
             input->pressed &= ~PKGI_BUTTON_SELECT;
+
             pkgi_msg_dialog(MDIALOG_OK, "             \xE2\x98\x85  PKGi PS3 v" PKGI_VERSION "  \xE2\x98\x85          \n\n"
                               "  original PS Vita version by mmozeiko    \n\n"
                               "    PlayStation 3 version by Bucanero     ");
@@ -593,84 +594,100 @@ static void pkgi_update_check_thread(void)
     LOG("checking latest pkgi version at %s", PKGI_UPDATE_URL);
 
     pkgi_http* http = pkgi_http_get(PKGI_UPDATE_URL, NULL, 0);
-    if (http)
-    {
-        int64_t sz;
-        pkgi_http_response_length(http, &sz);
-
-        char buffer[8192];
-        uint32_t size = 0;
-
-        while (size < sizeof(buffer) - 1)
-        {
-            int read = pkgi_http_read(http, buffer + size, sizeof(buffer) - 1 - size);
-            if (read < 0)
-            {
-                size = 0;
-                break;
-            }
-            else if (read == 0)
-            {
-                break;
-            }
-            size += read;
-        }
-
-        if (size != 0)
-        {
-            LOG("received %u bytes", size);
-        }
-        buffer[size] = 0;
-
-        static const char find[] = "\"name\":\"PKGi PS3 v";
-        const char* start = pkgi_strstr(buffer, find);
-        if (start != NULL)
-        {
-            LOG("found name");
-            start += sizeof(find) - 1;
-
-            char* end = pkgi_strstr(start, "\"");
-            if (end != NULL)
-            {
-                *end = 0;
-                LOG("latest version is %s", start);
-
-                if (pkgi_stricmp(PKGI_VERSION, start) != 0)
-                {
-                    LOG("new version available");
-
-                    DbItem update_item;
-                    update_item.content = "UP0001-NP00PKGI3_00-0000000000000000";
-                    update_item.name    = "PKGi PS3 Update";
-                    update_item.url     = "http://update.pkgi.tk/pkgi-ps3.pkg";
-
-                    pkgi_dialog_start_progress(update_item.name, "Preparing...", 0);
-                    
-                    if (pkgi_download(&update_item, 0) && install(update_item.content))
-                    {
-                        char text[256];
-                        pkgi_snprintf(text, sizeof(text), "Successfully downloaded PKGi PS3 v%s", start);
-                        pkgi_dialog_message(update_item.name, text);
-                        LOG("update downloaded!");
-                    }
-                }
-            }
-            else
-            {
-                LOG("no end of name found");
-            }
-        }
-        else
-        {
-            LOG("no name found");
-        }
-
-        pkgi_http_close(http);
-    }
-    else
+    if (!http)
     {
         LOG("http request to %s failed", PKGI_UPDATE_URL);
+        pkgi_thread_exit();
     }
+
+    int64_t sz;
+    pkgi_http_response_length(http, &sz);
+
+    char buffer[8192];
+    uint32_t size = 0;
+
+    while (size < sizeof(buffer) - 1)
+    {
+        int read = pkgi_http_read(http, buffer + size, sizeof(buffer) - 1 - size);
+        if (read < 0)
+        {
+            size = 0;
+            break;
+        }
+        else if (read == 0)
+        {
+            break;
+        }
+        size += read;
+    }
+
+    if (size != 0)
+    {
+        LOG("received %u bytes", size);
+    }
+    buffer[size] = 0;
+
+    pkgi_http_close(http);
+
+    static const char find[] = "\"name\":\"PKGi PS3 v";
+    const char* start = pkgi_strstr(buffer, find);
+    if (!start)
+    {
+        LOG("no name found");
+        pkgi_thread_exit();
+    }
+
+    LOG("found name");
+    start += sizeof(find) - 1;
+
+    char* end = pkgi_strstr(start, "\"");
+    if (!end)
+    {
+        LOG("no end of name found");
+        pkgi_thread_exit();
+    }
+
+    *end = 0;
+    LOG("latest version is %s", start);
+
+    if (pkgi_stricmp(PKGI_VERSION, start) == 0)
+    {
+        LOG("no new version available");
+        pkgi_thread_exit();
+    }
+
+	start = pkgi_strstr(end+1, "\"browser_download_url\":\"");
+	if (!start)
+	{
+		LOG("no download URL found");
+        pkgi_thread_exit();
+	}
+
+	start += 24;
+	end = pkgi_strstr(start, "\"");
+	if (!end)
+	{
+		LOG("no download URL found");
+        pkgi_thread_exit();
+	}
+
+	*end = 0;
+	LOG("download URL is %s", start);
+
+    DbItem update_item = {
+        .content = "UP0001-NP00PKGI3_00-0000000000000000",
+        .name    = "PKGi PS3 Update",
+        .url     = start,
+    };
+
+    pkgi_dialog_start_progress(update_item.name, "Preparing...", 0);
+    
+    if (pkgi_download(&update_item, 0) && install(update_item.content))
+    {
+        pkgi_dialog_message(update_item.name, "Successfully downloaded PKGi PS3 update");
+        LOG("update downloaded!");
+    }
+
     pkgi_thread_exit();
 }
 

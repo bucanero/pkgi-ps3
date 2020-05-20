@@ -7,8 +7,8 @@
 
 #include <stddef.h>
 
-#define MAX_DB_SIZE (6*1024*1024)
-#define MAX_DB_ITEMS 20000
+#define MAX_DB_SIZE (8*1024*1024)
+#define MAX_DB_ITEMS 32768
 #define MAX_DB_COLUMNS 32
 
 #define EXTDB_ID_LENGTH 110
