@@ -239,8 +239,8 @@ static void pkgi_do_main(pkgi_input* input)
     
     if (input)
     {
-        if (input->active & PKGI_BUTTON_O) {
-            input->pressed &= ~PKGI_BUTTON_O;
+        if (input->active & pkgi_cancel_button()) {
+            input->pressed &= ~pkgi_cancel_button();
             if (pkgi_msg_dialog(MDIALOG_YESNO, "Exit to XMB?"))
                 state = StateTerminate;
         }

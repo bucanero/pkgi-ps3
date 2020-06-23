@@ -705,8 +705,8 @@ void pkgi_start(void)
         LOG("mutex create error (%x)", ret);
     }
 
-//    if (config.enterButtonAssign == SCE_SYSTEM_PARAM_ENTER_BUTTON_CIRCLE)
-    if (false)
+    sysUtilGetSystemParamInt(SYSUTIL_SYSTEMPARAM_ID_ENTER_BUTTON_ASSIGN, &ret);
+    if (ret == 0)
     {
         g_ok_button = PKGI_BUTTON_O;
         g_cancel_button = PKGI_BUTTON_X;
