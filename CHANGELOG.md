@@ -4,6 +4,13 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 ## [Unreleased]()
 
+## [v1.1.6](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.1.6) - 2020-06-23
+
+### Added
+
+* Generate .rif files when downloading items (system must be activated)
+* Improved speed when creating empty files in background download mode
+
 ## [v1.1.3](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.1.3) - 2020-05-20
 
 ### Added

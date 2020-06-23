@@ -1210,12 +1210,12 @@ pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
 
     if (content)
     {
-        pkgi_snprintf(path, sizeof(path), "%s%s.pkg", pkgi_get_temp_folder(), strrchr(url, '/'));
+        pkgi_snprintf(path, sizeof(path), "%s%s", pkgi_get_temp_folder(), strrchr(url, '/'));
 
         int64_t fsize = pkgi_get_size(path);
         if (fsize < 0)
         {
-            LOG("trying shorter name (%s)", content);
+            LOG("trying shorter name (%s.pkg)", content);
             pkgi_snprintf(path, sizeof(path), "%s/%s.pkg", pkgi_get_temp_folder(), content);
             fsize = pkgi_get_size(path);
         }

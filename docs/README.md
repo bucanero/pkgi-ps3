@@ -17,6 +17,7 @@ The `pkgi-ps3` homebrew app allows to download and install `.pkg` files directly
 * **standalone:** no PC required, everything happens directly on the PS3.
 * **automatic downloads:** just choose an item, and it will be downloaded by the app to your HDD (`direct mode`) or queued for background download (`background mode`) using the internal Download Manager.
 * **resumes interrupted downloads:** you can stop a download at any time, switch applications, and come back to resume the download later.
+* **content activation:** the app can generate .rif files for downloaded content (system must be activated)
 
 ### Notes:
 * **queuing** up multiple downloads is only supported when using `background download` mode.
@@ -160,8 +161,7 @@ It will open the context menu. Press ![Triangle](https://github.com/bucanero/pkg
 
 ### Notes
 
-- **HEN users:** the item's `.rap` will be activated automatically when launched.
-- **CFW users:** update to COBRA 8.2 firmware for automatic `.rap` import, or use reactPSN/psnpatch on older CFWs after installing the content.
+- **RAP data:** if the item has `.rap` data, the file will be saved in the `/dev_hdd0/exdata/` folder.
 
 
 # Q&A
@@ -190,6 +190,7 @@ You need to have installed:
 - [PSL1GHT](https://github.com/bucanero/PSL1GHT) SDK
 - [Tiny3D](https://github.com/Estwald/PSDK3v2/tree/master/libraries-src/Tiny3D) library (from Estwald)
 - [YA2D](https://github.com/bucanero/ya2d_ps3) library (an extended version from my repo)
+- [PolarSSL](https://github.com/ps3dev/ps3libraries/blob/master/scripts/015-polarssl.sh) library
 - [MikMod](https://github.com/ps3dev/ps3libraries/blob/master/scripts/011-libmikmod-3.1.11.sh) library
 - [dbglogger](https://github.com/bucanero/psl1ght-libs/tree/master/dbglogger) library (only required for debug logging)
 
