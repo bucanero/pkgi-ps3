@@ -10,6 +10,7 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 * Generate .rif files when downloading items (system must be activated)
 * Improved speed when creating empty files in background download mode
+* Enter button detection (`cross`/`circle`)
 
 ## [v1.1.3](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.1.3) - 2020-05-20
 
