@@ -25,7 +25,7 @@ struct rif
 	uint32_t version;
 	uint32_t licenseType;
 	uint64_t accountid;
-    uint8_t titleid[0x30]; //Content ID
+    char titleid[0x30]; //Content ID
     uint8_t padding[0xC]; //Padding for randomness
     uint32_t actDatIndex; //Key index on act.dat between 0x00 and 0x7F
     uint8_t key[0x10]; //encrypted klicensee
@@ -198,7 +198,7 @@ int rap2rif(const uint8_t* rap, const char* content_id, const char *exdata_path)
 	rif.timestamp = 0x0000012F415C0000;
 	rif.expiration = 0;
 	rif.accountid = get64be(actdat->accountId);
-	strncpy((char*) rif.titleid, content_id, sizeof(rif.titleid));
+	strncpy(rif.titleid, content_id, sizeof(rif.titleid));
 
 	//convert rap to rifkey(klicensee)
 	rap_to_klicensee(rap, rif.key);
@@ -215,8 +215,8 @@ int rap2rif(const uint8_t* rap, const char* content_id, const char *exdata_path)
 	ecdsa_set_priv(ec_k_nm);
 	ecdsa_sign(sha1_digest, R, S);
 
-	memcpy(rif.r, R+1, 0x14);
-	memcpy(rif.s, S+1, 0x14);
+	memcpy(rif.r, R+1, sizeof(rif.r));
+	memcpy(rif.s, S+1, sizeof(rif.s));
 
     snprintf(path, sizeof(path), "%s%s.rif", exdata_path, content_id);
 

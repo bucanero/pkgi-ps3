@@ -7,9 +7,9 @@
 
 #include <sys/stat.h>
 #include <sys/file.h>
-#include <lv2/sysfs.h>
+#include <stdio.h>
+#include <dirent.h>
 
-#define BUFF_SIZE  0x200000 // 2MB
 
 #define PDB_HDR_FILENAME	"\x00\x00\x00\xCB"
 #define PDB_HDR_DATETIME	"\x00\x00\x00\xCC"
@@ -46,7 +46,6 @@ static uint8_t down[64 * 1024];
 // pkg header
 static uint64_t total_size;
 
-
 // UI stuff
 static char dialog_extra[256];
 static char dialog_eta[256];
@@ -55,19 +54,6 @@ static uint32_t info_update;
 
 static uint32_t	queue_task_id 	= 10000002;
 static uint32_t	install_task_id = 80000002;
-
-
-// Async IO stuff
-#define AIO_BUFFERS		4
-#define AIO_NUMBER		2
-#define AIO_FAILED 		0
-#define AIO_READY 		1
-#define AIO_BUSY  		2
-
-static sysFSAio aio_write[AIO_NUMBER];
-
-uint8_t write_status[AIO_NUMBER];
-uint8_t buffer_to_write;
 
 
 uint32_t get_task_dir_id(const char* dir, uint32_t tid)
@@ -289,107 +275,25 @@ static void update_progress(void)
     }
 }
 
-static void writing_callback(sysFSAio *xaio, s32 error, s32 xid, u64 size)
-{
-	int i = xaio->usrdata;
-	
-	if(error != 0) {
-		write_status[i] = AIO_FAILED;
-		LOG("Error : writing error %X", (unsigned int) error);
-	} else 
-	if(size != xaio->size) {
-		write_status[i] = AIO_FAILED;
-		LOG("Error : writing size %X / %X", (unsigned int) size, (unsigned int) xaio->size);
-	} else {
-		buffer_to_write++;
-		if (buffer_to_write == AIO_BUFFERS) buffer_to_write=0;
-		write_status[i] = AIO_READY;
-		download_offset+=size;
-	}
-}
-
 static int create_dummy_pkg(void)
 {
-    int fdw, i;
-	static int id_w[2] = {-1, -1};
-	
 	char dst[256];
 	pkgi_snprintf(dst, sizeof(dst), PKGI_QUEUE_FOLDER "/%d/%s", queue_task_id, root);
 
-    if(sysFsAioInit(dst)!= 0)  {
-		LOG("Error : AIO_FAILED to copy_async / sysFsAioInit(dst)");
-		return AIO_FAILED;
-	}
+	LOG("Creating empty file '%s'...", dst);
+	if (!pkgi_save(dst, "PKGi PS3", 8))
+		return 0;
 
-	if(sysFsOpen(dst, SYS_O_CREAT | SYS_O_TRUNC | SYS_O_WRONLY, &fdw, 0, 0) != 0) {
-		LOG("Error : AIO_FAILED to copy_async / sysFsOpen(src)");
-		return AIO_FAILED;
-	}
-
-	char *mem = (char *) pkgi_malloc(BUFF_SIZE);
-	if(mem == NULL) {
-		LOG("Error : AIO_FAILED to copy_async / malloc");
-		return AIO_FAILED;
-	}
-	
-	for(i=0; i < AIO_NUMBER; i++) {
-		aio_write[i].fd = -1;
-		write_status[i]=AIO_READY;
-	}
-
-	uint64_t writing_pos=0ULL;		
-	buffer_to_write=0;
 	download_offset=0;
-	
-    while(download_offset < download_size)
-    {
-    	i = !i;
-
-		if((write_status[i] == AIO_READY) && (writing_pos < download_size))
-		{
-			aio_write[i].fd = fdw;
-			aio_write[i].offset = writing_pos;
-			aio_write[i].buffer_addr = (u32) (u64) &mem[0];
-			aio_write[i].size = min64(BUFF_SIZE, download_size - writing_pos);
-			aio_write[i].usrdata = i;
-									
-			write_status[i] = AIO_BUSY;
-			writing_pos += aio_write[i].size;
-						
-			if(sysFsAioWrite(&aio_write[i], &id_w[i], writing_callback) != 0) {
-				LOG("Error : AIO_FAILED to copy_async / sysFsAioWrite");
-				goto error;
-			}
-		}
-			
-		if(write_status[i] == AIO_FAILED || pkgi_dialog_is_cancelled()) {
-			LOG("Error : AIO_FAILED to copy_async / write_status = AIO_FAILED !");
-			goto error;
-		}
-			
-		update_progress();
-    }
-	
-	for(i=0; i<AIO_NUMBER; i++) {
-		sysFsClose(aio_write[i].fd);
+	if (truncate(dst, download_size) != 0)
+	{
+		LOG("Error truncating (%s)", dst);
+		return 0;
 	}
-	sysFsAioFinish(dst);
-    pkgi_free(mem);
-	
+
+	LOG("(%s) %d bytes written", dst, download_size);
+	download_offset=download_size;
     return 1;
-
-error:
-	for(i=0; i<AIO_NUMBER; i++) {
-		sysFsAioCancel(id_w[i]);
-	}
-	for(i=0; i<AIO_NUMBER; i++) {
-		sysFsClose(aio_write[i].fd);
-	}
-
-	sysFsAioFinish(dst);
-    pkgi_free(mem);
-
-    return AIO_FAILED;
 }
 
 static int queue_pkg_task(void)
@@ -681,6 +585,51 @@ static int create_rap(const char* contentid, const uint8_t* rap)
     return 1;
 }
 
+static int create_rif(const char* contentid, const uint8_t* rap)
+{
+    DIR *d;
+    struct dirent *dir;
+    char path[256];
+    char *lic_path = NULL;
+
+    LOG("creating %s.rif", contentid);
+    pkgi_dialog_update_progress("Creating RIF file", NULL, NULL, 1.f);
+
+    d = opendir("/dev_hdd0/home/");
+    while ((dir = readdir(d)) != NULL)
+    {
+        if (pkgi_strstr(dir->d_name, ".") == NULL && pkgi_strstr(dir->d_name, "..") == NULL)
+        {
+            pkgi_snprintf(path, sizeof(path)-1, "%s%s%s", "/dev_hdd0/home/", dir->d_name, "/exdata/act.dat");
+            if (pkgi_get_size(path) > 0)
+            {
+                pkgi_snprintf(path, sizeof(path)-1, "%s%s%s", "/dev_hdd0/home/", dir->d_name, "/exdata/");
+            	lic_path = path;
+            	LOG("using folder '%s'", lic_path);
+                break;
+            }
+        }
+    }
+    closedir(d);
+
+    if (!lic_path)
+    {
+    	LOG("Skipping %s.rif: no act.dat file found", contentid);
+    	return 1;
+    }
+
+    if (!rap2rif(rap, contentid, lic_path))
+    {
+        char error[256];
+        pkgi_snprintf(error, sizeof(error), "Cannot save %s.rif", contentid);
+        pkgi_dialog_error(error);
+        return 0;
+    }
+
+    LOG("RIF file created");
+    return 1;
+}
+
 int pkgi_download(const DbItem* item, const int background_dl)
 {
     int result = 0;
@@ -714,6 +663,12 @@ int pkgi_download(const DbItem* item, const int background_dl)
     info_start = pkgi_time_msec();
     info_update = info_start + 1000;
 
+    if (item->rap)
+    {
+        if (!create_rap(item->content, item->rap)) goto finish;
+        if (!create_rif(item->content, item->rap)) goto finish;
+    }
+
 	if (background_dl)
 	{
     	if (!queue_pkg_task()) goto finish;
@@ -723,11 +678,6 @@ int pkgi_download(const DbItem* item, const int background_dl)
 	    if (!download_pkg_file()) goto finish;
 	    if (!check_integrity(item->digest)) goto finish;
 	}
-
-    if (item->rap)
-    {
-        if (!create_rap(item->content, item->rap)) goto finish;
-    }
 
     pkgi_rm(resume_file);
     result = 1;
@@ -777,7 +727,7 @@ int pkgi_install(const char *titleid)
     
     LOG("move (%s) -> (%s)", pkg_path, filename);
     
-    int ret = sysLv2FsRename(pkg_path, filename);
+    int ret = rename(pkg_path, filename);
 
 	return (ret == 0);
 }
