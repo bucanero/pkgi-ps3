@@ -5,7 +5,7 @@
 #include "pkgi_dialog.h"
 
 #define PKGI_UPDATE_URL     "https://api.github.com/repos/bucanero/pkgi-ps3/releases/latest"
-#define PKGI_VERSION        "1.1.3"
+#define PKGI_VERSION        "1.1.6"
 
 // values compatible with psp2/ctrl.h header
 #define PKGI_BUTTON_SELECT 0x00000001

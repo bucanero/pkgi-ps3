@@ -592,9 +592,6 @@ static int create_rif(const char* contentid, const uint8_t* rap)
     char path[256];
     char *lic_path = NULL;
 
-    LOG("creating %s.rif", contentid);
-    pkgi_dialog_update_progress("Creating RIF file", NULL, NULL, 1.f);
-
     d = opendir("/dev_hdd0/home/");
     while ((dir = readdir(d)) != NULL)
     {
@@ -617,6 +614,9 @@ static int create_rif(const char* contentid, const uint8_t* rap)
     	LOG("Skipping %s.rif: no act.dat file found", contentid);
     	return 1;
     }
+
+    LOG("creating %s.rif", contentid);
+    pkgi_dialog_update_progress("Creating RIF file", NULL, NULL, 1.f);
 
     if (!rap2rif(rap, contentid, lic_path))
     {
