@@ -182,6 +182,11 @@ It will open the context menu. Press ![Triangle](https://github.com/bucanero/pkg
    
    Optimization is still pending. If `direct` download is slow, you can use `background download` mode to download files using the internal PS3 Download Manager.
 
+# Credits
+
+* [Bucanero](http://www.bucanero.com.ar/): Project developer
+* [mmozeiko](https://github.com/mmozeiko/): [PS Vita pkgi](https://github.com/mmozeiko/pkgi)
+
 # Building
 
 You need to have installed:
