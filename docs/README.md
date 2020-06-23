@@ -29,7 +29,7 @@ Get the [latest version here][pkgi_latest].
 
 ### Changelog
 
-See the [latest changes here](CHANGELOG.md).
+See the [latest changes here](https://github.com/bucanero/pkgi-ps3/blob/master/CHANGELOG.md).
 
 # Setup instructions
 
