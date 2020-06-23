@@ -17,7 +17,7 @@ The `pkgi-ps3` homebrew app allows to download and install `.pkg` files directly
 * **standalone:** no PC required, everything happens directly on the PS3.
 * **automatic downloads:** just choose an item, and it will be downloaded by the app to your HDD (`direct mode`) or queued for background download (`background mode`) using the internal Download Manager.
 * **resumes interrupted downloads:** you can stop a download at any time, switch applications, and come back to resume the download later.
-* **content activation:** the app can generate .rif files for downloaded content (system must be activated)
+* **content activation:** the app can generate `.rif` files for downloaded content (system must be activated)
 
 ### Notes:
 * **queuing** up multiple downloads is only supported when using `background download` mode.
