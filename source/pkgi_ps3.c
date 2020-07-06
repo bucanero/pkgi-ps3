@@ -668,8 +668,8 @@ void init_http_pool(void)
 
     http_pools.caList = (httpsData *)malloc(sizeof(httpsData));
     if (http_pools.caList) {
-    	(&http_pools.caList[0])->ptr = http_pools.cert_buffer;
-	    (&http_pools.caList[0])->size = cert_size;
+    	http_pools.caList->ptr = http_pools.cert_buffer;
+	    http_pools.caList->size = cert_size;
 	}
 
 	ret = httpsInit(1, (httpsData *) http_pools.caList);
@@ -747,30 +747,20 @@ int pkgi_update(pkgi_input* input)
 	ya2d_controlsRead();
     
     uint32_t previous = input->down;
-    input->down = 0;
+    input->down = *(uint32_t*)&ya2d_paddata[0].button[2];
 
-    if (ya2d_paddata[0].BTN_CROSS)      input->down |= PKGI_BUTTON_X;
-    if (ya2d_paddata[0].BTN_TRIANGLE)   input->down |= PKGI_BUTTON_T;
-    if (ya2d_paddata[0].BTN_CIRCLE)     input->down |= PKGI_BUTTON_O;
-    if (ya2d_paddata[0].BTN_SQUARE)     input->down |= PKGI_BUTTON_S;
-    if (ya2d_paddata[0].BTN_SELECT)     input->down |= PKGI_BUTTON_SELECT;
-    if (ya2d_paddata[0].BTN_START)      input->down |= PKGI_BUTTON_START;
- 
-    if (ya2d_paddata[0].BTN_UP || (ya2d_paddata[0].ANA_L_V < ANALOG_MIN))
+    if (ya2d_paddata[0].ANA_L_V < ANALOG_MIN)
         input->down |= PKGI_BUTTON_UP;
         
-    if (ya2d_paddata[0].BTN_DOWN || (ya2d_paddata[0].ANA_L_V > ANALOG_MAX))
+    if (ya2d_paddata[0].ANA_L_V > ANALOG_MAX)
         input->down |= PKGI_BUTTON_DOWN;
         
-    if (ya2d_paddata[0].BTN_LEFT || (ya2d_paddata[0].ANA_L_H < ANALOG_MIN))
+    if (ya2d_paddata[0].ANA_L_H < ANALOG_MIN)
         input->down |= PKGI_BUTTON_LEFT;
         
-    if (ya2d_paddata[0].BTN_RIGHT || (ya2d_paddata[0].ANA_L_H > ANALOG_MAX))
+    if (ya2d_paddata[0].ANA_L_H > ANALOG_MAX)
         input->down |= PKGI_BUTTON_RIGHT;
 
-    if (ya2d_paddata[0].BTN_L1 || ya2d_paddata[0].BTN_L2)      input->down |= PKGI_BUTTON_LT;
-    if (ya2d_paddata[0].BTN_R1 || ya2d_paddata[0].BTN_R2)      input->down |= PKGI_BUTTON_RT;
- 
     input->pressed = input->down & ~previous;
     input->active = input->pressed;
 

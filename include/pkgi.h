@@ -7,22 +7,20 @@
 #define PKGI_UPDATE_URL     "https://api.github.com/repos/bucanero/pkgi-ps3/releases/latest"
 #define PKGI_VERSION        "1.1.6"
 
-// values compatible with psp2/ctrl.h header
-#define PKGI_BUTTON_SELECT 0x00000001
-#define PKGI_BUTTON_START  0x00000008
+#define PKGI_BUTTON_SELECT 0x00010000
+#define PKGI_BUTTON_START  0x00080000
+#define PKGI_BUTTON_UP     0x00100000
+#define PKGI_BUTTON_RIGHT  0x00200000
+#define PKGI_BUTTON_DOWN   0x00400000
+#define PKGI_BUTTON_LEFT   0x00800000
 
-#define PKGI_BUTTON_UP    0x00000010
-#define PKGI_BUTTON_RIGHT 0x00000020
-#define PKGI_BUTTON_DOWN  0x00000040
-#define PKGI_BUTTON_LEFT  0x00000080
+#define PKGI_BUTTON_LT (0x00000004 | 0x00000001) // L1/L2
+#define PKGI_BUTTON_RT (0x00000008 | 0x00000002) // R1/R2
 
-#define PKGI_BUTTON_LT 0x00000100
-#define PKGI_BUTTON_RT 0x00000200
-
-#define PKGI_BUTTON_X 0x00004000 // cross
-#define PKGI_BUTTON_O 0x00002000 // circle
-#define PKGI_BUTTON_T 0x00001000 // triangle
-#define PKGI_BUTTON_S 0x00008000 // square
+#define PKGI_BUTTON_X 0x00000040 // cross
+#define PKGI_BUTTON_O 0x00000020 // circle
+#define PKGI_BUTTON_T 0x00000010 // triangle
+#define PKGI_BUTTON_S 0x00000080 // square
 
 #define PKGI_UNUSED(x) (void)(x)
 
