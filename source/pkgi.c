@@ -554,7 +554,7 @@ static void pkgi_do_tail(void)
     }
     else
     {
-        pkgi_snprintf(text, sizeof(text), "%s Install  " PKGI_UTF8_T " Menu  " PKGI_UTF8_S " Details  %s Exit", pkgi_get_ok_str(), pkgi_get_cancel_str());
+        pkgi_snprintf(text, sizeof(text), "%s Download  " PKGI_UTF8_T " Menu  " PKGI_UTF8_S " Details  %s Exit", pkgi_get_ok_str(), pkgi_get_cancel_str());
     }
 
     pkgi_clip_set(left, bottom_y, VITA_WIDTH - right - left, VITA_HEIGHT - bottom_y);
