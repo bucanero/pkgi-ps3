@@ -550,7 +550,7 @@ static void pkgi_do_tail(void)
 
     if (pkgi_menu_is_open())
     {
-        pkgi_snprintf(text, sizeof(text), "%s Select  " PKGI_UTF8_T " Close  %s Cancel", pkgi_get_ok_str(), pkgi_get_cancel_str());
+        pkgi_snprintf(text, sizeof(text), "%s Select  %s Close", pkgi_get_ok_str(), pkgi_get_cancel_str());
     }
     else
     {

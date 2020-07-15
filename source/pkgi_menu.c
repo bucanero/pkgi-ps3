@@ -158,12 +158,6 @@ int pkgi_do_menu(pkgi_input* input)
 
     if (input->pressed & pkgi_cancel_button())
     {
-        menu_result = MenuResultCancel;
-        menu_delta = -1;
-        return 1;
-    }
-    else if (input->pressed & PKGI_BUTTON_T)
-    {
         menu_result = MenuResultAccept;
         menu_delta = -1;
         return 1;
