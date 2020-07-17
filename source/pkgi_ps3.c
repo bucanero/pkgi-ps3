@@ -747,7 +747,7 @@ int pkgi_update(pkgi_input* input)
 	ya2d_controlsRead();
     
     uint32_t previous = input->down;
-    input->down = *(uint32_t*)&ya2d_paddata[0].button[2];
+    memcpy(&input->down, &ya2d_paddata[0].button[2], sizeof(uint32_t));
 
     if (ya2d_paddata[0].ANA_L_V < ANALOG_MIN)
         input->down |= PKGI_BUTTON_UP;
