@@ -192,8 +192,8 @@ It will open the context menu. Press ![Triangle](https://github.com/bucanero/pkg
 You need to have installed:
 
 - [PS3 toolchain](https://github.com/bucanero/ps3toolchain)
-- [PSL1GHT](https://github.com/bucanero/PSL1GHT) SDK
-- [Tiny3D](https://github.com/Estwald/PSDK3v2/tree/master/libraries-src/Tiny3D) library (from Estwald)
+- [PSL1GHT](https://github.com/ps3dev/PSL1GHT) SDK
+- [Tiny3D](https://github.com/wargio/Tiny3D) library
 - [YA2D](https://github.com/bucanero/ya2d_ps3) library (an extended version from my repo)
 - [PolarSSL](https://github.com/ps3dev/ps3libraries/blob/master/scripts/015-polarssl.sh) library
 - [MikMod](https://github.com/ps3dev/ps3libraries/blob/master/scripts/011-libmikmod-3.1.11.sh) library
