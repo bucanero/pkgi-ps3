@@ -33,7 +33,7 @@ static uint64_t initial_offset;  // where http download resumes
 static uint64_t download_offset; // pkg absolute offset
 static uint64_t download_size;   // pkg total size (from http request)
 
-static sha256_ctx sha;
+static sha256_context sha;
 
 static void* item_file;     // current file handle
 static char item_name[256]; // current file name
@@ -650,6 +650,7 @@ int pkgi_download(const DbItem* item, const int background_dl)
         pkgi_dialog_set_progress_title(background_dl ? "Adding background task..." : "Downloading...");
         download_resume = 0;
         sha256_init(&sha);
+        sha256_starts(&sha, 0);
     }
 
     http = NULL;

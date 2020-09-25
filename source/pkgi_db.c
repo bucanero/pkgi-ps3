@@ -258,12 +258,9 @@ int load_database(uint8_t db_id)
     loaded = pkgi_load(path, db_data+db_size, sizeof(db_data) - 1);
     if (loaded > 0)
     {
-        sha256_ctx sha;
         uint8_t check[SHA256_DIGEST_SIZE];
 
-        sha256_init(&sha);
-        sha256_update(&sha, (uint8_t*)db_data+db_size, EXTDB_ID_LENGTH);
-        sha256_finish(&sha, check);
+        sha256((uint8_t*)db_data+db_size, EXTDB_ID_LENGTH, check, 0);
 
         if (pkgi_memequ(EXTDB_ID_SHA256, check, SHA256_DIGEST_SIZE))
         {

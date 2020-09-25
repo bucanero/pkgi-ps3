@@ -631,7 +631,7 @@ void load_ttf_fonts()
 void init_http_pool(void)
 {
     int ret;
-	s32 cert_size=0;
+	u32 cert_size=0;
 
     LOG("initializing HTTP");
     http_pools.http_pool = malloc(0x10000);
@@ -696,7 +696,7 @@ void pkgi_start(void)
     sys_mutex_attr_t mutex_attr;
     mutex_attr.attr_protocol = SYS_MUTEX_PROTOCOL_FIFO;
     mutex_attr.attr_recursive = SYS_MUTEX_ATTR_NOT_RECURSIVE;
-    mutex_attr.attr_pshared = SYS_MUTEX_ATTR_PSHARED;
+    mutex_attr.attr_pshared = SYS_MUTEX_ATTR_NOT_PSHARED;
     mutex_attr.attr_adaptive = SYS_MUTEX_ATTR_ADAPTIVE;
     strcpy(mutex_attr.name, "dialog");
 
@@ -1237,7 +1237,7 @@ pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
     httpUri uri;
     int ret;
     void *uri_p = NULL;
-    s32 pool_size = 0;
+    u32 pool_size = 0;
 
     LOG("starting http GET request for %s", url);
 
@@ -1367,7 +1367,7 @@ int pkgi_http_read(pkgi_http* http, void* buffer, uint32_t size)
     else
     {
         // LOG("http asking to read %u bytes", size);
-        s32 recv;
+        u32 recv;
         int res = httpRecvResponse(http->transaction, buffer, size, &recv);
 
 //        LOG("http read (%d) %d bytes", size, recv);
