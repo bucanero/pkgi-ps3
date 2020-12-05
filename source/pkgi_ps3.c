@@ -10,6 +10,7 @@
 #include <http/https.h>
 #include <io/pad.h>
 #include <lv2/sysfs.h>
+#include <lv2/process.h>
 #include <net/net.h>
 
 #include <unistd.h>
@@ -679,6 +680,23 @@ void init_http_pool(void)
     return;
 }
 
+static void sys_callback(uint64_t status, uint64_t param, void* userdata)
+{
+    switch (status) {
+        case SYSUTIL_EXIT_GAME:
+            pkgi_end();
+            sysProcessExit(1);
+            break;
+        
+        case SYSUTIL_MENU_OPEN:
+        case SYSUTIL_MENU_CLOSE:
+            break;
+
+        default:
+            break;
+    }
+}
+
 void pkgi_start(void)
 {
     pkgi_start_debug_log();
@@ -738,6 +756,9 @@ void pkgi_start(void)
     pkgi_mkdirs(PKGI_RAP_FOLDER);
 
     init_music();
+
+	// register exit callback
+	sysUtilRegisterCallback(SYSUTIL_EVENT_SLOT0, sys_callback, NULL);
 
     g_time = pkgi_time_msec();
 }
@@ -828,7 +849,7 @@ void pkgi_end(void)
     sysModuleUnload(SYSMODULE_HTTPS);
     sysModuleUnload(SYSMODULE_HTTP);
 
-//    sceKernelExitProcess(0);
+    sysProcessExit(0);
 }
 
 int pkgi_get_temperature(uint8_t cpu)
