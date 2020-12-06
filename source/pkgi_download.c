@@ -89,29 +89,30 @@ static void write_pdb_string(void* fp, const char* header, const char* pdbstr)
 static int create_queue_pdb_files(void)
 {
 	// Create files	
-	char szPDBFile[256] = "";
-	char szIconFile[256] = "";
+	char srcFile[256];
+	char szIconFile[256];
 	
-	pkgi_snprintf(szPDBFile, sizeof(szPDBFile), PKGI_QUEUE_FOLDER "/%d/d0.pdb", queue_task_id);
+	pkgi_snprintf(srcFile, sizeof(srcFile), "%s/%.9s.PNG", pkgi_get_temp_folder(), root);
 	pkgi_snprintf(szIconFile, sizeof(szIconFile), PKGI_QUEUE_FOLDER "/%d/ICON_FILE", queue_task_id);
 	
 	// write - ICON_FILE
-	if (!pkgi_save(szIconFile, iconfile_data, iconfile_data_size))
+	if (rename(srcFile, szIconFile) != 0)
 	{
-	    LOG("Error saving %s", szIconFile);
-	    return 0;
-    }
+		LOG("Error saving %s", szIconFile);
+		return 0;
+	}
 	
-	void *fpPDB = pkgi_create(szPDBFile);
+	pkgi_snprintf(srcFile, sizeof(srcFile), PKGI_QUEUE_FOLDER "/%d/d0.pdb", queue_task_id);
+	void *fpPDB = pkgi_create(srcFile);
 	if(!fpPDB)
 	{
-	    LOG("Failed to create file %s", szPDBFile);
+		LOG("Failed to create file %s", srcFile);
 		return 0;
 	}
 
 	// write - d0.pdb
 	//
-    pkgi_write(fpPDB, pkg_d0top_data, d0top_data_size);
+	pkgi_write(fpPDB, pkg_d0top_data, d0top_data_size);
 	
 	// 000000CE - Download expected size (in bytes)
 	pkgi_write(fpPDB, PDB_HDR_SIZE "\x00\x00\x00\x08\x00\x00\x00\x08", 12);
@@ -130,7 +131,7 @@ static int create_queue_pdb_files(void)
 	write_pdb_string(fpPDB, PDB_HDR_ICON, szIconFile);
 
 	// 00000069 - Display title	
-	char title_str[256] = "";
+	char title_str[256];
 	pkgi_snprintf(title_str, sizeof(title_str), "\xE2\x98\x85 Download \x22%s\x22", db_item->name);
 	write_pdb_string(fpPDB, PDB_HDR_TITLE, title_str);
 	
@@ -670,15 +671,18 @@ int pkgi_download(const DbItem* item, const int background_dl)
         if (!create_rif(item->content, item->rap)) goto finish;
     }
 
-	if (background_dl)
-	{
-    	if (!queue_pkg_task()) goto finish;
-	}
-	else
-	{
-	    if (!download_pkg_file()) goto finish;
-	    if (!check_integrity(item->digest)) goto finish;
-	}
+    pkgi_dialog_update_progress("Downloading icon", NULL, NULL, 1.f);
+    if (!pkgi_download_icon(item->content)) goto finish;
+
+    if (background_dl)
+    {
+        if (!queue_pkg_task()) goto finish;
+    }
+    else
+    {
+        if (!download_pkg_file()) goto finish;
+        if (!check_integrity(item->digest)) goto finish;
+    }
 
     pkgi_rm(resume_file);
     result = 1;
@@ -712,8 +716,9 @@ int pkgi_install(const char *titleid)
 	LOG("Creating .pdb files [%s]", titleid);
 
 	// write - ICON_FILE
-    pkgi_snprintf(filename, sizeof(filename), PKGI_INSTALL_FOLDER "/%d/ICON_FILE", install_task_id);
-	if (!pkgi_save(filename, iconfile_data, iconfile_data_size))
+    pkgi_snprintf(filename, sizeof(filename), "%s/ICON_FILE", pkg_path);
+    pkgi_snprintf(resume_file, sizeof(resume_file), "%s/%s.PNG", pkgi_get_temp_folder(), titleid);
+	if (rename(resume_file, filename) != 0)
 	{
 	    LOG("Error saving %s", filename);
 	    return 0;
@@ -728,7 +733,71 @@ int pkgi_install(const char *titleid)
     
     LOG("move (%s) -> (%s)", pkg_path, filename);
     
-    int ret = rename(pkg_path, filename);
+	return (rename(pkg_path, filename) == 0);
+}
 
-	return (ret == 0);
+int pkgi_download_icon(const char* content)
+{
+    char icon_url[256];
+    char icon_file[256];
+    uint8_t hmac[20];
+
+    pkgi_snprintf(icon_file, sizeof(icon_file), PKGI_TMP_FOLDER "/%.9s.PNG", content + 7);
+    LOG("package icon file: %s", icon_file);
+
+    if (pkgi_get_size(icon_file) > 0)
+        return 1;
+
+    pkgi_snprintf(icon_url, sizeof(icon_url), "%.9s_00", content + 7);
+    sha1_hmac(tmdb_hmac_key, sizeof(tmdb_hmac_key), (uint8_t*) icon_url, 12, hmac);
+
+    pkgi_snprintf(icon_url, sizeof(icon_url), "http://tmdb.np.dl.playstation.net/tmdb/%.9s_00_%llX%llX%X/ICON0.PNG", 
+        content + 7,
+        ((uint64_t*)hmac)[0], 
+        ((uint64_t*)hmac)[1], 
+        ((uint32_t*)hmac)[4]);
+
+    pkgi_http* http = pkgi_http_get(icon_url, NULL, 0);
+    if (!http)
+    {
+        LOG("http request to %s failed", icon_url);
+        return pkgi_save(icon_file, iconfile_data, iconfile_data_size);
+    }
+
+    int64_t sz;
+    if (!pkgi_http_response_length(http, &sz))
+    {
+        LOG("icon not found, using default");
+        pkgi_http_close(http);
+        return pkgi_save(icon_file, iconfile_data, iconfile_data_size);
+    }
+
+    uint32_t size = 0;
+    void* f = pkgi_create(icon_file);
+
+    while (size < sz)
+    {
+        int read = pkgi_http_read(http, down, sizeof(down));
+        if (read < 0)
+        {
+            size = 0;
+            break;
+        }
+        else if (read == 0)
+        {
+            break;
+        }
+        pkgi_write(f, down, read);
+        size += read;
+    }
+
+    if (size != 0)
+    {
+        LOG("received %u bytes", size);
+    }
+
+    pkgi_close(f);
+    pkgi_http_close(http);
+
+    return 1;
 }

@@ -1031,7 +1031,7 @@ void pkgi_unlock_process(void)
 
 pkgi_texture pkgi_load_jpg_raw(const void* data, uint32_t size)
 {
-	ya2d_Texture *tex = ya2d_loadJPGfromBuffer((void *)data, size);
+	ya2d_Texture *tex = ya2d_loadJPGfromBuffer(data, size);
 
     if (!tex)
     {
@@ -1042,11 +1042,22 @@ pkgi_texture pkgi_load_jpg_raw(const void* data, uint32_t size)
 
 pkgi_texture pkgi_load_png_raw(const void* data, uint32_t size)
 {
-	ya2d_Texture *tex = ya2d_loadPNGfromBuffer((void *)data, size);
+	ya2d_Texture *tex = ya2d_loadPNGfromBuffer(data, size);
 
     if (!tex)
     {
         LOG("failed to load texture");
+    }
+    return tex;
+}
+
+pkgi_texture pkgi_load_png_file(const char* filename)
+{
+	ya2d_Texture *tex = ya2d_loadPNGfromFile(filename);
+
+    if (!tex)
+    {
+        LOG("failed to load texture file %s", filename);
     }
     return tex;
 }

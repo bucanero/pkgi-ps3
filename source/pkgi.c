@@ -455,6 +455,7 @@ static void pkgi_do_main(pkgi_input* input)
             (item->rap ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF),
             (item->digest ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF) );
 
+        pkgi_download_icon(item->content);
         pkgi_dialog_details(item->name, item_info, item->description);
     }
 }
@@ -554,7 +555,7 @@ static void pkgi_do_tail(void)
     }
     else
     {
-        pkgi_snprintf(text, sizeof(text), "%s Install  " PKGI_UTF8_T " Menu  " PKGI_UTF8_S " Details  %s Exit", pkgi_get_ok_str(), pkgi_get_cancel_str());
+        pkgi_snprintf(text, sizeof(text), "%s Download  " PKGI_UTF8_T " Menu  " PKGI_UTF8_S " Details  %s Exit", pkgi_get_ok_str(), pkgi_get_cancel_str());
     }
 
     pkgi_clip_set(left, bottom_y, VITA_WIDTH - right - left, VITA_HEIGHT - bottom_y);

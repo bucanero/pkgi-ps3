@@ -5,7 +5,7 @@
 #include "pkgi_dialog.h"
 
 #define PKGI_UPDATE_URL     "https://api.github.com/repos/bucanero/pkgi-ps3/releases/latest"
-#define PKGI_VERSION        "1.1.6"
+#define PKGI_VERSION        "1.1.8"
 
 #define PKGI_BUTTON_SELECT 0x00010000
 #define PKGI_BUTTON_START  0x00080000
@@ -14,8 +14,10 @@
 #define PKGI_BUTTON_DOWN   0x00400000
 #define PKGI_BUTTON_LEFT   0x00800000
 
-#define PKGI_BUTTON_LT (0x00000004 | 0x00000001) // L1/L2
-#define PKGI_BUTTON_RT (0x00000008 | 0x00000002) // R1/R2
+#define PKGI_BUTTON_LT     0x00000004 // L1
+#define PKGI_BUTTON_RT     0x00000008 // R1
+#define PKGI_BUTTON_L2     0x00000001
+#define PKGI_BUTTON_R2     0x00000002
 
 #define PKGI_BUTTON_X 0x00000040 // cross
 #define PKGI_BUTTON_O 0x00000020 // circle
@@ -136,6 +138,7 @@ void pkgi_stop_music(void);
 
 pkgi_texture pkgi_load_png_raw(const void* data, uint32_t size);
 pkgi_texture pkgi_load_jpg_raw(const void* data, uint32_t size);
+pkgi_texture pkgi_load_png_file(const char* filename);
 void pkgi_draw_background(pkgi_texture texture);
 void pkgi_draw_texture(pkgi_texture texture, int x, int y);
 void pkgi_draw_texture_z(pkgi_texture texture, int x, int y, int z, float scale);

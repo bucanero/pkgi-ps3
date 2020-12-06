@@ -21,6 +21,7 @@ static char dialog_eta[256];
 static float dialog_progress;
 static int dialog_allow_close;
 static int dialog_cancelled;
+static pkgi_texture pkg_icon = NULL;
 
 static int32_t dialog_width;
 static int32_t dialog_height;
@@ -55,6 +56,10 @@ void pkgi_dialog_allow_close(int allow)
 void pkgi_dialog_details(const char* title, const char* text, const char* extra)
 {
     pkgi_dialog_lock();
+
+    pkgi_snprintf(dialog_extra, sizeof(dialog_extra), PKGI_TMP_FOLDER "/%.9s.PNG", text + 11);
+    if (!pkg_icon && pkgi_get_size(dialog_extra)) 
+        pkg_icon = pkgi_load_png_file(dialog_extra);
 
     pkgi_strncpy(dialog_title, sizeof(dialog_title), title);
     pkgi_strncpy(dialog_text, sizeof(dialog_text), text);
@@ -173,6 +178,13 @@ void pkgi_do_dialog(pkgi_input* input)
             dialog_width = 0;
             dialog_height = 0;
             dialog_delta = 0;
+
+            if (pkg_icon)
+            {
+                pkgi_free_texture(pkg_icon);
+                pkg_icon = NULL;
+            }
+
             pkgi_dialog_unlock();
             return;
         }
@@ -296,6 +308,8 @@ void pkgi_do_dialog(pkgi_input* input)
     }
     else if (local_type == DialogDetails)
     {
+        pkgi_draw_texture_z(pkg_icon, PKGI_DIALOG_HMARGIN + PKGI_DIALOG_PADDING + 425, PKGI_DIALOG_VMARGIN + PKGI_DIALOG_PADDING + 25, PKGI_DIALOG_TEXT_Z, 0.5);
+
         pkgi_draw_text_z(PKGI_DIALOG_HMARGIN + PKGI_DIALOG_PADDING, PKGI_DIALOG_VMARGIN + PKGI_DIALOG_PADDING + font_height*2, PKGI_DIALOG_TEXT_Z, PKGI_COLOR_TEXT_DIALOG, local_text);
         pkgi_draw_text_z(PKGI_DIALOG_HMARGIN + PKGI_DIALOG_PADDING, PKGI_DIALOG_VMARGIN + PKGI_DIALOG_PADDING + font_height*5, PKGI_DIALOG_TEXT_Z, PKGI_COLOR_TEXT_DIALOG, local_extra);
 
@@ -375,7 +389,7 @@ int pkgi_msg_dialog(int tdialog, const char * str)
     if (tdialog == MDIALOG_YESNO)
         mtype = MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_YESNO  | MSG_DIALOG_DEFAULT_CURSOR_NO;
 
-    msgDialogOpen2(mtype, str, msg_dialog_event, (void*)  0x0000aaaa, NULL);
+    msgDialogOpen2(mtype, str, msg_dialog_event, NULL, NULL);
     wait_dialog();
     return (msg_dialog_action == 1);
 }
