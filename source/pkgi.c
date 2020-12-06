@@ -9,6 +9,8 @@
 
 #include <stddef.h>
 
+#define content_filter(c)   (c ? 1 << (7 + c) : DbFilterAllContent)
+
 typedef enum  {
     StateError,
     StateRefreshing,
@@ -35,6 +37,8 @@ static int bottom_y;
 
 static char search_text[256];
 static char error_state[256];
+
+static void reposition(void);
 
 static const char* pkgi_get_ok_str(void)
 {
@@ -251,6 +255,36 @@ static void pkgi_do_main(pkgi_input* input)
             pkgi_msg_dialog(MDIALOG_OK, "             \xE2\x98\x85  PKGi PS3 v" PKGI_VERSION "  \xE2\x98\x85          \n\n"
                               "  original PS Vita version by mmozeiko    \n\n"
                               "    PlayStation 3 version by Bucanero     ");
+        }
+
+        if (input->active & PKGI_BUTTON_L2)
+        {
+            config.filter ^= content_filter(config.content);
+
+            if (config.content == 0)
+                config.content = MAX_CONTENT_TYPES;
+
+            config.content--;
+            config.filter ^= content_filter(config.content);
+
+            pkgi_db_configure(search_active ? search_text : NULL, &config);
+            reposition();
+            db_count = pkgi_db_count();
+        }
+
+        if (input->active & PKGI_BUTTON_R2)
+        {
+            config.filter ^= content_filter(config.content);
+
+            config.content++;
+            if (config.content == MAX_CONTENT_TYPES)
+                config.content = 0;
+
+            config.filter ^= content_filter(config.content);
+
+            pkgi_db_configure(search_active ? search_text : NULL, &config);
+            reposition();
+            db_count = pkgi_db_count();
         }
 
         if (input->active & PKGI_BUTTON_UP)
