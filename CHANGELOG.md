@@ -4,6 +4,18 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 ## [Unreleased]()
 
+## [v1.1.8](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.1.8) - 2020-12-08
+
+### Added
+
+* Content icon download from the TMDB (based on Title ID)
+* Use content icons for package bubbles (XMB)
+* Set <kbd>L2</kbd>/<kbd>R2</kbd> buttons as shortcuts to switch between content categories
+
+### Fixed
+
+* XMB callback handling
+
 ## [v1.1.6](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.1.6) - 2020-06-23
 
 ### Added
