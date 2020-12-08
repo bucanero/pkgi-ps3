@@ -370,8 +370,15 @@ void msg_dialog_event(msgButton button, void *userdata)
     }
 }
 
-void wait_dialog() 
+int pkgi_msg_dialog(int tdialog, const char * str)
 {
+    msg_dialog_action = 0;
+
+    msgType mtype = MSG_DIALOG_NORMAL;
+    mtype |= (tdialog ? (MSG_DIALOG_BTN_TYPE_YESNO  | MSG_DIALOG_DEFAULT_CURSOR_NO) : MSG_DIALOG_BTN_TYPE_OK);
+
+    msgDialogOpen2(mtype, str, msg_dialog_event, NULL, NULL);
+
     while(!msg_dialog_action)
     {
         pkgi_swap();
@@ -379,17 +386,6 @@ void wait_dialog()
 
     msgDialogAbort();
     pkgi_sleep(100);
-}
 
-int pkgi_msg_dialog(int tdialog, const char * str)
-{
-    msg_dialog_action = 0;
-
-    msgType mtype = MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_OK;
-    if (tdialog == MDIALOG_YESNO)
-        mtype = MSG_DIALOG_NORMAL | MSG_DIALOG_BTN_TYPE_YESNO  | MSG_DIALOG_DEFAULT_CURSOR_NO;
-
-    msgDialogOpen2(mtype, str, msg_dialog_event, NULL, NULL);
-    wait_dialog();
     return (msg_dialog_action == 1);
 }

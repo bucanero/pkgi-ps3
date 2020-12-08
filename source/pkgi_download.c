@@ -716,8 +716,8 @@ int pkgi_install(const char *titleid)
 	LOG("Creating .pdb files [%s]", titleid);
 
 	// write - ICON_FILE
-    pkgi_snprintf(filename, sizeof(filename), "%s/ICON_FILE", pkg_path);
-    pkgi_snprintf(resume_file, sizeof(resume_file), "%s/%s.PNG", pkgi_get_temp_folder(), titleid);
+	pkgi_snprintf(filename, sizeof(filename), "%s/ICON_FILE", pkg_path);
+	pkgi_snprintf(resume_file, sizeof(resume_file), "%s/%s.PNG", pkgi_get_temp_folder(), titleid);
 	if (rename(resume_file, filename) != 0)
 	{
 	    LOG("Error saving %s", filename);

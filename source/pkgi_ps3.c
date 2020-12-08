@@ -757,8 +757,8 @@ void pkgi_start(void)
 
     init_music();
 
-	// register exit callback
-	sysUtilRegisterCallback(SYSUTIL_EVENT_SLOT0, sys_callback, NULL);
+    // register exit callback
+    sysUtilRegisterCallback(SYSUTIL_EVENT_SLOT0, sys_callback, NULL);
 
     g_time = pkgi_time_msec();
 }
@@ -1031,7 +1031,7 @@ void pkgi_unlock_process(void)
 
 pkgi_texture pkgi_load_jpg_raw(const void* data, uint32_t size)
 {
-	ya2d_Texture *tex = ya2d_loadJPGfromBuffer(data, size);
+    ya2d_Texture *tex = ya2d_loadJPGfromBuffer(data, size);
 
     if (!tex)
     {
@@ -1042,7 +1042,7 @@ pkgi_texture pkgi_load_jpg_raw(const void* data, uint32_t size)
 
 pkgi_texture pkgi_load_png_raw(const void* data, uint32_t size)
 {
-	ya2d_Texture *tex = ya2d_loadPNGfromBuffer(data, size);
+    ya2d_Texture *tex = ya2d_loadPNGfromBuffer(data, size);
 
     if (!tex)
     {
@@ -1053,7 +1053,7 @@ pkgi_texture pkgi_load_png_raw(const void* data, uint32_t size)
 
 pkgi_texture pkgi_load_png_file(const char* filename)
 {
-	ya2d_Texture *tex = ya2d_loadPNGfromFile(filename);
+    ya2d_Texture *tex = ya2d_loadPNGfromFile(filename);
 
     if (!tex)
     {
