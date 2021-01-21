@@ -153,11 +153,12 @@ REGION|TITLE|name|url|rap|contentid|DATE|PKG FILENAME|size|checksum
 
 Using the application is simple and straight-forward: 
 
- - Move **UP/DOWN** to select the item you want to install, and press ![X button](https://github.com/bucanero/pkgi-ps3/raw/master/data/CROSS.png).
+ - Move <kbd>UP</kbd>/<kbd>DOWN</kbd> to select the item you want to download, and press ![X button](https://github.com/bucanero/pkgi-ps3/raw/master/data/CROSS.png).
  - To see the item's details, press ![Square](https://github.com/bucanero/pkgi-ps3/raw/master/data/SQUARE.png).
  - To sort/filter/search press ![Triangle](https://github.com/bucanero/pkgi-ps3/raw/master/data/TRIANGLE.png).
 It will open the context menu. Press ![Triangle](https://github.com/bucanero/pkgi-ps3/raw/master/data/TRIANGLE.png) again to confirm the new settings, or press ![O button](https://github.com/bucanero/pkgi-ps3/raw/master/data/CIRCLE.png) to cancel any changes.
-- Press left or right trigger buttons **(L1/R1)** to move pages up or down.
+- Press left or right trigger buttons <kbd>L1</kbd>/<kbd>R1</kbd> to move pages up or down.
+- Press <kbd>L2</kbd>/<kbd>R2</kbd> trigger buttons to switch between categories.
 
 ### Notes
 
