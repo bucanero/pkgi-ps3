@@ -196,7 +196,7 @@ You need to have installed:
 - [PSL1GHT](https://github.com/ps3dev/PSL1GHT) SDK
 - [Tiny3D](https://github.com/wargio/Tiny3D) library
 - [YA2D](https://github.com/bucanero/ya2d_ps3) library (an extended version from my repo)
-- [PolarSSL](https://github.com/ps3dev/ps3libraries/blob/master/scripts/015-polarssl.sh) library
+- [PolarSSL](https://github.com/bucanero/ps3libraries/blob/master/scripts/015-polarssl-1.3.9.sh) library
 - [MikMod](https://github.com/ps3dev/ps3libraries/blob/master/scripts/011-libmikmod-3.1.11.sh) library
 - [dbglogger](https://github.com/bucanero/psl1ght-libs/tree/master/dbglogger) library (only required for debug logging)
 
