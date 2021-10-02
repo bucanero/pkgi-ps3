@@ -91,12 +91,14 @@ typedef struct Config {
     uint8_t dl_mode_background;
     uint8_t music;
     uint8_t allow_refresh;
+    char language[3];
 } Config;
 
 
 int pkgi_db_reload(char* error, uint32_t error_size);
 int pkgi_db_update(const char* update_url, uint32_t update_len, char* error, uint32_t error_size);
 void pkgi_db_get_update_status(uint32_t* updated, uint32_t* total);
+int pkgi_db_load_xml_updates(const char* content_id, const char* name);
 
 void pkgi_db_configure(const char* search, const Config* config);
 

@@ -38,8 +38,8 @@ INCLUDES	:=	include
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS		:=	-lya2d -lfont3d -ltiny3d -lsimdmath -lgcm_sys -lio -lsysutil -lrt -llv2 -lpngdec -lsysmodule -lm -lsysfs  -ljpgdec -ldbglogger \
-				-lnet -lhttp -lhttputil -lssl -lfreetype -lz -lmikmod -laudio -lpolarssl
+LIBS		:=	-lxml2 -lya2d -lfont3d -ltiny3d -lsimdmath -lgcm_sys -lio -lsysutil -lrt -llv2 -lpngdec -lsysmodule -lm -lsysfs  -ljpgdec -ldbglogger \
+				-lnet -lhttp -lhttputil -lssl -lfreetype -lz -lmikmod -laudio -lpolarssl -lmini18n
 
 
 #---------------------------------------------------------------------------------
@@ -109,6 +109,8 @@ export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
 export INCLUDE	:=	$(foreach dir,$(INCLUDES), -I$(CURDIR)/$(dir)) \
 					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
 					$(LIBPSL1GHT_INC) \
+					-I$(PORTLIBS)/include/freetype2 \
+					-I$(PORTLIBS)/include/libxml2 \
 					-I$(CURDIR)/$(BUILD) -I$(PORTLIBS)/include
 
 #---------------------------------------------------------------------------------

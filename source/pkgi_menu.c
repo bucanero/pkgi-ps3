@@ -1,3 +1,4 @@
+#include <mini18n.h>
 #include "pkgi_menu.h"
 #include "pkgi_config.h"
 #include "pkgi_style.h"
@@ -33,7 +34,7 @@ typedef struct {
     uint32_t value;
 } MenuEntry;
 
-static const MenuEntry menu_entries[] =
+static MenuEntry menu_entries[] =
 {
     { MenuSearch, "Search...", 0 },
     { MenuSearchClear, PKGI_UTF8_CLEAR " clear", 0 },
@@ -61,7 +62,7 @@ static const MenuEntry menu_entries[] =
     { MenuRefresh, "Refresh...", 0 },
 };
 
-static const MenuEntry content_entries[] = 
+static MenuEntry content_entries[] = 
 {
     { MenuFilter, "All", DbFilterAllContent },
     { MenuFilter, "Games", DbFilterContentGame },
@@ -97,6 +98,36 @@ void pkgi_menu_start(int search_clear, const Config* config)
     menu_delta = 1;
     menu_config = *config;
     menu_allow_refresh = config->allow_refresh;
+
+    menu_entries[0].text = _("Search...");
+    menu_entries[2].text = _("Sort by:");
+    menu_entries[3].text = _("Title");
+    menu_entries[4].text = _("Region");
+    menu_entries[5].text = _("Name");
+    menu_entries[6].text = _("Size");
+    menu_entries[7].text = _("Content:");
+    menu_entries[8].text = _("All");
+    menu_entries[9].text = _("Regions:");
+    menu_entries[10].text = _("Asia");
+    menu_entries[11].text = _("Europe");
+    menu_entries[12].text = _("Japan");
+    menu_entries[13].text = _("USA");
+    menu_entries[14].text = _("Options:");
+    menu_entries[15].text = _("Back. DL");
+    menu_entries[16].text = _("Music");
+    menu_entries[17].text = _("Updates");
+    menu_entries[18].text = _("Refresh...");
+
+    content_entries[0].text = _("All");
+    content_entries[1].text = _("Games");
+    content_entries[2].text = _("DLCs");
+    content_entries[3].text = _("Themes");
+    content_entries[4].text = _("Avatars");
+    content_entries[5].text = _("Demos");
+    content_entries[6].text = _("Managers");
+    content_entries[7].text = _("Emulators");
+    content_entries[8].text = _("Apps");
+    content_entries[9].text = _("Tools");
 }
 
 int pkgi_do_menu(pkgi_input* input)
@@ -292,7 +323,7 @@ int pkgi_do_menu(pkgi_input* input)
         else if (type == MenuMode)
         {
             pkgi_snprintf(text, sizeof(text), PKGI_UTF8_CLEAR " %s",
-                menu_config.dl_mode_background == entry->value ? entry->text : "Direct DL");            
+                menu_config.dl_mode_background == entry->value ? entry->text : _("Direct DL"));
         }
         else if (type == MenuMusic)
         {

@@ -8,6 +8,7 @@
 #include "pkgi_style.h"
 
 #include <stddef.h>
+#include <mini18n.h>
 
 #define content_filter(c)   (c ? 1 << (7 + c) : DbFilterAllContent)
 
@@ -76,7 +77,7 @@ static void pkgi_refresh_thread(void)
 static int install(const char* content)
 {
     LOG("installing...");
-    pkgi_dialog_start_progress("Installing", "Please wait...", -1);
+    pkgi_dialog_start_progress(_("Installing"), _("Please wait..."), -1);
 
     char titleid[10];
     pkgi_memcpy(titleid, content + 7, 9);
@@ -88,7 +89,7 @@ static int install(const char* content)
 
     if (!ok)
     {
-        pkgi_dialog_error("installation failed");
+        pkgi_dialog_error(_("Installation failed"));
         return 0;
     }
 
@@ -112,11 +113,11 @@ static void pkgi_download_thread(void)
         if (!config.dl_mode_background)
         {
             install(item->content);
-            pkgi_dialog_message(item->name, "Successfully downloaded");
+            pkgi_dialog_message(item->name, _("Successfully downloaded"));
         }
         else
         {
-            pkgi_dialog_message(item->name, "Task successfully queued (reboot to start)");
+            pkgi_dialog_message(item->name, _("Task successfully queued (reboot to start)"));
         }
         LOG("download completed!");
     }
@@ -157,19 +158,19 @@ static const char* friendly_size_str(uint64_t size)
 {
     if (size > 10ULL * 1000 * 1024 * 1024)
     {
-        return "GB";
+        return _("GB");
     }
     else if (size > 10 * 1000 * 1024)
     {
-        return "MB";
+        return _("MB");
     }
     else if (size > 10 * 1000)
     {
-        return "KB";
+        return _("KB");
     }
     else
     {
-        return "B";
+        return _("B");
     }
 }
 
@@ -179,7 +180,7 @@ int pkgi_check_free_space(uint64_t size)
     if (size > free + 1024 * 1024)
     {
         char error[256];
-        pkgi_snprintf(error, sizeof(error), "pkg requires %u %s free space, but only %u %s available",
+        pkgi_snprintf(error, sizeof(error), _("pkg requires %u %s free space, but only %u %s available"),
             friendly_size(size), friendly_size_str(size),
             friendly_size(free), friendly_size_str(free)
         );
@@ -219,16 +220,17 @@ static const char* content_type_str(ContentType content)
 {
     switch (content)
     {
-    case ContentGame: return "Game";
-    case ContentDLC: return "DLC";
-    case ContentTheme: return "Theme";
-    case ContentAvatar: return "Avatar";
-    case ContentDemo: return "Demo";
-    case ContentManager: return "Manager";
-    case ContentEmulator: return "Emulator";
-    case ContentApp: return "App";
-    case ContentTool: return "Tool";
-    default: return "Unknown";
+        case 0: return _("All");
+        case ContentGame: return _("Games");
+        case ContentDLC: return _("DLCs");
+        case ContentTheme: return _("Themes");
+        case ContentAvatar: return _("Avatars");
+        case ContentDemo: return _("Demos");
+        case ContentManager: return _("Managers");
+        case ContentEmulator: return _("Emulators");
+        case ContentApp: return _("Apps");
+        case ContentTool: return _("Tools");
+        default: return _("Unknown");
     }
 }
 
@@ -245,7 +247,7 @@ static void pkgi_do_main(pkgi_input* input)
     {
         if (input->active & pkgi_cancel_button()) {
             input->pressed &= ~pkgi_cancel_button();
-            if (pkgi_msg_dialog(MDIALOG_YESNO, "Exit to XMB?"))
+            if (pkgi_msg_dialog(MDIALOG_YESNO, _("Exit to XMB?")))
                 state = StateTerminate;
         }
 
@@ -253,8 +255,8 @@ static void pkgi_do_main(pkgi_input* input)
             input->pressed &= ~PKGI_BUTTON_SELECT;
 
             pkgi_msg_dialog(MDIALOG_OK, "             \xE2\x98\x85  PKGi PS3 v" PKGI_VERSION "  \xE2\x98\x85          \n\n"
-                              "  original PS Vita version by mmozeiko    \n\n"
-                              "    PlayStation 3 version by Bucanero     ");
+                              "    PlayStation 3 version by Bucanero     \n\n"
+                              "  original PS Vita version by mmozeiko    ");
         }
 
         if (input->active & PKGI_BUTTON_L2)
@@ -429,7 +431,7 @@ static void pkgi_do_main(pkgi_input* input)
 
     if (db_count == 0)
     {
-        const char* text = "No items!";
+        const char* text = _("No items!");
 
         int w = pkgi_text_width(text);
         pkgi_draw_text((VITA_WIDTH - w) / 2, VITA_HEIGHT / 2, PKGI_COLOR_TEXT, text);
@@ -455,7 +457,7 @@ static void pkgi_do_main(pkgi_input* input)
 
         DbItem* item = pkgi_db_get(selected_item);
 
-        if ((item->presence == PresenceInstalled) && pkgi_msg_dialog(MDIALOG_YESNO, "Item already installed, download again?"))
+        if ((item->presence == PresenceInstalled) && pkgi_msg_dialog(MDIALOG_YESNO, _("Item already installed, download again?")))
         {
             LOG("[%.9s] %s - already installed", item->content + 7, item->name);
             item->presence = PresenceMissing;
@@ -464,7 +466,7 @@ static void pkgi_do_main(pkgi_input* input)
         if (item->presence == PresenceIncomplete || (item->presence == PresenceMissing && pkgi_check_free_space(item->size)))
         {
             LOG("[%.9s] %s - starting to install", item->content + 7, item->name);
-            pkgi_dialog_start_progress("Downloading...", "Preparing...", 0);
+            pkgi_dialog_start_progress(_("Downloading..."), _("Preparing..."), 0);
             pkgi_start_thread("download_thread", &pkgi_download_thread);
         }
     }
@@ -483,8 +485,9 @@ static void pkgi_do_main(pkgi_input* input)
         DbItem* item = pkgi_db_get(selected_item);
         char item_info[256];
 
-        pkgi_snprintf(item_info, sizeof(item_info), "ID: %s\n\nContent: (%s) RAP: (%s) SHA256: (%s)", 
+        pkgi_snprintf(item_info, sizeof(item_info), "ID: %s\n\n%s: %s RAP: (%s) SHA256: (%s)", 
             item->content,
+            _("Content"),
             content_type_str(item->type),
             (item->rap ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF),
             (item->digest ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF) );
@@ -504,11 +507,11 @@ static void pkgi_do_refresh(void)
 
     if (total == 0)
     {
-        pkgi_snprintf(text, sizeof(text), "Refreshing... %.2f KB", (uint32_t)updated / 1024.f);
+        pkgi_snprintf(text, sizeof(text), "%s... %.2f %s", _("Refreshing"), (uint32_t)updated / 1024.f, _("KB"));
     }
     else
     {
-        pkgi_snprintf(text, sizeof(text), "Refreshing... %u%%", updated * 100U / total);
+        pkgi_snprintf(text, sizeof(text), "%s... %u%%", _("Refreshing"), updated * 100U / total);
     }
 
     int w = pkgi_text_width(text);
@@ -518,7 +521,7 @@ static void pkgi_do_refresh(void)
 static void pkgi_do_head(void)
 {
     char title[256];
-    pkgi_snprintf(title, sizeof(title), "PKGi PS3 v%s", PKGI_VERSION);
+    pkgi_snprintf(title, sizeof(title), "PKGi PS3 v%s - %s", PKGI_VERSION, content_type_str(config.content));
     pkgi_draw_text(0, 0, PKGI_COLOR_TEXT_HEAD, title);
 
     pkgi_draw_fill_rect(0, font_height, VITA_WIDTH, PKGI_MAIN_HLINE_HEIGHT, PKGI_COLOR_HLINE);
@@ -563,11 +566,11 @@ static void pkgi_do_tail(void)
     char text[256];
     if (count == total)
     {
-        pkgi_snprintf(text, sizeof(text), "Count: %u", count);
+        pkgi_snprintf(text, sizeof(text), "%s: %u", _("Count"), count);
     }
     else
     {
-        pkgi_snprintf(text, sizeof(text), "Count: %u (%u)", count, total);
+        pkgi_snprintf(text, sizeof(text), "%s: %u (%u)", _("Count"), count, total);
     }
     pkgi_draw_text(0, bottom_y, PKGI_COLOR_TEXT_TAIL, text);
 
@@ -575,7 +578,7 @@ static void pkgi_do_tail(void)
     pkgi_friendly_size(size, sizeof(size), pkgi_get_free_space());
 
     char free_str[64];
-    pkgi_snprintf(free_str, sizeof(free_str), "Free: %s", size);
+    pkgi_snprintf(free_str, sizeof(free_str), "%s: %s", _("Free"), size);
 
     int rightw = pkgi_text_width(free_str);
     pkgi_draw_text(VITA_WIDTH - PKGI_MAIN_HLINE_EXTRA - rightw, bottom_y, PKGI_COLOR_TEXT_TAIL, free_str);
@@ -585,11 +588,11 @@ static void pkgi_do_tail(void)
 
     if (pkgi_menu_is_open())
     {
-        pkgi_snprintf(text, sizeof(text), "%s Select  " PKGI_UTF8_T " Close  %s Cancel", pkgi_get_ok_str(), pkgi_get_cancel_str());
+        pkgi_snprintf(text, sizeof(text), "%s %s  " PKGI_UTF8_T " %s  %s %s", pkgi_get_ok_str(), _("Select"), _("Close"), pkgi_get_cancel_str(), _("Cancel"));
     }
     else
     {
-        pkgi_snprintf(text, sizeof(text), "%s Download  " PKGI_UTF8_T " Menu  " PKGI_UTF8_S " Details  %s Exit", pkgi_get_ok_str(), pkgi_get_cancel_str());
+        pkgi_snprintf(text, sizeof(text), "%s %s  " PKGI_UTF8_T " %s  " PKGI_UTF8_S " %s  %s %s", pkgi_get_ok_str(), _("Download"), _("Menu"), _("Details"), pkgi_get_cancel_str(), _("Exit"));
     }
 
     pkgi_clip_set(left, bottom_y, VITA_WIDTH - right - left, VITA_HEIGHT - bottom_y);
@@ -715,15 +718,24 @@ static void pkgi_update_check_thread(void)
         .url     = start,
     };
 
-    pkgi_dialog_start_progress(update_item.name, "Preparing...", 0);
+    pkgi_dialog_start_progress(update_item.name, _("Preparing..."), 0);
     
     if (pkgi_download(&update_item, 0) && install(update_item.content))
     {
-        pkgi_dialog_message(update_item.name, "Successfully downloaded PKGi PS3 update");
+        pkgi_dialog_message(update_item.name, _("Successfully downloaded PKGi PS3 update"));
         LOG("update downloaded!");
     }
 
     pkgi_thread_exit();
+}
+
+void pkgi_load_language(const char* lang)
+{
+    char path[256];
+
+    pkgi_snprintf(path, sizeof(path), PKGI_APP_FOLDER "/LANG/%s.po", lang);
+    LOG("Loading language file (%s)...", path);
+    mini18n_set_locale(path);
 }
 
 int main(int argc, const char* argv[])
@@ -736,6 +748,7 @@ int main(int argc, const char* argv[])
         pkgi_start_music();
     }
     
+    pkgi_load_language(config.language);
     pkgi_dialog_init();
     
     font_height = pkgi_text_height("M");
@@ -829,7 +842,7 @@ int main(int argc, const char* argv[])
                 MenuResult mres = pkgi_menu_result();
                 if (mres == MenuResultSearch)
                 {
-                    pkgi_dialog_input_text("Search", search_text);
+                    pkgi_dialog_input_text(_("Search"), search_text);
                 }
                 else if (mres == MenuResultSearchClear)
                 {
@@ -866,6 +879,7 @@ int main(int argc, const char* argv[])
     }
 
     LOG("finished");
+    mini18n_close();
     pkgi_free_texture(background);
     pkgi_end();
 	return 0;

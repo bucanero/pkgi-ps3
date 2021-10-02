@@ -1573,3 +1573,116 @@ void pkgi_close(void* f)
         LOG("close error 0x%08x", err);
     }
 }
+
+char * pkgi_http_download_buffer(const char* url, uint32_t* buf_size)
+{
+    pkgi_http* http = pkgi_http_get(url, NULL, 0);
+    if (!http)
+    {
+        LOG("http request to %s failed", url);
+        return NULL;
+    }
+
+    int64_t sz = 0;
+    uint32_t size = 0;
+    pkgi_http_response_length(http, &sz);
+
+    if (sz <= 0)
+        return NULL;
+
+    char * buffer = malloc(sz);
+
+    if (!buffer)
+        return NULL;
+
+    while (size < sz)
+    {
+        int read = pkgi_http_read(http, buffer + size, sz - size);
+        if (read < 0)
+        {
+            size = 0;
+            break;
+        }
+        else if (read == 0)
+        {
+            break;
+        }
+        size += read;
+    }
+
+    if (size != 0)
+    {
+        LOG("received %u bytes", size);
+    }
+    *buf_size = size;
+
+    pkgi_http_close(http);
+    return buffer;
+}
+
+const char * pkgi_get_user_language()
+{
+    int language;
+
+    if(sysUtilGetSystemParamInt(SYSUTIL_SYSTEMPARAM_ID_LANG, &language) < 0)
+        return "en";
+
+    switch (language)
+    {
+    case SYSUTIL_LANG_JAPANESE:
+        return "jp";
+
+    case SYSUTIL_LANG_ENGLISH_US:
+    case SYSUTIL_LANG_ENGLISH_GB:
+        return "en";
+
+    case SYSUTIL_LANG_FRENCH:
+        return "fr";
+
+    case SYSUTIL_LANG_SPANISH:
+        return "es";
+
+    case SYSUTIL_LANG_GERMAN:
+        return "de";
+
+    case SYSUTIL_LANG_ITALIAN:
+        return "it";
+
+    case SYSUTIL_LANG_DUTCH:
+        return "nl";
+
+    case SYSUTIL_LANG_RUSSIAN:
+        return "ru";
+
+    case SYSUTIL_LANG_KOREAN:
+        return "kr";
+
+    case SYSUTIL_LANG_CHINESE_T:
+    case SYSUTIL_LANG_CHINESE_S:
+        return "cn";
+
+    case SYSUTIL_LANG_FINNISH:
+        return "fi";
+
+    case SYSUTIL_LANG_SWEDISH:
+        return "sv";
+
+    case SYSUTIL_LANG_DANISH:
+        return "da";
+
+    case SYSUTIL_LANG_NORWEGIAN:
+        return "no";
+
+    case SYSUTIL_LANG_POLISH:
+        return "pl";
+
+    case SYSUTIL_LANG_PORTUGUESE_PT:
+    case SYSUTIL_LANG_PORTUGUESE_BR:
+        return "pt";
+
+    default:
+        break;
+    }
+
+    return "en";
+}
