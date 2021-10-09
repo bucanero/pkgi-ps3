@@ -70,7 +70,7 @@ static MenuEntry content_entries[] =
     { MenuFilter, "Themes", DbFilterContentTheme },
     { MenuFilter, "Avatars", DbFilterContentAvatar },
     { MenuFilter, "Demos", DbFilterContentDemo },
-    { MenuFilter, "Managers", DbFilterContentManager },
+    { MenuFilter, "Updates", DbFilterContentUpdate },
     { MenuFilter, "Emulators", DbFilterContentEmulator },
     { MenuFilter, "Apps", DbFilterContentApp },
     { MenuFilter, "Tools", DbFilterContentTool }
@@ -124,7 +124,7 @@ void pkgi_menu_start(int search_clear, const Config* config)
     content_entries[3].text = _("Themes");
     content_entries[4].text = _("Avatars");
     content_entries[5].text = _("Demos");
-    content_entries[6].text = _("Managers");
+    content_entries[6].text = _("Updates");
     content_entries[7].text = _("Emulators");
     content_entries[8].text = _("Apps");
     content_entries[9].text = _("Tools");

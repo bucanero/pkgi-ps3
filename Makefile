@@ -13,7 +13,7 @@ endif
 TITLE		:=	PKGi PS3
 APPID		:=	NP00PKGI3
 CONTENTID	:=	UP0001-$(APPID)_00-0000000000000000
-ICON0		:=	ICON0.PNG
+ICON0		:=	pkgfiles/ICON0.PNG
 SFOXML		:=	sfo.xml
 
 include $(PSL1GHT)/ppu_rules
@@ -33,13 +33,13 @@ SOURCES		:=	source
 DATA		:=	data
 SHADERS		:=	shaders
 INCLUDES	:=	include
-
+PKGFILES	:=	pkgfiles
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS		:=	-lxml2 -lya2d -lfont3d -ltiny3d -lsimdmath -lgcm_sys -lio -lsysutil -lrt -llv2 -lpngdec -lsysmodule -lm -lsysfs  -ljpgdec -ldbglogger \
-				-lnet -lhttp -lhttputil -lssl -lfreetype -lz -lmikmod -laudio -lpolarssl -lmini18n
+LIBS		:=	-lcurl -lxml2 -lya2d -lfont3d -ltiny3d -lsimdmath -lgcm_sys -lio -lsysutil -lrt -llv2 -lpngdec -lsysmodule -lm -lsysfs  -ljpgdec -ldbglogger \
+				-lnet -lhttp -lhttputil -lssl -lfreetype -lz -lmikmod -laudio -lpolarssl -lmini18n -ljson-c
 
 
 #---------------------------------------------------------------------------------

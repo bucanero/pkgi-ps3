@@ -38,14 +38,14 @@ typedef enum {
     DbFilterContentTheme    = 0x000400,
     DbFilterContentAvatar   = 0x000800,
     DbFilterContentDemo     = 0x001000,
-    DbFilterContentManager  = 0x002000,
+    DbFilterContentUpdate   = 0x002000,
     DbFilterContentEmulator = 0x004000,
     DbFilterContentApp      = 0x008000,
     DbFilterContentTool     = 0x010000,
 
     DbFilterAllRegions = DbFilterRegionUSA | DbFilterRegionEUR | DbFilterRegionJPN | DbFilterRegionASA,
     DbFilterAllContent = DbFilterContentGame | DbFilterContentDLC | DbFilterContentTheme | DbFilterContentAvatar | 
-                         DbFilterContentDemo | DbFilterContentManager | DbFilterContentEmulator | DbFilterContentApp | DbFilterContentTool,
+                         DbFilterContentDemo | DbFilterContentUpdate | DbFilterContentEmulator | DbFilterContentApp | DbFilterContentTool,
     DbFilterAll = DbFilterAllRegions | DbFilterAllContent | DbFilterInstalled | DbFilterMissing,
 } DbFilter;
 
@@ -56,7 +56,7 @@ typedef enum {
     ContentTheme,
     ContentAvatar,
     ContentDemo,
-    ContentManager,
+    ContentUpdate,
     ContentEmulator,
     ContentApp,
     ContentTool

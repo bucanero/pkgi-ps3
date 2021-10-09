@@ -413,7 +413,7 @@ static int matches(GameRegion region, ContentType content, uint32_t filter)
         || (content == ContentTheme && (filter & DbFilterContentTheme))
         || (content == ContentAvatar && (filter & DbFilterContentAvatar))
         || (content == ContentDemo && (filter & DbFilterContentDemo))
-        || (content == ContentManager && (filter & DbFilterContentManager))
+        || (content == ContentUpdate && (filter & DbFilterContentUpdate))
         || (content == ContentEmulator && (filter & DbFilterContentEmulator))
         || (content == ContentApp && (filter & DbFilterContentApp))
         || (content == ContentTool && (filter & DbFilterContentTool))
@@ -613,15 +613,15 @@ int pkgi_db_load_xml_updates(const char* content_id, const char* name)
     xmlNode *cur_node = NULL;
     char *value;
     char updUrl[256];
+    uint32_t size, updates = 0;
 
     pkgi_snprintf(updUrl, sizeof(updUrl), "https://a0.ww.np.dl.playstation.net/tpl/np/%.9s/%.9s-ver.xml", content_id + 7, content_id + 7);
     LOG("Loading update xml (%s)...", updUrl);
 
-    uint32_t size;
     char * buffer = pkgi_http_download_buffer(updUrl, &size);
 
     if (!buffer)
-        return 0;
+        return (-1);
 
     /*parse the file and get the DOM */
     doc = xmlParseMemory(buffer, size);
@@ -650,20 +650,20 @@ int pkgi_db_load_xml_updates(const char* content_id, const char* name)
             memset(&db[db_count], 0, sizeof(DbItem));
             // keep the parent's content-id
             db[db_count].content = content_id;
-            db[db_count].type = ContentTool;
+            db[db_count].type = ContentUpdate;
 
             value = (char*) xmlGetProp(cur_node, BAD_CAST "version");
-            size = strlen(value) + 1;
+            size = pkgi_strlen(value) + 1;
             pkgi_memcpy(db_data + db_size, value, size);
             db[db_count].description = db_data + db_size;
             db_size += size;
 
             pkgi_snprintf(db_data + db_size, 1024, "%s (%s)", name, value);
             db[db_count].name = db_data + db_size;
-            db_size += (strlen(db[db_count].name) + 1);
+            db_size += (pkgi_strlen(db[db_count].name) + 1);
 
             value = (char*) xmlGetProp(cur_node, BAD_CAST "url");
-            size = strlen(value) + 1;
+            size = pkgi_strlen(value) + 1;
             pkgi_memcpy(db_data + db_size, value, size);
             db[db_count].url = db_data + db_size;
             db_size += size;
@@ -671,6 +671,7 @@ int pkgi_db_load_xml_updates(const char* content_id, const char* name)
             value = (char*) xmlGetProp(cur_node, BAD_CAST "size");
             db[db_count].size = pkgi_strtoll(value);
 
+//            value = (char*) xmlGetProp(cur_node, BAD_CAST "ps3_system_ver");
 //            value = (char*) xmlGetProp(cur_node, BAD_CAST "sha1sum");
 //            LOG("SHA1 (%s)", value);
 //            db[db_count].digest = pkgi_hexbytes(value, SHA1_DIGEST_SIZE);
@@ -679,6 +680,7 @@ int pkgi_db_load_xml_updates(const char* content_id, const char* name)
 
             db_item[db_count] = db + db_count;
             db_count++;
+            updates++;
         }
     }
 
@@ -687,5 +689,5 @@ int pkgi_db_load_xml_updates(const char* content_id, const char* name)
     xmlCleanupParser();
     free(buffer);
 
-    return 1;
+    return updates;
 }

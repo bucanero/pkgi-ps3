@@ -15,10 +15,14 @@
 
 #include "pkgi.h"
 #include "pkgi_utils.h"
-#include "ecdsa.h"
 
 #define SYS_SS_APPLIANCE_INFO_MANAGER              867
 #define AIM_GET_DEVICE_ID                          0x19003
+
+int ecdsa_set_curve(u32 type);
+void ecdsa_set_pub(u8 *Q);
+void ecdsa_set_priv(u8 *k);
+void ecdsa_sign_rif(u8 *hash, u8 *R, u8 *S);
 
 struct rif
 {
@@ -146,7 +150,8 @@ int rap_to_klicensee(const uint8_t *rap_key, uint8_t *klicensee)
 	return 0;
 }
 
-struct actdat *actdat_get(const char* base) {
+struct actdat *actdat_get(const char* base)
+{
 	char path[256];
     struct actdat *actdat;
 
@@ -213,7 +218,7 @@ int rap2rif(const uint8_t* rap, const char* content_id, const char *exdata_path)
 	ecdsa_set_curve(0);
 	ecdsa_set_pub(ec_Q_nm);
 	ecdsa_set_priv(ec_k_nm);
-	ecdsa_sign(sha1_digest, R, S);
+	ecdsa_sign_rif(sha1_digest, R, S);
 
 	memcpy(rif.r, R+1, sizeof(rif.r));
 	memcpy(rif.s, S+1, sizeof(rif.s));

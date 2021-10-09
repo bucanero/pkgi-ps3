@@ -4,8 +4,8 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <ppu-types.h>
 
-#include "ecdsa.h"
 
 const u8 p_fixed[20] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0x00,0x00,
 						0x00,0x01,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
@@ -274,30 +274,6 @@ static void point_from_mon(struct point *p)
 	bn_from_mon(p->y, ec_p, 20);
 }
 
-#if 0
-static int point_is_on_curve(u8 *p)
-{
-	u8 s[20], t[20];
-	u8 *x, *y;
-
-	x = p;
-	y = p + 20;
-
-	elt_square(t, x);
-	elt_mul(s, t, x);
-
-	elt_mul(t, x, ec_a);
-	elt_add(s, s, t);
-
-	elt_add(s, s, ec_b);
-
-	elt_square(t, y);
-	elt_sub(s, s, t);
-
-	return elt_is_zero(s);
-}
-#endif
-
 static void point_zero(struct point *p)
 {
 	elt_zero(p->x);
@@ -464,54 +440,6 @@ try_again:
 	bn_from_mon(S, ec_N, 21);
 }
 
-static int check_ecdsa(struct point *Q, u8 *R, u8 *S, u8 *hash)
-{
-	u8 Sinv[21];
-	u8 e[21];
-	u8 w1[21], w2[21];
-	struct point r1, r2;
-	u8 rr[21];
-
-	e[0] = 0;
-	memcpy(e + 1, hash, 20);
-	bn_reduce(e, ec_N, 21);
-
-	bn_to_mon(R, ec_N, 21);
-	bn_to_mon(S, ec_N, 21);
-	bn_to_mon(e, ec_N, 21);
-
-	bn_mon_inv(Sinv, S, ec_N, 21);
-
-	bn_mon_mul(w1, e, Sinv, ec_N, 21);
-	bn_mon_mul(w2, R, Sinv, ec_N, 21);
-
-	bn_from_mon(w1, ec_N, 21);
-	bn_from_mon(w2, ec_N, 21);
-
-	point_mul(&r1, w1, &ec_G);
-	point_mul(&r2, w2, Q);
-
-	point_add(&r1, &r1, &r2);
-
-	point_from_mon(&r1);
-
-	rr[0] = 0;
-	memcpy(rr + 1, r1.x, 20);
-	bn_reduce(rr, ec_N, 21);
-
-	bn_from_mon(R, ec_N, 21);
-	bn_from_mon(S, ec_N, 21);
-
-	return (bn_compare(rr, R, 21) == 0);
-}
-
-#if 0
-static void ec_priv_to_pub(u8 *k, u8 *Q)
-{
-	point_mul(Q, k, ec_G);
-}
-#endif
-
 int set_vsh_curve(u8 *p, u8 *a, u8 *b, u8 *N, u8 *Gx, u8 *Gy)
 {	
 	memcpy(p, p_fixed, 20);
@@ -552,12 +480,7 @@ void ecdsa_set_priv(u8 *k)
 	memcpy(ec_k, k, sizeof ec_k);
 }
 
-int ecdsa_verify(u8 *hash, u8 *R, u8 *S)
-{
-	return check_ecdsa(&ec_Q, R, S, hash);
-}
-
-void ecdsa_sign(u8 *hash, u8 *R, u8 *S)
+void ecdsa_sign_rif(u8 *hash, u8 *R, u8 *S)
 {
 	generate_ecdsa(R, S, ec_k, hash);
 }

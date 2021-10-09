@@ -6,9 +6,11 @@
 #include "pkgi_download.h"
 #include "pkgi_utils.h"
 #include "pkgi_style.h"
+#include "pkgi_sha256.h"
 
 #include <stddef.h>
 #include <mini18n.h>
+#include <json/json.h>
 
 #define content_filter(c)   (c ? 1 << (7 + c) : DbFilterAllContent)
 
@@ -226,7 +228,7 @@ static const char* content_type_str(ContentType content)
         case ContentTheme: return _("Themes");
         case ContentAvatar: return _("Avatars");
         case ContentDemo: return _("Demos");
-        case ContentManager: return _("Managers");
+        case ContentUpdate: return _("Updates");
         case ContentEmulator: return _("Emulators");
         case ContentApp: return _("Apps");
         case ContentTool: return _("Tools");
@@ -245,18 +247,18 @@ static void pkgi_do_main(pkgi_input* input)
     
     if (input)
     {
-        if (input->active & pkgi_cancel_button()) {
+        if (input->active & pkgi_cancel_button())
+        {
             input->pressed &= ~pkgi_cancel_button();
-            if (pkgi_msg_dialog(MDIALOG_YESNO, _("Exit to XMB?")))
-                state = StateTerminate;
+            pkgi_dialog_ok_cancel("\xE2\x98\x85  PKGi PS3 v" PKGI_VERSION "  \xE2\x98\x85", _("Exit to XMB?"));
         }
 
-        if (input->active & PKGI_BUTTON_SELECT) {
+        if (input->active & PKGI_BUTTON_SELECT)
+        {
             input->pressed &= ~PKGI_BUTTON_SELECT;
-
-            pkgi_msg_dialog(MDIALOG_OK, "             \xE2\x98\x85  PKGi PS3 v" PKGI_VERSION "  \xE2\x98\x85          \n\n"
-                              "    PlayStation 3 version by Bucanero     \n\n"
-                              "  original PS Vita version by mmozeiko    ");
+            pkgi_dialog_message("\xE2\x98\x85  PKGi PS3 v" PKGI_VERSION "  \xE2\x98\x85",
+                                "             PlayStation 3 version by Bucanero\n\n"
+                                "            original PS Vita version by mmozeiko");
         }
 
         if (input->active & PKGI_BUTTON_L2)
@@ -483,17 +485,9 @@ static void pkgi_do_main(pkgi_input* input)
         input->pressed &= ~PKGI_BUTTON_S;
 
         DbItem* item = pkgi_db_get(selected_item);
-        char item_info[256];
-
-        pkgi_snprintf(item_info, sizeof(item_info), "ID: %s\n\n%s: %s RAP: (%s) SHA256: (%s)", 
-            item->content,
-            _("Content"),
-            content_type_str(item->type),
-            (item->rap ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF),
-            (item->digest ? PKGI_UTF8_CHECK_ON : PKGI_UTF8_CHECK_OFF) );
 
         pkgi_download_icon(item->content);
-        pkgi_dialog_details(item->name, item_info, item->description);
+        pkgi_dialog_details(item, content_type_str(item->type));
     }
 }
 
@@ -627,95 +621,54 @@ static void reposition(void)
     }
 }
 
+const char * json_parse(json_object * jobj, const char* search)
+{
+    json_object *val;
+    if (json_object_object_get_ex(jobj, search, &val) && (json_object_get_type(val) == json_type_string))
+        return (json_object_get_string(val));
+
+    return NULL;
+}
+
 static void pkgi_update_check_thread(void)
 {
+    const char *value;
+    char *buffer;
+    uint32_t size;
+
     LOG("checking latest pkgi version at %s", PKGI_UPDATE_URL);
 
-    pkgi_http* http = pkgi_http_get(PKGI_UPDATE_URL, NULL, 0);
-    if (!http)
+    buffer = pkgi_http_download_buffer(PKGI_UPDATE_URL, &size);
+
+    if (!buffer)
     {
-        LOG("http request to %s failed", PKGI_UPDATE_URL);
+        LOG("no update data available");
         pkgi_thread_exit();
     }
 
-    int64_t sz;
-    pkgi_http_response_length(http, &sz);
+    json_object * jobj = json_tokener_parse(buffer);
 
-    char buffer[8192];
-    uint32_t size = 0;
-
-    while (size < sizeof(buffer) - 1)
-    {
-        int read = pkgi_http_read(http, buffer + size, sizeof(buffer) - 1 - size);
-        if (read < 0)
-        {
-            size = 0;
-            break;
-        }
-        else if (read == 0)
-        {
-            break;
-        }
-        size += read;
-    }
-
-    if (size != 0)
-    {
-        LOG("received %u bytes", size);
-    }
-    buffer[size] = 0;
-
-    pkgi_http_close(http);
-
-    static const char find[] = "\"name\":\"PKGi PS3 v";
-    const char* start = pkgi_strstr(buffer, find);
-    if (!start)
-    {
-        LOG("no name found");
-        pkgi_thread_exit();
-    }
-
-    LOG("found name");
-    start += sizeof(find) - 1;
-
-    char* end = pkgi_strstr(start, "\"");
-    if (!end)
-    {
-        LOG("no end of name found");
-        pkgi_thread_exit();
-    }
-
-    *end = 0;
-    LOG("latest version is %s", start);
-
-    if (pkgi_stricmp(PKGI_VERSION, start) == 0)
+    if ((value = json_parse(jobj, "name")) == NULL || !pkgi_memequ("PKGi PS3", value, 8) || pkgi_stricmp(PKGI_VERSION, value+10) == 0)
     {
         LOG("no new version available");
         pkgi_thread_exit();
     }
 
-	start = pkgi_strstr(end+1, "\"browser_download_url\":\"");
-	if (!start)
-	{
-		LOG("no download URL found");
-        pkgi_thread_exit();
-	}
+    LOG("latest version is %s", value+9);
 
-	start += 24;
-	end = pkgi_strstr(start, "\"");
-	if (!end)
-	{
-		LOG("no download URL found");
+    value = json_parse(json_object_array_get_idx(json_object_object_get(jobj, "assets"), 0), "browser_download_url");
+    if (!value)
+    {
+        LOG("no download URL found");
         pkgi_thread_exit();
-	}
+    }
 
-	*end = 0;
-	LOG("download URL is %s", start);
+	LOG("download URL is %s", value);
 
     DbItem update_item = {
         .content = "UP0001-NP00PKGI3_00-0000000000000000",
         .name    = "PKGi PS3 Update",
-        .url     = start,
+        .url     = value,
     };
 
     pkgi_dialog_start_progress(update_item.name, _("Preparing..."), 0);
@@ -807,6 +760,14 @@ int main(int argc, const char* argv[])
         if (pkgi_dialog_is_open())
         {
             pkgi_do_dialog(&input);
+
+            if (pkgi_dialog_is_cancelled())
+            {
+                pkgi_dialog_close();
+                if (pkgi_dialog_is_cancelled() > 1)
+                    state = StateTerminate;
+            }
+
         }
 
         if (pkgi_dialog_input_update())

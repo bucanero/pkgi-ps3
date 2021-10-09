@@ -5,6 +5,7 @@
 #include <sys/thread.h>
 #include <sys/mutex.h>
 #include <sys/memory.h>
+#include <sys/process.h>
 #include <sysutil/osk.h>
 
 #include <http/https.h>
@@ -18,6 +19,7 @@
 #include <stdio.h>
 
 #include <ya2d/ya2d.h>
+#include <curl/curl.h>
 
 #include "ttf_render.h"
 
@@ -71,6 +73,12 @@ typedef struct
     httpsData* caList;
     void* cert_buffer;
 } t_http_pools;
+
+struct curl_MemoryStruct
+{
+    char *memory;
+    size_t size;
+};
 
 
 static sys_mutex_t g_dialog_lock;
@@ -849,6 +857,10 @@ void pkgi_end(void)
     sysModuleUnload(SYSMODULE_HTTPS);
     sysModuleUnload(SYSMODULE_HTTP);
 
+#ifdef PKGI_ENABLE_LOGGING
+    sysProcessExitSpawn2("/dev_hdd0/game/PSL145310/RELOAD.SELF", NULL, NULL, NULL, 0, 1001, SYS_PROCESS_SPAWN_STACK_SIZE_1M);
+#endif
+
     sysProcessExit(0);
 }
 
@@ -1574,50 +1586,86 @@ void pkgi_close(void* f)
     }
 }
 
+void pkgi_curl_init(CURL *curl)
+{
+    // Set user agent string
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, PKGI_USER_AGENT);
+    // don't verify the certificate's name against host
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+    // don't verify the peer's SSL certificate
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+    // Set SSL VERSION to TLS 1.2
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+    // Set timeout for the connection to build
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 10L);
+    // Follow redirects
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+}
+
+static size_t curl_WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
+{
+    size_t realsize = size * nmemb;
+    struct curl_MemoryStruct *mem = (struct curl_MemoryStruct *)userp;
+
+    char *ptr = realloc(mem->memory, mem->size + realsize + 1);
+    if(!ptr)
+    {
+        /* out of memory! */
+        LOG("not enough memory (realloc)");
+        return 0;
+    }
+
+    mem->memory = ptr;
+    memcpy(&(mem->memory[mem->size]), contents, realsize);
+    mem->size += realsize;
+    mem->memory[mem->size] = 0;
+
+    return realsize;
+}
+
 char * pkgi_http_download_buffer(const char* url, uint32_t* buf_size)
 {
-    pkgi_http* http = pkgi_http_get(url, NULL, 0);
-    if (!http)
+    CURL *curl;
+    CURLcode res;
+    struct curl_MemoryStruct chunk;
+
+    curl = curl_easy_init();
+    if(!curl)
     {
-        LOG("http request to %s failed", url);
+        LOG("cURL init error");
+        return NULL;
+    }
+    
+    chunk.memory = malloc(1);   /* will be grown as needed by the realloc above */
+    chunk.size = 0;             /* no data at this point */
+
+    pkgi_curl_init(curl);
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
+    // The function that will be used to write the data
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_WriteMemoryCallback);
+    // The data file descriptor which will be written to
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+
+    // Perform the request
+    res = curl_easy_perform(curl);
+//    long httpresponsecode = 0;
+//    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpresponsecode);
+
+    if(res != CURLE_OK)
+    {
+        LOG("curl_easy_perform() failed: %s", curl_easy_strerror(res));
+        curl_easy_cleanup(curl);
+        free(chunk.memory);
         return NULL;
     }
 
-    int64_t sz = 0;
-    uint32_t size = 0;
-    pkgi_http_response_length(http, &sz);
+    LOG("%lu bytes retrieved", (unsigned long)chunk.size);
+    // clean-up
+    curl_easy_cleanup(curl);
 
-    if (sz <= 0)
-        return NULL;
-
-    char * buffer = malloc(sz);
-
-    if (!buffer)
-        return NULL;
-
-    while (size < sz)
-    {
-        int read = pkgi_http_read(http, buffer + size, sz - size);
-        if (read < 0)
-        {
-            size = 0;
-            break;
-        }
-        else if (read == 0)
-        {
-            break;
-        }
-        size += read;
-    }
-
-    if (size != 0)
-    {
-        LOG("received %u bytes", size);
-    }
-    *buf_size = size;
-
-    pkgi_http_close(http);
-    return buffer;
+    *buf_size = chunk.size;
+    return (chunk.memory);
 }
 
 const char * pkgi_get_user_language()
@@ -1629,56 +1677,59 @@ const char * pkgi_get_user_language()
 
     switch (language)
     {
-    case SYSUTIL_LANG_JAPANESE:
-        return "jp";
+    case SYSUTIL_LANG_JAPANESE:             //  0   Japanese
+        return "ja";
 
-    case SYSUTIL_LANG_ENGLISH_US:
-    case SYSUTIL_LANG_ENGLISH_GB:
+    case SYSUTIL_LANG_ENGLISH_US:           //  1   English (United States)
+    case SYSUTIL_LANG_ENGLISH_GB:           // 18   English (United Kingdom)
         return "en";
 
-    case SYSUTIL_LANG_FRENCH:
+    case SYSUTIL_LANG_FRENCH:               //  2   French
         return "fr";
 
-    case SYSUTIL_LANG_SPANISH:
+    case SYSUTIL_LANG_SPANISH:              //  3   Spanish
         return "es";
 
-    case SYSUTIL_LANG_GERMAN:
+    case SYSUTIL_LANG_GERMAN:               //  4   German
         return "de";
 
-    case SYSUTIL_LANG_ITALIAN:
+    case SYSUTIL_LANG_ITALIAN:              //  5   Italian
         return "it";
 
-    case SYSUTIL_LANG_DUTCH:
+    case SYSUTIL_LANG_DUTCH:                //  6   Dutch
         return "nl";
 
-    case SYSUTIL_LANG_RUSSIAN:
+    case SYSUTIL_LANG_RUSSIAN:              //  8   Russian
         return "ru";
 
-    case SYSUTIL_LANG_KOREAN:
-        return "kr";
+    case SYSUTIL_LANG_KOREAN:               //  9   Korean
+        return "ko";
 
-    case SYSUTIL_LANG_CHINESE_T:
-    case SYSUTIL_LANG_CHINESE_S:
-        return "cn";
+    case SYSUTIL_LANG_CHINESE_T:            // 10   Chinese (traditional)
+    case SYSUTIL_LANG_CHINESE_S:            // 11   Chinese (simplified)
+        return "ch";
 
-    case SYSUTIL_LANG_FINNISH:
+    case SYSUTIL_LANG_FINNISH:              // 12   Finnish
         return "fi";
 
-    case SYSUTIL_LANG_SWEDISH:
+    case SYSUTIL_LANG_SWEDISH:              // 13   Swedish
         return "sv";
 
-    case SYSUTIL_LANG_DANISH:
+    case SYSUTIL_LANG_DANISH:               // 14   Danish
         return "da";
 
-    case SYSUTIL_LANG_NORWEGIAN:
+    case SYSUTIL_LANG_NORWEGIAN:            // 15   Norwegian
         return "no";
 
-    case SYSUTIL_LANG_POLISH:
+    case SYSUTIL_LANG_POLISH:               // 16   Polish
         return "pl";
 
-    case SYSUTIL_LANG_PORTUGUESE_PT:
-    case SYSUTIL_LANG_PORTUGUESE_BR:
+    case SYSUTIL_LANG_PORTUGUESE_PT:        //  7   Portuguese (Portugal)
+    case SYSUTIL_LANG_PORTUGUESE_BR:        // 17   Portuguese (Brazil)
         return "pt";
+
+    case SYSUTIL_LANG_TURKISH:              // 19   Turkish
+        return "tr";
 
     default:
         break;

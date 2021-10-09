@@ -225,7 +225,7 @@ const char* pkgi_content_tag(ContentType content)
     case ContentTheme: return "_themes";
     case ContentAvatar: return "_avatars";
     case ContentDemo: return "_demos";
-    case ContentManager: return "_managers";
+    case ContentUpdate: return "_updates";
     case ContentEmulator: return "_emulators";
     case ContentApp: return "_apps";
     case ContentTool: return "_tools";
