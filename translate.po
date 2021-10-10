@@ -18,23 +18,23 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 
 #: pkgi.c:82
-msgid "Installing"
+msgid "Instalowanie"
 msgstr ""
 
 #: pkgi.c:82
-msgid "Please wait..."
+msgid "Proszę czekać..."
 msgstr ""
 
 #: pkgi.c:94
-msgid "Installation failed"
+msgid "Instalacja nie powiodła się"
 msgstr ""
 
 #: pkgi.c:118
-msgid "Successfully downloaded"
+msgid "Pobrano pomyślnie"
 msgstr ""
 
 #: pkgi.c:122
-msgid "Task successfully queued (reboot to start)"
+msgid "Zadanie pomyślnie umieszczone w kolejce (uruchom ponownie, aby rozpocząć)"
 msgstr ""
 
 #: pkgi.c:163
@@ -55,99 +55,99 @@ msgstr ""
 
 #: pkgi.c:185
 #, c-format
-msgid "pkg requires %u %s free space, but only %u %s available"
+msgid "pkg wymaga %u %s wolnego miejsca, ale dostępne jest tylko %u %s"
 msgstr ""
 
 #: pkgi.c:225 pkgi_menu.c:109 pkgi_menu.c:121
-msgid "All"
+msgid "Wszystko"
 msgstr ""
 
 #: pkgi.c:226 pkgi_menu.c:122
-msgid "Games"
+msgid "Gry"
 msgstr ""
 
 #: pkgi.c:227 pkgi_menu.c:123
-msgid "DLCs"
+msgid "DLC"
 msgstr ""
 
 #: pkgi.c:228 pkgi_menu.c:124
-msgid "Themes"
+msgid "Motywy"
 msgstr ""
 
 #: pkgi.c:229 pkgi_menu.c:125
-msgid "Avatars"
+msgid "Awatary"
 msgstr ""
 
 #: pkgi.c:230 pkgi_menu.c:126
-msgid "Demos"
+msgid "Dema"
 msgstr ""
 
 #: pkgi.c:231 pkgi_menu.c:118 pkgi_menu.c:127
-msgid "Updates"
+msgid "Aktualizacje"
 msgstr ""
 
 #: pkgi.c:232 pkgi_menu.c:128
-msgid "Emulators"
+msgid "Emulatory"
 msgstr ""
 
 #: pkgi.c:233 pkgi_menu.c:129
-msgid "Apps"
+msgid "Aplikacje"
 msgstr ""
 
 #: pkgi.c:234 pkgi_menu.c:130
-msgid "Tools"
+msgid "Narzędzia"
 msgstr ""
 
 #: pkgi.c:235
-msgid "Unknown"
+msgid "Nieznany"
 msgstr ""
 
 #: pkgi.c:253
-msgid "Exit to XMB?"
+msgid "Wyjść do XMB?"
 msgstr ""
 
 #: pkgi.c:436
-msgid "No items!"
+msgid "Żadnych danych!"
 msgstr ""
 
 #: pkgi.c:462
-msgid "Item already installed, download again?"
+msgid "Element już zainstalowany, pobrać ponownie?"
 msgstr ""
 
 #: pkgi.c:471 pkgi_download.c:372 pkgi_download.c:652
-msgid "Downloading..."
+msgid "Ściąganie..."
 msgstr ""
 
 #: pkgi.c:471 pkgi.c:674
-msgid "Preparing..."
+msgid "Przygotowanie..."
 msgstr ""
 
 #: pkgi.c:504 pkgi.c:508
-msgid "Refreshing"
+msgid "Odświeżanie"
 msgstr ""
 
 #: pkgi.c:563 pkgi.c:567
-msgid "Count"
+msgid "Liczenie"
 msgstr ""
 
 #: pkgi.c:575
-msgid "Free"
+msgid "Darmowy"
 msgstr ""
 
 #: pkgi.c:585
-msgid "Select"
+msgid "Wybierz"
 msgstr ""
 
 #: pkgi.c:585
-msgid "Close"
+msgid "Zamknij"
 msgstr ""
 
 #: pkgi.c:585
-msgid "Cancel"
+msgid "Anuluj"
 msgstr ""
 
 #: pkgi.c:589 pkgi_download.c:136
-msgid "Download"
+msgid "Pobierz"
 msgstr ""
 
 #: pkgi.c:589
@@ -155,79 +155,79 @@ msgid "Menu"
 msgstr ""
 
 #: pkgi.c:589
-msgid "Details"
+msgid "Detale"
 msgstr ""
 
 #: pkgi.c:589
-msgid "Exit"
+msgid "Wyjdź"
 msgstr ""
 
 #: pkgi.c:678
-msgid "Successfully downloaded PKGi PS3 update"
+msgid "Pomyślnie pobrano aktualizację PKGi PS3"
 msgstr ""
 
 #: pkgi.c:1051
-msgid "Search"
+msgid "Szukaj"
 msgstr ""
 
 #: pkgi_db.c:145 pkgi_db.c:153
-msgid "failed to download list from"
+msgid "nie udało się pobrać z listy"
 msgstr ""
 
 #: pkgi_db.c:159
-msgid "list is too large... check for newer pkgi version!"
+msgid "lista jest za duża... sprawdź nowszą wersję pkgi!"
 msgstr ""
 
 #: pkgi_db.c:187
-msgid "list is empty... check the DB server"
+msgid "lista jest pusta... sprawdź serwer DB"
 msgstr ""
 
 #: pkgi_db.c:390
-msgid "ERROR: pkgi.txt file(s) missing or bad config.txt file"
+msgid "BŁĄD: brak pliku(ów) pkgi.txt lub zły plik config.txt"
 msgstr ""
 
 #: pkgi_dialog.c:80
-msgid "Content"
+msgid "Zadowolony"
 msgstr ""
 
 #: pkgi_dialog.c:108
-msgid "ERROR"
+msgid "BŁĄD"
 msgstr ""
 
 #: pkgi_dialog.c:169
-msgid "Failed to download the update list"
+msgid "Nie udało się pobrać listy aktualizacji"
 msgstr ""
 
 #: pkgi_dialog.c:174
-msgid "update(s) loaded"
+msgid "załadowano aktualizacje"
 msgstr ""
 
 #: pkgi_dialog.c:319
 #, c-format
-msgid "press %s to cancel"
+msgid "naciśnij %s aby anulować"
 msgstr ""
 
 #: pkgi_dialog.c:333
 #, c-format
-msgid "press %s to close - %s to scan updates"
+msgid "naciśnij %s, aby zamknąć - %s aby przeskanować aktualizacje"
 msgstr ""
 
 #: pkgi_dialog.c:365
-msgid "Enter"
+msgid "Wejdź"
 msgstr ""
 
 #: pkgi_dialog.c:365
-msgid "Back"
+msgid "Cofnij"
 msgstr ""
 
 #: pkgi_dialog.c:367
 #, c-format
-msgid "press %s to close"
+msgid "naciśnij %s aby zamknąć"
 msgstr ""
 
 #. 00000069 - Display title
 #: pkgi_download.c:183
-msgid "Install"
+msgid "zainstaluj"
 msgstr ""
 
 #: pkgi_download.c:216 pkgi_download.c:220 pkgi_download.c:226
@@ -235,103 +235,103 @@ msgid "ETA"
 msgstr ""
 
 #: pkgi_download.c:310 pkgi_download.c:392
-msgid "Could not send HTTP request"
+msgid "Nie można wysłać żądania HTTP"
 msgstr ""
 
 #: pkgi_download.c:317 pkgi_download.c:399
-msgid "HTTP request failed"
+msgid "Żądanie HTTP nie powiodło się"
 msgstr ""
 
 #: pkgi_download.c:322 pkgi_download.c:404
-msgid "HTTP response has unknown length"
+msgid "Odpowiedź HTTP ma nieznaną długość"
 msgstr ""
 
 #: pkgi_download.c:331
-msgid "Not enough free space on HDD"
+msgid "Za mało wolnego miejsca na dysku twardym"
 msgstr ""
 
 #: pkgi_download.c:340
-msgid "Could not create task directory on HDD."
+msgid "Nie można utworzyć katalogu zadań na dysku twardym."
 msgstr ""
 
 #: pkgi_download.c:348
-msgid "Saving background task..."
+msgid "Zapisywanie zadania w tle..."
 msgstr ""
 
 #: pkgi_download.c:354
-msgid "Could not create PKG file to HDD."
+msgid "Nie można utworzyć pliku PKG na HDD."
 msgstr ""
 
 #: pkgi_download.c:360
-msgid "Could not create task files to HDD."
+msgid "Nie można utworzyć plików zadań na HDD."
 msgstr ""
 
 #: pkgi_download.c:425
-msgid "HTTP download error"
+msgid "Błąd pobierania HTTP"
 msgstr ""
 
 #: pkgi_download.c:432
-msgid "HTTP connection closed"
+msgid "Połączenie HTTP zamknięte"
 msgstr ""
 
 #: pkgi_download.c:445
-msgid "failed to write to"
+msgid "zapisywanie nie powiodło się"
 msgstr ""
 
 #: pkgi_download.c:465
-msgid "cannot create folder"
+msgid "nie można utworzyć folderu"
 msgstr ""
 
 #: pkgi_download.c:475
-msgid "cannot create file"
+msgid "nie można stworzyć pliku"
 msgstr ""
 
 #: pkgi_download.c:490
-msgid "cannot resume file"
+msgid "nie można wznowić pliku"
 msgstr ""
 
 #: pkgi_download.c:562
-msgid "pkg integrity failed, try downloading again"
+msgid "Integralność pakietu nie powiodła się, spróbuj pobrać ponownie"
 msgstr ""
 
 #: pkgi_download.c:573
-msgid "Creating RAP file"
+msgid "Tworzenie pliku RAP"
 msgstr ""
 
 #: pkgi_download.c:581 pkgi_download.c:626
-msgid "Cannot save"
+msgid "Nie można zapisać"
 msgstr ""
 
 #: pkgi_download.c:621
-msgid "Creating RIF file"
+msgid "Tworzenie pliku RIF"
 msgstr ""
 
 #: pkgi_download.c:646
-msgid "Resuming..."
+msgid "Wznawianie..."
 msgstr ""
 
 #: pkgi_download.c:652
-msgid "Adding background task..."
+msgid "Dodawanie zadania w tle..."
 msgstr ""
 
 #: pkgi_download.c:675
-msgid "Downloading icon"
+msgid "Ikona pobierania"
 msgstr ""
 
 #: pkgi_download.c:713
-msgid "Could not create install directory on HDD."
+msgid "Nie można utworzyć katalogu instalacyjnego na dysku twardym."
 msgstr ""
 
 #: pkgi_menu.c:102
-msgid "Search..."
+msgid "Szukaj..."
 msgstr ""
 
 #: pkgi_menu.c:103
-msgid "Sort by:"
+msgid "Sortuj według:"
 msgstr ""
 
 #: pkgi_menu.c:104
-msgid "Title"
+msgid "Tytuł"
 msgstr ""
 
 #: pkgi_menu.c:105
@@ -339,31 +339,31 @@ msgid "Region"
 msgstr ""
 
 #: pkgi_menu.c:106
-msgid "Name"
+msgid "Nazwa"
 msgstr ""
 
 #: pkgi_menu.c:107
-msgid "Size"
+msgid "Rozmiar"
 msgstr ""
 
 #: pkgi_menu.c:108
-msgid "Content:"
+msgid "Zawartość:"
 msgstr ""
 
 #: pkgi_menu.c:110
-msgid "Regions:"
+msgid "Regiony:"
 msgstr ""
 
 #: pkgi_menu.c:111
-msgid "Asia"
+msgid "Azja"
 msgstr ""
 
 #: pkgi_menu.c:112
-msgid "Europe"
+msgid "Europa"
 msgstr ""
 
 #: pkgi_menu.c:113
-msgid "Japan"
+msgid "Japonia"
 msgstr ""
 
 #: pkgi_menu.c:114
@@ -371,21 +371,21 @@ msgid "USA"
 msgstr ""
 
 #: pkgi_menu.c:115
-msgid "Options:"
+msgid "Opcje:"
 msgstr ""
 
 #: pkgi_menu.c:116
-msgid "Back. DL"
+msgid "Przywróć. DL"
 msgstr ""
 
 #: pkgi_menu.c:117
-msgid "Music"
+msgid "Muzyka"
 msgstr ""
 
 #: pkgi_menu.c:119
-msgid "Refresh..."
+msgid "Odśwież..."
 msgstr ""
 
 #: pkgi_menu.c:326
-msgid "Direct DL"
+msgid "Skieruj DL"
 msgstr ""
