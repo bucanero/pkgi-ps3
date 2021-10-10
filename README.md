@@ -198,6 +198,7 @@ You need to have installed:
 - [YA2D](https://github.com/bucanero/ya2d_ps3) library (an extended version from my repo)
 - [PolarSSL](https://github.com/bucanero/ps3libraries/blob/master/scripts/015-polarssl-1.3.9.sh) library
 - [MikMod](https://github.com/ps3dev/ps3libraries/blob/master/scripts/011-libmikmod-3.1.11.sh) library
+- [Mini18n](https://github.com/bucanero/mini18n) library
 - [dbglogger](https://github.com/bucanero/psl1ght-libs/tree/master/dbglogger) library (only required for debug logging)
 
 Run `make` to create a release build. After that, run `make pkg` to create a `.pkg` install file. 
