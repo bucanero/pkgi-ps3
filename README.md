@@ -3,7 +3,7 @@
 [![Downloads][img_downloads]][pkgi_downloads] [![Release][img_latest]][pkgi_latest] [![License][img_license]][pkgi_license]
 
 
-**PKGi PS3** is a PlayStation 3 port of PSVita [pkgi](https://github.com/mmozeiko/pkgi).
+**PKGi PS3** is a PlayStation 3 port of [pkgi (PSVita)](https://github.com/mmozeiko/pkgi).
 
 The `pkgi-ps3` homebrew app allows to download and install `.pkg` files directly on your PS3.
 
@@ -18,6 +18,7 @@ The `pkgi-ps3` homebrew app allows to download and install `.pkg` files directly
 * **automatic downloads:** just choose an item, and it will be downloaded by the app to your HDD (`direct mode`) or queued for background download (`background mode`) using the internal Download Manager.
 * **resumes interrupted downloads:** you can stop a download at any time, switch applications, and come back to resume the download later.
 * **content activation:** the app can generate `.rif` files for downloaded content (system must be activated)
+* **content updates:** the app can check online for available content updates
 
 ### Notes:
 * **queuing** up multiple downloads is only supported when using `background download` mode.
@@ -45,7 +46,7 @@ You can also load additional database files:
 - `pkgi_themes.txt`
 - `pkgi_avatars.txt`
 - `pkgi_demos.txt`
-- `pkgi_managers.txt`
+- `pkgi_updates.txt`
 - `pkgi_emulators.txt`
 - `pkgi_apps.txt`
 - `pkgi_tools.txt`
@@ -102,18 +103,18 @@ UP0001-NP00PKGI3_00-0000000000000000,0,PKGi PS3 v0.1.0,,,http://bucanero.helioho
 ```
 ### Content types
 
-| Type value |	Content type |
-|------------|--------------|
-| 0	| Unknown
-| 1	| Game
-| 2	| DLC
-| 3	| Theme
-| 4	| Avatar
-| 5	| Demo
-| 6	| Backup Manager
-| 7	| Emulator
-| 8	| Application
-| 9	| Tool
+| Type value |	Content type | DB File |
+|------------|--------------|---------|
+| 0	| Unknown            |
+| 1	| Game               | `pkgi_games.txt`
+| 2	| DLC                | `pkgi_dlcs.txt`
+| 3	| Theme              | `pkgi_themes.txt`
+| 4	| Avatar             | `pkgi_avatars.txt`
+| 5	| Demo               | `pkgi_demos.txt`
+| 6	| Update             | `pkgi_updates.txt`
+| 7	| Emulator           | `pkgi_emulators.txt`
+| 8	| Application        | `pkgi_apps.txt`
+| 9	| Tool               | `pkgi_tools.txt`
 
 ## User-defined DB format
 
@@ -196,7 +197,8 @@ You need to have installed:
 - [PSL1GHT](https://github.com/ps3dev/PSL1GHT) SDK
 - [Tiny3D](https://github.com/wargio/Tiny3D) library
 - [YA2D](https://github.com/bucanero/ya2d_ps3) library (an extended version from my repo)
-- [PolarSSL](https://github.com/bucanero/ps3libraries/blob/master/scripts/015-polarssl-1.3.9.sh) library
+- [PolarSSL](https://github.com/bucanero/ps3libraries/blob/master/scripts/015-polarssl-1.3.9.sh) library (v1.3.9)
+- [libcurl](https://github.com/bucanero/ps3libraries/blob/master/scripts/016-libcurl-7.64.1.sh) library (v7.64.1)
 - [MikMod](https://github.com/ps3dev/ps3libraries/blob/master/scripts/011-libmikmod-3.1.11.sh) library
 - [Mini18n](https://github.com/bucanero/mini18n) library
 - [dbglogger](https://github.com/bucanero/psl1ght-libs/tree/master/dbglogger) library (only required for debug logging)
@@ -205,6 +207,8 @@ Run `make` to create a release build. After that, run `make pkg` to create a `.p
 
 You can also set the environment variable `PS3LOAD=tcp:x.x.x.x` to the PS3's IP address;
 that will allow you to use `make run` and send `pkgi-ps3.self` directly to the [PS3LoadX listener](https://github.com/bucanero/ps3loadx).
+
+## Debugging
 
 To enable debug logging, build PKGi PS3 with `make DEBUGLOG=1`. The application will send debug messages to
 UDP multicast address `239.255.0.100:30000`. To receive them you can use [socat][] on your PC:
