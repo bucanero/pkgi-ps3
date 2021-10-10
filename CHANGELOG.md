@@ -4,6 +4,16 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 ## [Unreleased]()
 
+## [v1.2.0](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.2.0) - 2021-10-09
+
+### Added
+
+* Internationalization support
+* Language detection based on PS3 settings
+* Spanish translation
+* Online scan for available content updates
+* Support for TLS v1.2 using newer libcurl+polarSSL
+
 ## [v1.1.8](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.1.8) - 2020-12-08
 
 ### Added
