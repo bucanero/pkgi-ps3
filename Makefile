@@ -147,6 +147,12 @@ npdrm: $(BUILD)
 
 #---------------------------------------------------------------------------------
 
+quickpkg:
+	$(VERB) if [ -n "$(PKGFILES)" -a -d "$(PKGFILES)" ]; then cp -rf $(PKGFILES)/* $(BUILDDIR)/pkg/; fi
+	$(VERB) $(PKG) --contentid $(CONTENTID) $(BUILDDIR)/pkg/ $(TARGET).pkg >> /dev/null
+	$(VERB) cp $(TARGET).pkg $(TARGET).gnpdrm.pkg
+	$(VERB) $(PACKAGE_FINALIZE) $(TARGET).gnpdrm.pkg
+
 else
 
 DEPENDS	:=	$(OFILES:.o=.d)
