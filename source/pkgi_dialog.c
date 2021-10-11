@@ -25,6 +25,7 @@ static int dialog_allow_close;
 static int dialog_cancelled;
 static pkgi_texture pkg_icon = NULL;
 static DbItem* db_item = NULL;
+static pkgi_dialog_callback_t dialog_callback = NULL;
 
 static int32_t dialog_width;
 static int32_t dialog_height;
@@ -95,10 +96,11 @@ void pkgi_dialog_message(const char* title, const char* text)
     pkgi_dialog_unlock();
 }
 
-void pkgi_dialog_ok_cancel(const char* title, const char* text)
+void pkgi_dialog_ok_cancel(const char* title, const char* text, pkgi_dialog_callback_t callback)
 {
     pkgi_dialog_lock();
     pkgi_dialog_data_init(DialogOkCancel, title, text);
+    dialog_callback = callback;
     pkgi_dialog_unlock();
 }
 
@@ -159,7 +161,11 @@ void pkgi_do_dialog(pkgi_input* input)
         else if (dialog_type == DialogOkCancel && (input->pressed & pkgi_ok_button()))
         {
             dialog_delta = -1;
-            dialog_cancelled = 2;
+            if (dialog_callback)
+            {
+                dialog_callback(MDIALOG_OK);
+                dialog_callback = NULL;
+            }
         }
         else if (dialog_type == DialogDetails && (input->pressed & PKGI_BUTTON_S))
         {

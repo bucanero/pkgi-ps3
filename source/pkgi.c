@@ -236,6 +236,20 @@ static const char* content_type_str(ContentType content)
     }
 }
 
+void cb_dialog_exit(int res)
+{
+    state = StateTerminate;
+}
+
+void cb_dialog_download(int res)
+{
+    DbItem* item = pkgi_db_get(selected_item);
+
+    item->presence = PresenceMissing;
+    pkgi_dialog_start_progress(_("Downloading..."), _("Preparing..."), 0);
+    pkgi_start_thread("download_thread", &pkgi_download_thread);
+}
+
 static void pkgi_do_main(pkgi_input* input)
 {
     int col_titleid = 0;
@@ -250,7 +264,7 @@ static void pkgi_do_main(pkgi_input* input)
         if (input->active & pkgi_cancel_button())
         {
             input->pressed &= ~pkgi_cancel_button();
-            pkgi_dialog_ok_cancel("\xE2\x98\x85  PKGi PS3 v" PKGI_VERSION "  \xE2\x98\x85", _("Exit to XMB?"));
+            pkgi_dialog_ok_cancel("\xE2\x98\x85  PKGi PS3 v" PKGI_VERSION "  \xE2\x98\x85", _("Exit to XMB?"), &cb_dialog_exit);
         }
 
         if (input->active & PKGI_BUTTON_SELECT)
@@ -459,13 +473,17 @@ static void pkgi_do_main(pkgi_input* input)
 
         DbItem* item = pkgi_db_get(selected_item);
 
-        if ((item->presence == PresenceInstalled) && pkgi_msg_dialog(MDIALOG_YESNO, _("Item already installed, download again?")))
+        if (!pkgi_check_free_space(item->size))
+        {
+            LOG("[%.9s] %s - no free space", item->content + 7, item->name);
+            pkgi_dialog_error(_("Not enough free space on HDD"));
+        }
+        else if (item->presence == PresenceInstalled)
         {
             LOG("[%.9s] %s - already installed", item->content + 7, item->name);
-            item->presence = PresenceMissing;
+            pkgi_dialog_ok_cancel(item->name, _("Item already installed, download again?"), &cb_dialog_download);
         }
-
-        if (item->presence == PresenceIncomplete || (item->presence == PresenceMissing && pkgi_check_free_space(item->size)))
+        else if (item->presence == PresenceIncomplete || (item->presence == PresenceMissing))
         {
             LOG("[%.9s] %s - starting to install", item->content + 7, item->name);
             pkgi_dialog_start_progress(_("Downloading..."), _("Preparing..."), 0);
@@ -764,10 +782,7 @@ int main(int argc, const char* argv[])
             if (pkgi_dialog_is_cancelled())
             {
                 pkgi_dialog_close();
-                if (pkgi_dialog_is_cancelled() > 1)
-                    state = StateTerminate;
             }
-
         }
 
         if (pkgi_dialog_input_update())
