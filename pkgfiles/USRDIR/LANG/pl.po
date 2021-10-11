@@ -31,7 +31,7 @@ msgstr "Instalacja nie powiodla sie"
 
 #: pkgi.c:118
 msgid "Successfully downloaded"
-msgstr "Pobrano pomyslni"
+msgstr "Pobrano pomyslnie"
 
 #: pkgi.c:122
 msgid "Task successfully queued (reboot to start)"
@@ -156,7 +156,7 @@ msgstr "Menu"
 
 #: pkgi.c:589
 msgid "Details"
-msgstr "Detale"
+msgstr "Szczegoly"
 
 #: pkgi.c:589
 msgid "Exit"
@@ -228,7 +228,7 @@ msgstr "nacisnij %s aby zamknac"
 #. 00000069 - Display title
 #: pkgi_download.c:183
 msgid "Install"
-msgstr "zainstaluj"
+msgstr "Zainstaluj"
 
 #: pkgi_download.c:216 pkgi_download.c:220 pkgi_download.c:226
 msgid "ETA"
@@ -248,7 +248,7 @@ msgstr "Odpowiedz HTTP ma nieznana dlugosc"
 
 #: pkgi_download.c:331
 msgid "Not enough free space on HDD"
-msgstr "Za malo wolnego miejsca na dysku twardym"
+msgstr "Nie wystarczajaca ilosc miejsca na dysku twardym"
 
 #: pkgi_download.c:340
 msgid "Could not create task directory on HDD."
@@ -292,7 +292,7 @@ msgstr "nie mozna wznowic pliku"
 
 #: pkgi_download.c:562
 msgid "pkg integrity failed, try downloading again"
-msgstr "Integralnosc pakietu nie powiodla sie, spr�buj pobrac ponownie"
+msgstr "Integralnosc pakietu nie powiodla sie, sprobuj pobrac ponownie"
 
 #: pkgi_download.c:573
 msgid "Creating RAP file"
@@ -376,7 +376,7 @@ msgstr "Opcje:"
 
 #: pkgi_menu.c:116
 msgid "Back. DL"
-msgstr "Przywr�c. DL"
+msgstr "Przywroc. DL"
 
 #: pkgi_menu.c:117
 msgid "Music"
