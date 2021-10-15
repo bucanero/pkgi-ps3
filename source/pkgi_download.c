@@ -79,12 +79,19 @@ uint32_t get_task_dir_id(const char* dir, uint32_t tid)
 
 static void write_pdb_string(void* fp, const char* header, const char* pdbstr)
 {
-	pkgi_write(fp, header, 4);
-    
 	unsigned int pdbstr_len = pkgi_strlen(pdbstr) + 1;
-	pkgi_write(fp, (char*) &pdbstr_len, 4);
-	pkgi_write(fp, (char*) &pdbstr_len, 4);
+
+	pkgi_write(fp, header, 4);
+	pkgi_write(fp, &pdbstr_len, 4);
+	pkgi_write(fp, &pdbstr_len, 4);
 	pkgi_write(fp, pdbstr, pdbstr_len);
+}
+
+static void write_pdb_int64(void* fp, const char* header, const uint64_t* pdb_u64)
+{
+	pkgi_write(fp, header, 4);
+	pkgi_write(fp, "\x00\x00\x00\x08\x00\x00\x00\x08", 8);
+	pkgi_write(fp, pdb_u64, 8);
 }
 
 static int create_queue_pdb_files(void)
@@ -93,7 +100,7 @@ static int create_queue_pdb_files(void)
 	char srcFile[256];
 	char szIconFile[256];
 	
-	pkgi_snprintf(srcFile, sizeof(srcFile), "%s/%.9s.PNG", pkgi_get_temp_folder(), root);
+	pkgi_snprintf(srcFile, sizeof(srcFile), "%s/%.9s.PNG", pkgi_get_temp_folder(), root + 7);
 	pkgi_snprintf(szIconFile, sizeof(szIconFile), PKGI_QUEUE_FOLDER "/%d/ICON_FILE", queue_task_id);
 	
 	// write - ICON_FILE
@@ -116,8 +123,7 @@ static int create_queue_pdb_files(void)
 	pkgi_write(fpPDB, pkg_d0top_data, d0top_data_size);
 	
 	// 000000CE - Download expected size (in bytes)
-	pkgi_write(fpPDB, PDB_HDR_SIZE "\x00\x00\x00\x08\x00\x00\x00\x08", 12);
-	pkgi_write(fpPDB, (char*) &total_size, 8);
+	write_pdb_int64(fpPDB, PDB_HDR_SIZE, &total_size);
 
 	// 000000CB - PKG file name
 	write_pdb_string(fpPDB, PDB_HDR_FILENAME, root);
@@ -166,18 +172,12 @@ int create_install_pdb_files(const char *path, uint64_t size)
 	pkgi_write(fp2, install_data_pdb, install_data_pdb_size);
 
 	// 000000D0 - Downloaded size (in bytes)
-	pkgi_write(fp1, PDB_HDR_DLSIZE "\x00\x00\x00\x08\x00\x00\x00\x08", 12);
-	pkgi_write(fp1, (char*) &size, 8);
-
-	pkgi_write(fp2, PDB_HDR_DLSIZE "\x00\x00\x00\x08\x00\x00\x00\x08", 12);
-	pkgi_write(fp2, (char*) &size, 8);
+	write_pdb_int64(fp1, PDB_HDR_DLSIZE, &size);
+	write_pdb_int64(fp2, PDB_HDR_DLSIZE, &size);
 
 	// 000000CE - Package expected size (in bytes)
-	pkgi_write(fp1, PDB_HDR_SIZE "\x00\x00\x00\x08\x00\x00\x00\x08", 12);
-	pkgi_write(fp1, (char*) &size, 8);
-
-	pkgi_write(fp2, PDB_HDR_SIZE "\x00\x00\x00\x08\x00\x00\x00\x08", 12);
-	pkgi_write(fp2, (char*) &size, 8);
+	write_pdb_int64(fp1, PDB_HDR_SIZE, &size);
+	write_pdb_int64(fp2, PDB_HDR_SIZE, &size);
 
 	// 00000069 - Display title	
     pkgi_snprintf(temp_buffer, sizeof(temp_buffer), "\xE2\x98\x85 %s \x22%s\x22", _("Install"), db_item->name);
@@ -636,10 +636,10 @@ int pkgi_download(const DbItem* item, const int background_dl)
 {
     int result = 0;
 
-    pkgi_snprintf(root, sizeof(root), "%.9s.pkg", item->content + 7);
+    pkgi_snprintf(root, sizeof(root), "%s.pkg", item->content);
     LOG("package installation file: %s", root);
 
-    pkgi_snprintf(resume_file, sizeof(resume_file), "%s/%.9s.resume", pkgi_get_temp_folder(), item->content + 7);
+    pkgi_snprintf(resume_file, sizeof(resume_file), "%s/%s.resume", pkgi_get_temp_folder(), item->content);
     if (pkgi_load(resume_file, &sha, sizeof(sha)) == sizeof(sha))
     {
         LOG("resume file exists, trying to resume");

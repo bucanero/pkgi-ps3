@@ -396,7 +396,7 @@ static void pkgi_do_main(pkgi_input* input)
 
         if (item->presence == PresenceUnknown)
         {
-            item->presence = pkgi_is_incomplete(titleid) ? PresenceIncomplete : pkgi_is_installed(titleid) ? PresenceInstalled : PresenceMissing;
+            item->presence = pkgi_is_incomplete(item->content) ? PresenceIncomplete : pkgi_is_installed(item->content) ? PresenceInstalled : PresenceMissing;
         }
 
         char size_str[64];

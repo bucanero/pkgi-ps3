@@ -918,10 +918,10 @@ int pkgi_dir_exists(const char* path)
     return 0;
 }
 
-int pkgi_is_installed(const char* titleid)
+int pkgi_is_installed(const char* content)
 {    
     char path[128];
-    snprintf(path, sizeof(path), "/dev_hdd0/game/%s", titleid);
+    snprintf(path, sizeof(path), "/dev_hdd0/game/%.9s", content + 7);
 
     return (pkgi_dir_exists(path));
 }
@@ -1249,8 +1249,8 @@ pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
         int64_t fsize = pkgi_get_size(path);
         if (fsize < 0)
         {
-            LOG("trying shorter name (%s.pkg)", content);
-            pkgi_snprintf(path, sizeof(path), "%s/%s.pkg", pkgi_get_temp_folder(), content);
+            LOG("trying shorter name (%.9s.pkg)", content + 7);
+            pkgi_snprintf(path, sizeof(path), "%s/%.9s.pkg", pkgi_get_temp_folder(), content + 7);
             fsize = pkgi_get_size(path);
         }
 
@@ -1600,6 +1600,10 @@ void pkgi_curl_init(CURL *curl)
     curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 10L);
     // Follow redirects
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    // maximum number of redirects allowed
+    curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 20L);
+    // Fail the request if the HTTP code returned is equal to or larger than 400
+    curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
 }
 
 static size_t curl_WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
