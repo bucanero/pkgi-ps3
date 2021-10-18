@@ -467,7 +467,7 @@ static void pkgi_do_main(pkgi_input* input)
         }
     }
 
-    if (input && (input->pressed & pkgi_ok_button()))
+    if (input && (input->pressed & pkgi_ok_button()) && db_count)
     {
         input->pressed &= ~pkgi_ok_button();
 
@@ -498,7 +498,7 @@ static void pkgi_do_main(pkgi_input* input)
 
         pkgi_menu_start(search_active, &config);
     }
-    else if (input && (input->active & PKGI_BUTTON_S))
+    else if (input && (input->active & PKGI_BUTTON_S) && db_count)
     {
         input->pressed &= ~PKGI_BUTTON_S;
 
