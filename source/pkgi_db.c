@@ -133,6 +133,16 @@ static char* generate_contentid(void)
     return cid;
 }
 
+static size_t write_update_data(void *buffer, size_t size, size_t nmemb, void *stream)
+{
+    size_t realsize = size * nmemb;
+
+    pkgi_memcpy(db_data + db_size, buffer, realsize);
+    db_size += realsize;
+
+    return (realsize);
+}
+
 int update_database(const char* update_url, const char* path, char* error, uint32_t error_size)
 {
     db_total = 0;
@@ -161,25 +171,13 @@ int update_database(const char* update_url, const char* path, char* error, uint3
             else if (length != 0)
             {
                 db_total = (uint32_t)length;
-            }
+                error[0] = 0;
 
-            error[0] = 0;
-
-            for (;;)
-            {
-                uint32_t want = (uint32_t)min64(1 << 16, sizeof(db_data) - 1 - db_size);
-                int read = pkgi_http_read(http, db_data + db_size, want);
-                if (read == 0)
+                if (!pkgi_http_read(http, &write_update_data, NULL))
                 {
-                        break;
-                }
-                else if (read < 0)
-                {
-                    pkgi_snprintf(error, error_size, "HTTP error 0x%08x", read);
+                    pkgi_snprintf(error, error_size, "%s", _("HTTP download error"));
                     db_size = 0;
-                    break;
                 }
-                db_size += read;
             }
 
             if (error[0] == 0 && db_size == 0)
@@ -211,7 +209,8 @@ int load_database(uint8_t db_id)
     pkgi_snprintf(path, sizeof(path), "%s/dbformat.txt", pkgi_get_config_folder());
 
     int loaded = pkgi_load(path, db_data, sizeof(db_data) - 1);
-    if (loaded > 0) {
+    if (loaded > 0)
+    {
         char* ptr = db_data;
         char* end = db_data + loaded + 1;
         column = 0;
@@ -648,8 +647,6 @@ int pkgi_db_load_xml_updates(const char* content_id, const char* name)
         if ((xmlStrcasecmp(cur_node->name, BAD_CAST "package") == 0) && (db_count < MAX_DB_ITEMS))
         {
             memset(&db[db_count], 0, sizeof(DbItem));
-            // keep the parent's content-id
-            db[db_count].content = content_id;
             db[db_count].type = ContentUpdate;
 
             value = (char*) xmlGetProp(cur_node, BAD_CAST "version");
@@ -657,6 +654,11 @@ int pkgi_db_load_xml_updates(const char* content_id, const char* name)
             pkgi_memcpy(db_data + db_size, value, size);
             db[db_count].description = db_data + db_size;
             db_size += size;
+
+            // append the version to content-id
+            pkgi_snprintf(db_data + db_size, 1024, "%s_%s", content_id, value);
+            db[db_count].content = db_data + db_size;
+            db_size += (pkgi_strlen(db[db_count].content) + 1);
 
             pkgi_snprintf(db_data + db_size, 1024, "%s (%s)", name, value);
             db[db_count].name = db_data + db_size;

@@ -8,7 +8,6 @@
 #include <sys/process.h>
 #include <sysutil/osk.h>
 
-#include <http/https.h>
 #include <io/pad.h>
 #include <lv2/sysfs.h>
 #include <lv2/process.h>
@@ -48,14 +47,9 @@
 struct pkgi_http
 {
     int used;
-    int local;
-
-    void* fd;
     uint64_t size;
     uint64_t offset;
-
-    httpClientId client;
-    httpTransId transaction;
+    CURL *curl;
 };
 
 typedef struct 
@@ -68,17 +62,9 @@ typedef struct
 
 typedef struct
 {
-    void* http_pool;
-    void* ssl_pool;
-    httpsData* caList;
-    void* cert_buffer;
-} t_http_pools;
-
-struct curl_MemoryStruct
-{
     char *memory;
     size_t size;
-};
+} curl_memory_t;
 
 
 static sys_mutex_t g_dialog_lock;
@@ -105,7 +91,6 @@ static uint16_t g_ime_input[SCE_IME_DIALOG_MAX_TEXT_LENGTH + 1];
 
 static pkgi_http g_http[4];
 static t_tex_buttons tex_buttons;
-static t_http_pools http_pools;
 
 static MREADER *mem_reader;
 static MODULE *module;
@@ -637,57 +622,6 @@ void load_ttf_fonts()
 	ya2d_texturePointer = (u32*) init_ttf_table((u16*) ya2d_texturePointer);
 }
 
-void init_http_pool(void)
-{
-    int ret;
-	u32 cert_size=0;
-
-    LOG("initializing HTTP");
-    http_pools.http_pool = malloc(0x10000);
-    if(http_pools.http_pool) {
-        ret = httpInit(http_pools.http_pool, 0x10000);
-        if(ret < 0) {
-            LOG("Error: httpInit failed (%x)", ret);
-        }
-    }
-
-    LOG("initializing HTTPS");
-	http_pools.ssl_pool = malloc(0x40000);
-    if(http_pools.ssl_pool) {
-		ret = sslInit(http_pools.ssl_pool, 0x40000);
-		if (ret < 0) {
-			LOG("Error : sslInit failed (%x)", ret);
-        }
-    }
-
-	ret = sslCertificateLoader(SSL_LOAD_CERT_ALL, NULL, 0, &cert_size);
-	if (ret < 0) {
-		LOG("Error : sslCertificateLoader failed (%x)", ret);
-	}
-
-	http_pools.cert_buffer = malloc(cert_size);
-	if (http_pools.cert_buffer==NULL) {
-		LOG("Error : out of memory (cert_buffer)");
-	}
-
-	ret = sslCertificateLoader(SSL_LOAD_CERT_ALL, http_pools.cert_buffer, cert_size, NULL);
-	if (ret < 0) {
-		LOG("Error : sslCertificateLoader failed (%x)", ret);
-	}
-
-    http_pools.caList = (httpsData *)malloc(sizeof(httpsData));
-    if (http_pools.caList) {
-    	http_pools.caList->ptr = http_pools.cert_buffer;
-	    http_pools.caList->size = cert_size;
-	}
-
-	ret = httpsInit(1, (httpsData *) http_pools.caList);
-	if (ret < 0) {
-		LOG("Error : httpsInit failed (%x)", ret);
-	}
-    return;
-}
-
 static void sys_callback(uint64_t status, uint64_t param, void* userdata)
 {
     switch (status) {
@@ -713,11 +647,6 @@ void pkgi_start(void)
 
     LOG("initializing SSL");
     sysModuleLoad(SYSMODULE_NET);
-    sysModuleLoad(SYSMODULE_HTTP);
-    sysModuleLoad(SYSMODULE_HTTPS);
-    sysModuleLoad(SYSMODULE_SSL);
-
-    init_http_pool();
 
     sys_mutex_attr_t mutex_attr;
     mutex_attr.attr_protocol = SYS_MUTEX_PROTOCOL_FIFO;
@@ -842,20 +771,7 @@ void pkgi_end(void)
 
 	ya2d_deinit();
 
-    httpsEnd();
-    sslEnd();
-    httpEnd();
-
-    if (http_pools.cert_buffer) free(http_pools.cert_buffer);
-    if (http_pools.caList)      free(http_pools.caList);
-    if (http_pools.ssl_pool)    free(http_pools.ssl_pool);
-    if (http_pools.http_pool)   free(http_pools.http_pool);
-
     sysMutexDestroy(g_dialog_lock);
-
-    sysModuleUnload(SYSMODULE_SSL);
-    sysModuleUnload(SYSMODULE_HTTPS);
-    sysModuleUnload(SYSMODULE_HTTP);
 
 #ifdef PKGI_ENABLE_LOGGING
     sysProcessExitSpawn2("/dev_hdd0/game/PSL145310/RELOAD.SELF", NULL, NULL, NULL, 0, 1001, SYS_PROCESS_SPAWN_STACK_SIZE_1M);
@@ -1203,15 +1119,32 @@ int pkgi_validate_url(const char* url)
     {
         return 0;
     }
-    if (pkgi_strstr(url, "http://") == url)
-    {
-        return 1;
-    }
-    if (pkgi_strstr(url, "https://") == url)
+    if ((pkgi_strstr(url, "http://") == url) || (pkgi_strstr(url, "https://") == url) ||
+        (pkgi_strstr(url, "ftp://") == url)  || (pkgi_strstr(url, "ftps://") == url))
     {
         return 1;
     }
     return 0;
+}
+
+void pkgi_curl_init(CURL *curl)
+{
+    // Set user agent string
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, PKGI_USER_AGENT);
+    // don't verify the certificate's name against host
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+    // don't verify the peer's SSL certificate
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+    // Set SSL VERSION to TLS 1.2
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+    // Set timeout for the connection to build
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 20L);
+    // Follow redirects
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    // maximum number of redirects allowed
+    curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 20L);
+    // Fail the request if the HTTP code returned is equal to or larger than 400
+    curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
 }
 
 pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
@@ -1240,202 +1173,92 @@ pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
         return NULL;
     }
 
-    char path[256];
-
-    if (content)
+    http->curl = curl_easy_init();
+    if (!http->curl)
     {
-        pkgi_snprintf(path, sizeof(path), "%s%s", pkgi_get_temp_folder(), strrchr(url, '/'));
-
-        int64_t fsize = pkgi_get_size(path);
-        if (fsize < 0)
-        {
-            LOG("trying shorter name (%.9s.pkg)", content + 7);
-            pkgi_snprintf(path, sizeof(path), "%s/%.9s.pkg", pkgi_get_temp_folder(), content + 7);
-            fsize = pkgi_get_size(path);
-        }
-
-        if (fsize > 0)
-        {
-            LOG("%s found, using it", path);
-
-            http->fd = pkgi_open(path);
-            http->used = 1;
-            http->local = 1;
-            http->offset = 0;
-            http->size = fsize;
-
-            return(http);
-        }
-        else
-        {
-            LOG("%s not found, downloading url", path);
-        }
-    }
-    else
-    {
-        http->fd = NULL;
+        LOG("curl init error");
+        return NULL;
     }
 
-    httpClientId clientID;
-    httpTransId transID = 0;
-    httpUri uri;
-    int ret;
-    void *uri_p = NULL;
-    u32 pool_size = 0;
+    pkgi_curl_init(http->curl);
+    curl_easy_setopt(http->curl, CURLOPT_URL, url);
 
     LOG("starting http GET request for %s", url);
 
-    ret = httpCreateClient(&clientID);
-    if (ret < 0)
-    {
-        LOG("httpCreateClient failed: 0x%08x", ret);
-        goto bail;
-    }
-    httpClientSetConnTimeout(clientID, 10 * 1000 * 1000);
-    httpClientSetUserAgent(clientID, PKGI_USER_AGENT);
-	httpClientSetAutoRedirect(clientID, 1);
-
-    ret = httpUtilParseUri(&uri, url, NULL, 0, &pool_size);
-    if (ret < 0)
-    {
-        LOG("httpUtilParseUri failed: 0x%08x", ret);
-        goto bail;
-    }
-
-    uri_p = malloc(pool_size);
-    if (!uri_p) goto bail;
-
-    ret = httpUtilParseUri(&uri, url, uri_p, pool_size, NULL);
-    if (ret < 0)
-    {
-        LOG("httpUtilParseUri failed: 0x%08x", ret);
-        goto bail;
-    }
-        
-    ret = httpCreateTransaction(&transID, clientID, HTTP_METHOD_GET, &uri);
-    if (ret < 0)
-    {
-        LOG("httpCreateTransaction failed: 0x%08x", ret);
-        goto bail;
-    }
-        
-    free(uri_p);
-    uri_p = NULL;
-
     if (offset != 0)
     {
-        char range[64];
-        pkgi_snprintf(range, sizeof(range), "bytes=%llu-", offset);
-        httpHeader reqHead;
-        reqHead.name = "Range";
-        reqHead.value = range;
-        ret = httpRequestAddHeader(transID, &reqHead);
-        if (ret < 0)
-        {
-            LOG("httpRequestAddHeader failed: 0x%08x", ret);
-            goto bail;
-        }
-    }
-
-    ret = httpSendRequest(transID, NULL, 0, NULL);
-    if (ret < 0)
-    {
-        LOG("httpSendRequest failed: 0x%08x", ret);
-        goto bail;
+        LOG("setting http offset %ld", offset);
+        /* resuming upload at this position */
+        curl_easy_setopt(http->curl, CURLOPT_RESUME_FROM_LARGE, (curl_off_t) offset);
     }
 
     http->used = 1;
-    http->local = 0;
-    http->client = clientID;
-    http->transaction = transID;
-
     return(http);
-
-bail:
-    if (uri_p) free(uri_p);
-    if (transID) httpDestroyTransaction(transID);
-    if (clientID) httpDestroyClient(clientID);
-
-    return NULL;
 }
 
 int pkgi_http_response_length(pkgi_http* http, int64_t* length)
 {
-    if (http->local)
+    CURLcode res;
+
+    // do the download request without getting the body
+    curl_easy_setopt(http->curl, CURLOPT_NOBODY, 1L);
+    curl_easy_setopt(http->curl, CURLOPT_NOPROGRESS, 1L);
+
+    // Perform the request
+    res = curl_easy_perform(http->curl);
+
+    if(res != CURLE_OK)
     {
-        *length = (int64_t)http->size;
-        return 1;
-    }
-    else
-    {
-        int res;
-        int status;
-        if ((res = httpResponseGetStatusCode(http->transaction, &status)) < 0)
-        {
-            LOG("httpResponseGetStatusCode failed: 0x%08x", res);
-            return 0;
-        }
-
-        LOG("http status code = %d", status);
-
-        if (status == HTTP_STATUS_CODE_OK || status == HTTP_STATUS_CODE_Partial_Content)
-        {
-            uint64_t content_length;
-
-	        res = httpResponseGetContentLength(http->transaction, &content_length);
-            if (res < 0)
-            {
-                LOG("httpResponseGetContentLength failed: 0x%08x", res);
-                return 0;
-            }
-            else
-            {
-                LOG("http response length = %llu", content_length);
-                *length = (int64_t)content_length;
-                http->size=content_length;
-            }
-            return 1;
-        }
+        LOG("curl_easy_perform() failed: %s", curl_easy_strerror(res));
         return 0;
     }
+
+    long status = 0;
+    curl_easy_getinfo(http->curl, CURLINFO_RESPONSE_CODE, &status);
+    LOG("http status code = %d", status);
+
+    curl_easy_getinfo(http->curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, length);
+    LOG("http response length = %llu", *length);
+    http->size = *length;
+
+    return 1;
 }
 
-int pkgi_http_read(pkgi_http* http, void* buffer, uint32_t size)
+int pkgi_http_read(pkgi_http* http, void* write_func, void* xferinfo_func)
 {
-    if (http->local)
-    {
-        int read = pkgi_read(http->fd, buffer, size);
-        http->offset += read;
-        return read;
-    }
-    else
-    {
-        // LOG("http asking to read %u bytes", size);
-        u32 recv;
-        int res = httpRecvResponse(http->transaction, buffer, size, &recv);
+    CURLcode res;
 
-//        LOG("http read (%d) %d bytes", size, recv);
-        
-        if (recv < 0)
-        {
-            LOG("httpRecvResponse failed: 0x%08x", res);
-        }
-        return recv;
+    curl_easy_setopt(http->curl, CURLOPT_NOBODY, 0L);
+    // The function that will be used to write the data
+    curl_easy_setopt(http->curl, CURLOPT_WRITEFUNCTION, write_func);
+    // The data file descriptor which will be written to
+    curl_easy_setopt(http->curl, CURLOPT_WRITEDATA, NULL);
+
+    if (xferinfo_func)
+    {
+        /* pass the struct pointer into the xferinfo function */
+        curl_easy_setopt(http->curl, CURLOPT_XFERINFOFUNCTION, xferinfo_func);
+        curl_easy_setopt(http->curl, CURLOPT_XFERINFODATA, NULL);
+        curl_easy_setopt(http->curl, CURLOPT_NOPROGRESS, 0L);
     }
+
+    // Perform the request
+    res = curl_easy_perform(http->curl);
+
+    if(res != CURLE_OK)
+    {
+        LOG("curl_easy_perform() failed: %s", curl_easy_strerror(res));
+        return 0;
+    }
+
+    return 1;
 }
 
 void pkgi_http_close(pkgi_http* http)
 {
     LOG("http close");
-    if (http->local)
-    {
-        pkgi_close(http->fd);
-    }
-    else
-    {
-        httpDestroyTransaction(http->transaction);        
-        httpDestroyClient(http->client);
-    }
+    curl_easy_cleanup(http->curl);
+
     http->used = 0;
 }
 
@@ -1482,8 +1305,7 @@ void pkgi_rm(const char* file)
     if (stat(file, &sb) == 0) {
         LOG("removing file %s", file);
 
-        int err = sysFsUnlink(file);
-        //int err = remove(file);
+        int err = unlink(file);
         if (err < 0)
         {
             LOG("error removing %s file, err=0x%08x", err);
@@ -1586,30 +1408,10 @@ void pkgi_close(void* f)
     }
 }
 
-void pkgi_curl_init(CURL *curl)
-{
-    // Set user agent string
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, PKGI_USER_AGENT);
-    // don't verify the certificate's name against host
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
-    // don't verify the peer's SSL certificate
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
-    // Set SSL VERSION to TLS 1.2
-    curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
-    // Set timeout for the connection to build
-    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 10L);
-    // Follow redirects
-    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-    // maximum number of redirects allowed
-    curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 20L);
-    // Fail the request if the HTTP code returned is equal to or larger than 400
-    curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
-}
-
-static size_t curl_WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
+static size_t curl_write_memory(void *contents, size_t size, size_t nmemb, void *userp)
 {
     size_t realsize = size * nmemb;
-    struct curl_MemoryStruct *mem = (struct curl_MemoryStruct *)userp;
+    curl_memory_t *mem = (curl_memory_t *)userp;
 
     char *ptr = realloc(mem->memory, mem->size + realsize + 1);
     if(!ptr)
@@ -1631,7 +1433,7 @@ char * pkgi_http_download_buffer(const char* url, uint32_t* buf_size)
 {
     CURL *curl;
     CURLcode res;
-    struct curl_MemoryStruct chunk;
+    curl_memory_t chunk;
 
     curl = curl_easy_init();
     if(!curl)
@@ -1647,14 +1449,12 @@ char * pkgi_http_download_buffer(const char* url, uint32_t* buf_size)
     curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
     // The function that will be used to write the data
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_WriteMemoryCallback);
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write_memory);
     // The data file descriptor which will be written to
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
 
     // Perform the request
     res = curl_easy_perform(curl);
-//    long httpresponsecode = 0;
-//    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpresponsecode);
 
     if(res != CURLE_OK)
     {

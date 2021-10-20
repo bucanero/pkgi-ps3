@@ -105,7 +105,7 @@ typedef struct pkgi_http pkgi_http;
 int pkgi_validate_url(const char* url);
 pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset);
 int pkgi_http_response_length(pkgi_http* http, int64_t* length);
-int pkgi_http_read(pkgi_http* http, void* buffer, uint32_t size);
+int pkgi_http_read(pkgi_http* http, void* write_func, void* xferinfo_func);
 void pkgi_http_close(pkgi_http* http);
 
 int pkgi_mkdirs(const char* path);

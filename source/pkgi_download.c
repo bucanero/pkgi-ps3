@@ -41,9 +41,6 @@ static char item_name[256]; // current file name
 static char item_path[256]; // current file path
 
 
-// temporary buffer for downloads
-static uint8_t down[64 * 1024];
-
 // pkg header
 static uint64_t total_size;
 
@@ -203,7 +200,7 @@ int create_install_pdb_files(const char *path, uint64_t size)
 	pkgi_close(fp2);
 
 	pkgi_snprintf(temp_buffer, sizeof(temp_buffer), "%s/%s", path, "f0.pdb");
-	pkgi_save(temp_buffer, down, 0);
+	pkgi_save(temp_buffer, temp_buffer, 0);
 
     return 1;
 }
@@ -227,9 +224,12 @@ static void calculate_eta(uint32_t speed)
     }
 }
 
-static void update_progress(void)
+/* follow the CURLOPT_XFERINFOFUNCTION callback definition */
+static int update_progress(void *p, int64_t dltotal, int64_t dlnow, int64_t ultotal, int64_t ulnow)
 {
     uint32_t info_now = pkgi_time_msec();
+    download_offset = initial_offset + dlnow;
+
     if (info_now >= info_update)
     {
         char text[256];
@@ -275,6 +275,21 @@ static void update_progress(void)
         pkgi_dialog_update_progress(text, dialog_extra, dialog_eta, percent);
         info_update = info_now + 500;
     }
+
+    return (pkgi_dialog_is_cancelled());
+}
+
+static size_t write_verify_data(void *buffer, size_t size, size_t nmemb, void *stream)
+{
+    size_t realsize = size * nmemb;
+
+    if (pkgi_write(item_file, buffer, realsize))
+    {
+        sha256_update(&sha, buffer, realsize);
+        return (realsize);
+    }
+
+    return 0;
 }
 
 static int create_dummy_pkg(void)
@@ -372,16 +387,8 @@ static void download_start(void)
     pkgi_dialog_set_progress_title(_("Downloading..."));
 }
 
-static int download_data(uint8_t* buffer, uint32_t size, int save)
+static int download_data(void)
 {
-    if (pkgi_dialog_is_cancelled())
-    {
-        pkgi_save(resume_file, &sha, sizeof(sha));
-        return 0;
-    }
-
-    update_progress();
-
     if (!http)
     {
         initial_offset = download_offset;
@@ -405,11 +412,12 @@ static int download_data(uint8_t* buffer, uint32_t size, int save)
             return 0;
         }
 
-        download_size = http_length + download_offset;
+        download_size = http_length;
         total_size = download_size;
 
         if (!pkgi_check_free_space(http_length))
         {
+            LOG("error! out of space");
             return 0;
         }
 
@@ -417,38 +425,19 @@ static int download_data(uint8_t* buffer, uint32_t size, int save)
         info_start = pkgi_time_msec();
         info_update = pkgi_time_msec() + 500;
     }
-        
-    int read = pkgi_http_read(http, buffer, size);
-    if (read < 0)
-    {
-        char error[256];
-        pkgi_snprintf(error, sizeof(error), "%s 0x%08x", _("HTTP download error"), read);
-        pkgi_dialog_error(error);
-        pkgi_save(resume_file, &sha, sizeof(sha));
-        return -1;
-    }
-    else if (read == 0)
-    {
-        pkgi_dialog_error(_("HTTP connection closed"));
-        pkgi_save(resume_file, &sha, sizeof(sha));
-        return -1;
-    }
-    download_offset += read;
 
-    sha256_update(&sha, buffer, read);
-
-    if (save)
+    if (!pkgi_http_read(http, &write_verify_data, &update_progress))
     {
-        if (!pkgi_write(item_file, buffer, read))
+        pkgi_save(resume_file, &sha, sizeof(sha));
+
+        if (!pkgi_dialog_is_cancelled())
         {
-            char error[256];
-            pkgi_snprintf(error, sizeof(error), "%s %s", _("failed to write to"), item_path);
-            pkgi_dialog_error(error);
-            return -1;
+            pkgi_dialog_error(_("HTTP download error"));
         }
+        return 0;
     }
-    
-    return read;
+
+    return 1;
 }
 
 // this includes creating of all the parent folders necessary to actually create file
@@ -515,18 +504,7 @@ static int download_pkg_file(void)
         if (!create_file()) goto bail;
     }
 
-    total_size = sizeof(down);//download_size;
-//    while (size > 0)
-    while (download_offset != total_size)
-    {
-        uint32_t read = (uint32_t)min64(sizeof(down), total_size - download_offset);
-        int size = download_data(down, read, 1);
-        
-        if (size <= 0)
-        {
-            goto bail;
-        }
-    }
+    if (!download_data()) goto bail;
 
     LOG("%s downloaded", item_path);
     result = 1;
@@ -742,6 +720,7 @@ int pkgi_download_icon(const char* content)
     char icon_url[256];
     char icon_file[256];
     uint8_t hmac[20];
+    uint32_t sz;
 
     pkgi_snprintf(icon_file, sizeof(icon_file), PKGI_TMP_FOLDER "/%.9s.PNG", content + 7);
     LOG("package icon file: %s", icon_file);
@@ -758,47 +737,25 @@ int pkgi_download_icon(const char* content)
         ((uint64_t*)hmac)[1], 
         ((uint32_t*)hmac)[4]);
 
-    pkgi_http* http = pkgi_http_get(icon_url, NULL, 0);
-    if (!http)
+    char * buffer = pkgi_http_download_buffer(icon_url, &sz);
+
+    if (!buffer)
     {
         LOG("http request to %s failed", icon_url);
         return pkgi_save(icon_file, iconfile_data, iconfile_data_size);
     }
 
-    int64_t sz;
-    if (!pkgi_http_response_length(http, &sz))
+    if (!sz)
     {
         LOG("icon not found, using default");
-        pkgi_http_close(http);
+        free(buffer);
         return pkgi_save(icon_file, iconfile_data, iconfile_data_size);
     }
 
-    uint32_t size = 0;
-    void* f = pkgi_create(icon_file);
+    LOG("received %u bytes", sz);
 
-    while (size < sz)
-    {
-        int read = pkgi_http_read(http, down, sizeof(down));
-        if (read < 0)
-        {
-            size = 0;
-            break;
-        }
-        else if (read == 0)
-        {
-            break;
-        }
-        pkgi_write(f, down, read);
-        size += read;
-    }
-
-    if (size != 0)
-    {
-        LOG("received %u bytes", size);
-    }
-
-    pkgi_close(f);
-    pkgi_http_close(http);
+    pkgi_save(icon_file, buffer, sz);
+    free(buffer);
 
     return 1;
 }
