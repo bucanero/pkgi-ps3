@@ -35,7 +35,7 @@ msgstr "Download conclu¡do"
 
 #: pkgi.c:122
 msgid "Task successfully queued (reboot to start)"
-msgstr "Adicionado a fila com sucesso (reinicie para começar)"
+msgstr "Adicionado a fila com sucesso (reinicie para come‡ar)"
 
 #: pkgi.c:163
 msgid "GB"
