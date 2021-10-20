@@ -15,7 +15,9 @@ msgstr ""
 "X-Poedit-Flags-xgettext: --add-comments\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: _\n"
-"X-Poedit-SearchPath-0: .\n"#: pkgi.c:82
+"X-Poedit-SearchPath-0: .\n"
+
+#: pkgi.c:82
 msgid "Installing"
 msgstr "Installazione in corso"
 
@@ -223,7 +225,6 @@ msgstr "Indietro"
 msgid "press %s to close"
 msgstr "Premi %s per chiudere"
 
-#. 00000069 - Display title
 #: pkgi_download.c:183
 msgid "Install"
 msgstr "Installa"
