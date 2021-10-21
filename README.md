@@ -19,6 +19,7 @@ The `pkgi-ps3` homebrew app allows to download and install `.pkg` files directly
 * **resumes interrupted downloads:** you can stop a download at any time, switch applications, and come back to resume the download later.
 * **content activation:** the app can generate `.rif` files for downloaded content (system must be activated)
 * **content updates:** the app can check online for available content updates
+* **localization support:** French, German, Italian, Polish, Portuguese, Spanish, Turkish
 
 ### Notes:
 * **queuing** up multiple downloads is only supported when using `background download` mode.
@@ -34,8 +35,8 @@ See the [latest changes here](CHANGELOG.md).
 
 # Setup instructions
 
-You need to create a `pkgi.txt` file in `/dev_hdd0/game/NP00PKGI3/USRDIR` that contains the items available for installation.
-The text database format is user customizable. Check [this section](#user-defined-db-format) to learn how to define your own custom db format.
+You need to create a [`pkgi.txt`](#sample-db-file) file in `/dev_hdd0/game/NP00PKGI3/USRDIR` that contains the items available for installation.
+The text database format is user customizable. Check [this section](#user-defined-db-format) to learn how to define your own custom DB format.
 
 ## Multiple databases
 
@@ -90,13 +91,16 @@ where:
 | `name` | is a string for the item's name.
 | `description` | is a string for the item's description.
 | `rap` | the 16 hex bytes for a RAP file, if needed by the item (`.rap` files will be created on `/dev_hdd0/exdata`). Leave empty to skip the `.rap` file.
-| `url` | is the HTTP/HTTPS URL where to download the `.pkg`.
+| `url` | is the HTTP/HTTPS/FTP/FTPS URL where to download the `.pkg` file.
 | `size` | is the size in bytes of the `.pkg` file, or 0 if unknown.
 | `checksum` | is a SHA256 digest of the `.pkg` file (as 32 hex bytes) to make sure the file is not tampered with. Leave empty to skip the check.
 
 **Note:** `name` and `description` cannot contain newlines or commas.
 
-An example `pkgi.txt` file:
+### Sample DB file
+
+An example `pkgi.txt` file following the `contentid,type,name,description,rap,url,size,checksum` format:
+
 ```
 EP0001-FILEMANAG_00-0000000000000000,8,FileManager v1.40,File Manager,,http://github.com/Zarh/ManaGunZ/releases/download/1.40/FileManager_v1.40.pkg,12171120,FAF680636B18AD0B70AA61F48A78C5E42D6972F795F1B82CC434BE3DDE60F00F
 UP0001-IRISMAN00_00-VER4880000000000,8,IRISMAN 4.88.1,Backup Manager,,http://github.com/aldostools/IRISMAN/releases/download/4.88/IRISMAN_4.88.pkg,29411984,E6EF607F0002B31BFB148BE4FC9BDBACB4E53110751F0E667C701D40B5290570
