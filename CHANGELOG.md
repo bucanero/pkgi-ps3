@@ -4,6 +4,23 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 ## [Unreleased]()
 
+## [v1.2.2](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.2.2) - 2021-10-22
+
+### Added
+
+* Migrated all networking code to `libcurl`
+* Support for HTTP, HTTPS, FTP, FTPS links with TLS v1.2
+* French translation
+* German translation
+* Italian translation
+* Polish translation
+* Portuguese translation
+* Turkish translation
+
+### Fixed
+
+* Crash when item list is empty
+
 ## [v1.2.0](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.2.0) - 2021-10-09
 
 ### Added
@@ -13,6 +30,7 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 * Spanish translation
 * Online scan for available content updates
 * Support for TLS v1.2 using newer libcurl+polarSSL
+* UI: use customized dialogs
 
 ## [v1.1.8](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.1.8) - 2020-12-08
 
@@ -30,7 +48,7 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 ### Added
 
-* Generate .rif files when downloading items (system must be activated)
+* Generate `.rif` files when downloading items (system must be activated)
 * Improved speed when creating empty files in background download mode
 * Enter button detection (`cross`/`circle`)
 

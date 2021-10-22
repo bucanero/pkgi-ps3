@@ -19,6 +19,7 @@ The `pkgi-ps3` homebrew app allows to download and install `.pkg` files directly
 * **resumes interrupted downloads:** you can stop a download at any time, switch applications, and come back to resume the download later.
 * **content activation:** the app can generate `.rif` files for downloaded content (system must be activated)
 * **content updates:** the app can check online for available content updates
+* **localization support:** French, German, Italian, Polish, Portuguese, Spanish, Turkish
 
 ### Notes:
 * **queuing** up multiple downloads is only supported when using `background download` mode.
@@ -34,8 +35,8 @@ See the [latest changes here](https://github.com/bucanero/pkgi-ps3/blob/master/C
 
 # Setup instructions
 
-You need to create a `pkgi.txt` file in `/dev_hdd0/game/NP00PKGI3/USRDIR` that contains the items available for installation.
-The text database format is user customizable. Check [this section](#user-defined-db-format) to learn how to define your own custom db format.
+You need to create a [`pkgi.txt`](#sample-db-file) file in `/dev_hdd0/game/NP00PKGI3/USRDIR` that contains the items available for installation.
+The text database format is user customizable. Check [this section](#user-defined-db-format) to learn how to define your own custom DB format.
 
 ## Multiple databases
 
@@ -90,16 +91,22 @@ where:
 | `name` | is a string for the item's name.
 | `description` | is a string for the item's description.
 | `rap` | the 16 hex bytes for a RAP file, if needed by the item (`.rap` files will be created on `/dev_hdd0/exdata`). Leave empty to skip the `.rap` file.
-| `url` | is the HTTP/HTTPS URL where to download the `.pkg`.
+| `url` | is the HTTP/HTTPS/FTP/FTPS URL where to download the `.pkg` file.
 | `size` | is the size in bytes of the `.pkg` file, or 0 if unknown.
 | `checksum` | is a SHA256 digest of the `.pkg` file (as 32 hex bytes) to make sure the file is not tampered with. Leave empty to skip the check.
 
 **Note:** `name` and `description` cannot contain newlines or commas.
 
-An example `pkgi.txt` file:
+### Sample DB file
+
+An example `pkgi.txt` file following the `contentid,type,name,description,rap,url,size,checksum` format:
+
 ```
-EP0000-NP9999999_00-0AB00A00FR000000,0,My PKG Test,A description of my pkg,dac109e963294de6cd6f6faf3f045fe9,http://192.168.1.1/html/mypackage.pkg,2715513,afb545c6e71bd95f77994ab4a659efbb8df32208f601214156ad89b1922e73c3
-UP0001-NP00PKGI3_00-0000000000000000,0,PKGi PS3 v0.1.0,,,http://bucanero.heliohost.org/pkgi.pkg,284848,3dc8de2ed94c0f9efeafa81df9b7d58f8c169e2875133d6d2649a7d477c1ae13
+EP0001-FILEMANAG_00-0000000000000000,8,FileManager v1.40,File Manager,,http://github.com/Zarh/ManaGunZ/releases/download/1.40/FileManager_v1.40.pkg,12171120,FAF680636B18AD0B70AA61F48A78C5E42D6972F795F1B82CC434BE3DDE60F00F
+UP0001-IRISMAN00_00-VER4880000000000,8,IRISMAN 4.88.1,Backup Manager,,http://github.com/aldostools/IRISMAN/releases/download/4.88/IRISMAN_4.88.pkg,29411984,E6EF607F0002B31BFB148BE4FC9BDBACB4E53110751F0E667C701D40B5290570
+EP0001-MANAGUNZ0_00-0000000000000000,8,ManaGunZ v1.40,Backup Manager,,http://github.com/Zarh/ManaGunZ/releases/download/1.40/ManaGunZ_v1.40.pkg,17563040,CE0E4036903E881C08259FD69E777F6BC9CD24E823B471A7B15C88FDDBB2E330
+UP0001-PS3SFM001_00-0000000000000000,8,Simple file manager v0.5.2,File Manager,,http://github.com/lmirel/fm_psx/releases/download/v0.5.2/sfm_ps3.pkg,1098800,301F64CC94E9BC442FDAC9199BFB8153AC2430A5E47331C6CF8A25B7881648A6
+EP0001-UPDWEBMOD_00-0000000000000000,9,webMAN MOD v1.47.36,Backup Manager,,http://github.com/aldostools/webMAN-MOD/releases/download/1.47.36/webMAN_MOD_1.47.36_Installer.pkg,13580448,
 ```
 ### Content types
 
