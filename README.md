@@ -19,7 +19,7 @@ The `pkgi-ps3` homebrew app allows to download and install `.pkg` files directly
 * **resumes interrupted downloads:** you can stop a download at any time, switch applications, and come back to resume the download later.
 * **content activation:** the app can generate `.rif` files for downloaded content (system must be activated)
 * **content updates:** the app can check online for available content updates
-* **localization support:** French, German, Italian, Polish, Portuguese, Spanish, Turkish
+* **localization support:** Finnish, French, German, Italian, Polish, Portuguese, Spanish, Turkish
 
 ### Notes:
 * **queuing** up multiple downloads is only supported when using `background download` mode.

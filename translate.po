@@ -225,7 +225,6 @@ msgstr ""
 msgid "press %s to close"
 msgstr ""
 
-#. 00000069 - Display title
 #: pkgi_download.c:183
 msgid "Install"
 msgstr ""

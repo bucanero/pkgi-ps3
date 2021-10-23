@@ -27,7 +27,7 @@ msgstr "Odota hetki..."
 
 #: pkgi.c:94
 msgid "Installation failed"
-msgstr "Asennus ep√§onnistui"
+msgstr "Asennus epÑonnistui"
 
 #: pkgi.c:118
 msgid "Successfully downloaded"
@@ -35,7 +35,7 @@ msgstr "Onnistuneesti ladattu"
 
 #: pkgi.c:122
 msgid "Task successfully queued (reboot to start)"
-msgstr "Teht√§v√§ onnistuneesti jonossa (k√§ynnist√§ uudelleen aloittaaksesi)"
+msgstr "TehtÑvÑ onnistuneesti jonossa (kÑynnistÑ uudelleen aloittaaksesi)"
 
 #: pkgi.c:163
 msgid "GB"
@@ -84,7 +84,7 @@ msgstr "Demot"
 
 #: pkgi.c:231 pkgi_menu.c:118 pkgi_menu.c:127
 msgid "Updates"
-msgstr "P√§ivitykset"
+msgstr "PÑivitykset"
 
 #: pkgi.c:232 pkgi_menu.c:128
 msgid "Emulators"
@@ -96,7 +96,7 @@ msgstr "Sovellukset"
 
 #: pkgi.c:234 pkgi_menu.c:130
 msgid "Tools"
-msgstr "Ty√∂kalut"
+msgstr "Tyîkalut"
 
 #: pkgi.c:235
 msgid "Unknown"
@@ -124,11 +124,11 @@ msgstr "Valmistelee..."
 
 #: pkgi.c:504 pkgi.c:508
 msgid "Refreshing"
-msgstr "P√§ivitt√§√§"
+msgstr "PÑivittÑÑ"
 
 #: pkgi.c:563 pkgi.c:567
 msgid "Count"
-msgstr "M√§√§r√§"
+msgstr "MÑÑrÑ"
 
 #: pkgi.c:575
 msgid "Free"
@@ -164,7 +164,7 @@ msgstr "Poistu"
 
 #: pkgi.c:678
 msgid "Successfully downloaded PKGi PS3 update"
-msgstr "Onnistuneesti ladattu PKGi PS3 p√§ivitys"
+msgstr "Onnistuneesti ladattu PKGi PS3 pÑivitys"
 
 #: pkgi.c:1051
 msgid "Search"
@@ -172,7 +172,7 @@ msgstr "Haku"
 
 #: pkgi_db.c:145 pkgi_db.c:153
 msgid "failed to download list from"
-msgstr "lataus listan lataaminen ep√§onnistui paikasta"
+msgstr "lataus listan lataaminen epÑonnistui paikasta"
 
 #: pkgi_db.c:159
 msgid "list is too large... tarkista onko uudempaa pkgi versiota!"
@@ -180,7 +180,7 @@ msgstr "lista on liian suuri... "
 
 #: pkgi_db.c:187
 msgid "list is empty... check the DB server"
-msgstr "lista on tyhj√§... tarkista tietokanta palvelimelta"
+msgstr "lista on tyhjÑ... tarkista tietokanta palvelimelta"
 
 #: pkgi_db.c:390
 msgid "ERROR: pkgi.txt file(s) missing or bad config.txt file"
@@ -188,7 +188,7 @@ msgstr "VIRHE: pkgi.txt tiedosto(t) puuttuu tai huono config.txt"
 
 #: pkgi_dialog.c:80
 msgid "Content"
-msgstr "Sis√§lt√∂"
+msgstr "SisÑltî"
 
 #: pkgi_dialog.c:108
 msgid "ERROR"
@@ -196,11 +196,11 @@ msgstr "VIRHE"
 
 #: pkgi_dialog.c:169
 msgid "Failed to download the update list"
-msgstr "P√§ivitys listan lataaminen ep√§onnistui"
+msgstr "PÑivitys listan lataaminen epÑonnistui"
 
 #: pkgi_dialog.c:174
 msgid "update(s) loaded"
-msgstr "p√§ivitys(ksi√§) ladattu"
+msgstr "pÑivitys(ksiÑ) ladattu"
 
 #: pkgi_dialog.c:319
 #, c-format
@@ -210,11 +210,11 @@ msgstr "paina %s peruuttaaksesi"
 #: pkgi_dialog.c:333
 #, c-format
 msgid "press %s to close - %s to scan updates"
-msgstr "paina %s sulkeaksesi - %s tarkistaaksesi p√§ivitykset"
+msgstr "paina %s sulkeaksesi - %s tarkistaaksesi pÑivitykset"
 
 #: pkgi_dialog.c:365
 msgid "Enter"
-msgstr "Menn√§"
+msgstr "MennÑ"
 
 #: pkgi_dialog.c:365
 msgid "Back"
@@ -225,7 +225,6 @@ msgstr "Takaisin"
 msgid "press %s to close"
 msgstr "paina %s sulkeaksesi"
 
-#. 00000069 - Display title
 #: pkgi_download.c:183
 msgid "Install"
 msgstr "Asenna"
@@ -236,11 +235,11 @@ msgstr "Arvio"
 
 #: pkgi_download.c:310 pkgi_download.c:392
 msgid "Could not send HTTP request"
-msgstr "Ei voitu l√§hettt√§√§ HTTP pyynt√∂√§"
+msgstr "Ei voitu lÑhetttÑÑ HTTP pyyntîÑ"
 
 #: pkgi_download.c:317 pkgi_download.c:399
 msgid "HTTP request failed"
-msgstr "HTTP pyynt√∂ ep√§onnistui"
+msgstr "HTTP pyyntî epÑonnistui"
 
 #: pkgi_download.c:322 pkgi_download.c:404
 msgid "HTTP response has unknown length"
@@ -248,15 +247,15 @@ msgstr "HTTP vastauksen pituus tuntematon"
 
 #: pkgi_download.c:331
 msgid "Not enough free space on HDD"
-msgstr "Ei tarpeeksi tallennustilaa HDD:ll√§"
+msgstr "Ei tarpeeksi tallennustilaa HDD:llÑ"
 
 #: pkgi_download.c:340
 msgid "Could not create task directory on HDD."
-msgstr "Ei voitu luoda teht√§v√§ kansiota HDD:lle"
+msgstr "Ei voitu luoda tehtÑvÑ kansiota HDD:lle"
 
 #: pkgi_download.c:348
 msgid "Saving background task..."
-msgstr "Tallennetaan tausta teht√§v√§√§"
+msgstr "Tallennetaan tausta tehtÑvÑÑ"
 
 #: pkgi_download.c:354
 msgid "Could not create PKG file to HDD."
@@ -264,7 +263,7 @@ msgstr "Ei voitu luoda PKG tiedostoa HDD:lle"
 
 #: pkgi_download.c:360
 msgid "Could not create task files to HDD."
-msgstr "Ei voitu luoda teht√§v√§ tiedostoja HDD:lle"
+msgstr "Ei voitu luoda tehtÑvÑ tiedostoja HDD:lle"
 
 #: pkgi_download.c:425
 msgid "HTTP download error"
@@ -276,7 +275,7 @@ msgstr "HTTP yhteys suljettu"
 
 #: pkgi_download.c:445
 msgid "failed to write to"
-msgstr "kirjoittaminen ep√§onnistui sijaintiin"
+msgstr "kirjoittaminen epÑonnistui sijaintiin"
 
 #: pkgi_download.c:465
 msgid "cannot create folder"
@@ -292,7 +291,7 @@ msgstr "ei voida jatkaa tiedostoa"
 
 #: pkgi_download.c:562
 msgid "pkg integrity failed, try downloading again"
-msgstr "pkg:n yhten√§isyys ep√§onnistui, yrit√§ ladata uudelleen"
+msgstr "pkg:n yhtenÑisyys epÑonnistui, yritÑ ladata uudelleen"
 
 #: pkgi_download.c:573
 msgid "Creating RAP file"
@@ -312,7 +311,7 @@ msgstr "Jatketaan."
 
 #: pkgi_download.c:652
 msgid "Adding background task..."
-msgstr "Lis√§t√§√§n tausta teht√§v√§√§..."
+msgstr "LisÑtÑÑn tausta tehtÑvÑÑ..."
 
 #: pkgi_download.c:675
 msgid "Downloading icon"
@@ -328,7 +327,7 @@ msgstr "Haku..."
 
 #: pkgi_menu.c:103
 msgid "Sort by:"
-msgstr "J√§rjest√§"
+msgstr "JÑrjestÑ"
 
 #: pkgi_menu.c:104
 msgid "Title"
@@ -348,7 +347,7 @@ msgstr "Koko"
 
 #: pkgi_menu.c:108
 msgid "Content:"
-msgstr "Sis√§lt√∂:"
+msgstr "SisÑltî:"
 
 #: pkgi_menu.c:110
 msgid "Regions:"
@@ -384,7 +383,7 @@ msgstr "Musiikki"
 
 #: pkgi_menu.c:119
 msgid "Refresh..."
-msgstr "P√§ivit√§..."
+msgstr "PÑivitÑ..."
 
 #: pkgi_menu.c:326
 msgid "Direct DL"

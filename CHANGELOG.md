@@ -10,6 +10,7 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 * Migrated all networking code to `libcurl`
 * Support for HTTP, HTTPS, FTP, FTPS links with TLS v1.2
+* Finnish translation
 * French translation
 * German translation
 * Italian translation
