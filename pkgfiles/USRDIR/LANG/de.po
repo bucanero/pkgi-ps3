@@ -64,7 +64,7 @@ msgstr "Alles"
 
 #: pkgi.c:226 pkgi_menu.c:122
 msgid "Games"
-msgstr ""
+msgstr "Spiele"
 
 #: pkgi.c:227 pkgi_menu.c:123
 msgid "DLCs"
@@ -76,7 +76,7 @@ msgstr "Designs"
 
 #: pkgi.c:229 pkgi_menu.c:125
 msgid "Avatars"
-msgstr ""
+msgstr "Avatare"
 
 #: pkgi.c:230 pkgi_menu.c:126
 msgid "Demos"
@@ -128,7 +128,7 @@ msgstr "Aktualisieren"
 
 #: pkgi.c:563 pkgi.c:567
 msgid "Count"
-msgstr ""
+msgstr "ZÑhler"
 
 #: pkgi.c:575
 msgid "Free"
@@ -160,7 +160,7 @@ msgstr ""
 
 #: pkgi.c:589
 msgid "Exit"
-msgstr ""
+msgstr "Ausgang"
 
 #: pkgi.c:678
 msgid "Successfully downloaded PKGi PS3 update"
@@ -225,7 +225,6 @@ msgstr "ZurÅck"
 msgid "press %s to close"
 msgstr "drÅcke %s zum schliessen"
 
-#. 00000069 - Display title
 #: pkgi_download.c:183
 msgid "Install"
 msgstr "Installiere"
@@ -352,7 +351,7 @@ msgstr "Inhalt:"
 
 #: pkgi_menu.c:110
 msgid "Regions:"
-msgstr ""
+msgstr "Regionen:"
 
 #: pkgi_menu.c:111
 msgid "Asia"
@@ -360,7 +359,7 @@ msgstr "Asien"
 
 #: pkgi_menu.c:112
 msgid "Europe"
-msgstr ""
+msgstr "Europa"
 
 #: pkgi_menu.c:113
 msgid "Japan"
