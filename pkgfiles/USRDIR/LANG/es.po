@@ -27,11 +27,11 @@ msgstr "Por favor espere..."
 
 #: pkgi.c:94
 msgid "Installation failed"
-msgstr "Error en la instalaci¢n"
+msgstr "Error en la instalaci√≥n"
 
 #: pkgi.c:118
 msgid "Successfully downloaded"
-msgstr "Descarga exitosa"
+msgstr "Descarga correcta"
 
 #: pkgi.c:122
 msgid "Task successfully queued (reboot to start)"
@@ -56,7 +56,7 @@ msgstr ""
 #: pkgi.c:185
 #, c-format
 msgid "pkg requires %u %s free space, but only %u %s available"
-msgstr "pkg requiere %u %s espacio libre, pero solo %u %s disponible"
+msgstr "pkg requiere de %u %s espacio libre, pero s√≥lo hay %u %s disponible"
 
 #: pkgi.c:225 pkgi_menu.c:109 pkgi_menu.c:121
 msgid "All"
@@ -108,11 +108,11 @@ msgstr "Salir al XMB?"
 
 #: pkgi.c:436
 msgid "No items!"
-msgstr "No hay °tems!"
+msgstr "No hay items!"
 
 #: pkgi.c:462
 msgid "Item already installed, download again?"
-msgstr "Item ya instalado, descargar nuevamente?"
+msgstr "Item ya instalado, ¬ødescargar nuevamente?"
 
 #: pkgi.c:471 pkgi_download.c:372 pkgi_download.c:652
 msgid "Downloading..."
@@ -136,7 +136,7 @@ msgstr "Libre"
 
 #: pkgi.c:585
 msgid "Select"
-msgstr "Selecci¢n"
+msgstr "Selecci√≥n"
 
 #: pkgi.c:585
 msgid "Close"
@@ -152,7 +152,7 @@ msgstr "Descargar"
 
 #: pkgi.c:589
 msgid "Menu"
-msgstr "Men£"
+msgstr "Men√∫"
 
 #: pkgi.c:589
 msgid "Details"
@@ -164,7 +164,7 @@ msgstr "Salir"
 
 #: pkgi.c:678
 msgid "Successfully downloaded PKGi PS3 update"
-msgstr "Actualizaci¢n de PKGi PS3 descargada"
+msgstr "Actualizaci√≥n de PKGi PS3 descargada"
 
 #: pkgi.c:1051
 msgid "Search"
@@ -176,11 +176,11 @@ msgstr "Error al descargar la lista desde"
 
 #: pkgi_db.c:159
 msgid "list is too large... check for newer pkgi version!"
-msgstr "lista demasiado grande... verificar nueva versi¢n de pkgi"
+msgstr "lista demasiado grande... comprobar si hay una nueva versi√≥n de pkgi"
 
 #: pkgi_db.c:187
 msgid "list is empty... check the DB server"
-msgstr "lista vac°a... revisar el servidor DB"
+msgstr "lista vac√≠a... revisar el servidor DB"
 
 #: pkgi_db.c:390
 msgid "ERROR: pkgi.txt file(s) missing or bad config.txt file"
@@ -244,7 +244,7 @@ msgstr "Fallo de solicitud HTTP"
 
 #: pkgi_download.c:322 pkgi_download.c:404
 msgid "HTTP response has unknown length"
-msgstr "Respuesta HTTP de tama§o desconocido"
+msgstr "Respuesta HTTP de tama√±o desconocido"
 
 #: pkgi_download.c:331
 msgid "Not enough free space on HDD"
@@ -272,7 +272,7 @@ msgstr "Error de descarga HTTP"
 
 #: pkgi_download.c:432
 msgid "HTTP connection closed"
-msgstr "Conexi¢n HTTP cerrada"
+msgstr "Conexi√≥n HTTP cerrada"
 
 #: pkgi_download.c:445
 msgid "failed to write to"
@@ -320,7 +320,7 @@ msgstr "Descargando icono"
 
 #: pkgi_download.c:713
 msgid "Could not create install directory on HDD."
-msgstr "No se puede crear carpeta de instalaci¢n en el disco"
+msgstr "No se puede crear carpeta de instalaci√≥n en el disco"
 
 #: pkgi_menu.c:102
 msgid "Search..."
@@ -332,11 +332,11 @@ msgstr "Ordenar por:"
 
 #: pkgi_menu.c:104
 msgid "Title"
-msgstr "T°tulo"
+msgstr "T√≠tulo"
 
 #: pkgi_menu.c:105
 msgid "Region"
-msgstr "Regi¢n"
+msgstr "Regi√≥n"
 
 #: pkgi_menu.c:106
 msgid "Name"
@@ -344,7 +344,7 @@ msgstr "Nombre"
 
 #: pkgi_menu.c:107
 msgid "Size"
-msgstr "Tama§o"
+msgstr "Tama√±o"
 
 #: pkgi_menu.c:108
 msgid "Content:"
@@ -364,7 +364,7 @@ msgstr "Europa"
 
 #: pkgi_menu.c:113
 msgid "Japan"
-msgstr "Jap¢n"
+msgstr "Jap√≥n"
 
 #: pkgi_menu.c:114
 msgid "USA"
@@ -380,7 +380,7 @@ msgstr "2do plano"
 
 #: pkgi_menu.c:117
 msgid "Music"
-msgstr "M£sica"
+msgstr "M√∫sica"
 
 #: pkgi_menu.c:119
 msgid "Refresh..."
@@ -388,7 +388,7 @@ msgstr "Actualizar..."
 
 #: pkgi_menu.c:326
 msgid "Direct DL"
-msgstr "DL directo"
+msgstr "Descarga directa"
 
 #msgid "---translated by---"
 #msgstr "bucanero"
