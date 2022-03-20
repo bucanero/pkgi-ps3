@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PKGi PS3\n"
 "POT-Creation-Date: 2021-10-09 19:00-0300\n"
 "PO-Revision-Date: 2021-10-09 19:00-0300\n"
-"Last-Translator: Algol\n"
+"Last-Translator: Croden1999\n"
 "Language-Team: \n"
 "Language: zh\n"
 "MIME-Version: 1.0\n"
@@ -19,23 +19,23 @@ msgstr ""
 
 #: pkgi.c:82
 msgid "Installing"
-msgstr "°²×°ÖĞ"
+msgstr "å®‰è£…ä¸­"
 
 #: pkgi.c:82
 msgid "Please wait..."
-msgstr "ÇëÉÔµÈ..."
+msgstr "è¯·ç¨ç­‰..."
 
 #: pkgi.c:94
 msgid "Installation failed"
-msgstr "°²×°Ê§°Ü"
+msgstr "å®‰è£…å¤±è´¥"
 
 #: pkgi.c:118
 msgid "Successfully downloaded"
-msgstr "ÏÂÔØÍê³É"
+msgstr "ä¸‹è½½å®Œæˆ"
 
 #: pkgi.c:122
 msgid "Task successfully queued (reboot to start)"
-msgstr "ÈÎÎñÒÑ³É¹¦ÅÅ¶Ó(ÖØÆô¿ªÊ¼)"
+msgstr "ä»»åŠ¡å·²æˆåŠŸæ’é˜Ÿ(é‡å¯å¼€å§‹)"
 
 #: pkgi.c:163
 msgid "GB"
@@ -56,178 +56,178 @@ msgstr ""
 #: pkgi.c:185
 #, c-format
 msgid "pkg requires %u %s free space, but only %u %s available"
-msgstr "pkgĞèÒª%u %sÊ£Óà¿Õ¼ä, µ«Ö»ÓĞ%u %s¿ÉÓÃ"
+msgstr "pkgéœ€è¦%u %så‰©ä½™ç©ºé—´, ä½†åªæœ‰%u %så¯ç”¨"
 
 #: pkgi.c:225 pkgi_menu.c:109 pkgi_menu.c:121
 msgid "All"
-msgstr "È«²¿"
+msgstr "å…¨éƒ¨"
 
 #: pkgi.c:226 pkgi_menu.c:122
 msgid "Games"
-msgstr "ÓÎÏ·"
+msgstr "æ¸¸æˆ"
 
 #: pkgi.c:227 pkgi_menu.c:123
 msgid "DLCs"
-msgstr "×·¼ÓÄÚÈİ"
+msgstr "è¿½åŠ å†…å®¹"
 
 #: pkgi.c:228 pkgi_menu.c:124
 msgid "Themes"
-msgstr "Ö÷Ìâ"
+msgstr "ä¸»é¢˜"
 
 #: pkgi.c:229 pkgi_menu.c:125
 msgid "Avatars"
-msgstr "Í·Ïñ"
+msgstr "å¤´åƒ"
 
 #: pkgi.c:230 pkgi_menu.c:126
 msgid "Demos"
-msgstr "ÊÔÍæ"
+msgstr "è¯•ç©"
 
 #: pkgi.c:231 pkgi_menu.c:118 pkgi_menu.c:127
 msgid "Updates"
-msgstr "¸üĞÂ"
+msgstr "æ›´æ–°"
 
 #: pkgi.c:232 pkgi_menu.c:128
 msgid "Emulators"
-msgstr "Ä£ÄâÆ÷"
+msgstr "æ¨¡æ‹Ÿå™¨"
 
 #: pkgi.c:233 pkgi_menu.c:129
 msgid "Apps"
-msgstr "Ó¦ÓÃ³ÌĞò"
+msgstr "åº”ç”¨ç¨‹åº"
 
 #: pkgi.c:234 pkgi_menu.c:130
 msgid "Tools"
-msgstr "¹¤¾ß"
+msgstr "å·¥å…·"
 
 #: pkgi.c:235
 msgid "Unknown"
-msgstr "Î´Öª"
+msgstr "æœªçŸ¥"
 
 #: pkgi.c:253
 msgid "Exit to XMB?"
-msgstr "ÍË³öµ½XMBÂğ£¿"
+msgstr "é€€å‡ºåˆ°XMBå—ï¼Ÿ"
 
 #: pkgi.c:436
 msgid "No items!"
-msgstr "Ã»ÓĞÄÚÈİ£¡"
+msgstr "æ²¡æœ‰å†…å®¹ï¼"
 
 #: pkgi.c:462
 msgid "Item already installed, download again?"
-msgstr "ÄÚÈİÒÑ°²×°£¬ÊÇ·ñÖØĞÂÏÂÔØ£¿"
+msgstr "å†…å®¹å·²å®‰è£…ï¼Œæ˜¯å¦é‡æ–°ä¸‹è½½ï¼Ÿ"
 
 #: pkgi.c:471 pkgi_download.c:372 pkgi_download.c:652
 msgid "Downloading..."
-msgstr "ÏÂÔØÖĞ..."
+msgstr "ä¸‹è½½ä¸­..."
 
 #: pkgi.c:471 pkgi.c:674
 msgid "Preparing..."
-msgstr "×¼±¸ÖĞ..."
+msgstr "å‡†å¤‡ä¸­..."
 
 #: pkgi.c:504 pkgi.c:508
 msgid "Refreshing"
-msgstr "Ë¢ĞÂÖĞ"
+msgstr "åˆ·æ–°ä¸­"
 
 #: pkgi.c:563 pkgi.c:567
 msgid "Count"
-msgstr "×ÜÊı"
+msgstr "æ€»æ•°"
 
 #: pkgi.c:575
 msgid "Free"
-msgstr "Ê£Óà"
+msgstr "å‰©ä½™"
 
 #: pkgi.c:585
 msgid "Select"
-msgstr "Ñ¡Ôñ"
+msgstr "é€‰æ‹©"
 
 #: pkgi.c:585
 msgid "Close"
-msgstr "¹Ø±Õ"
+msgstr "å…³é—­"
 
 #: pkgi.c:585
 msgid "Cancel"
-msgstr "È¡Ïû"
+msgstr "å–æ¶ˆ"
 
 #: pkgi.c:589 pkgi_download.c:136
 msgid "Download"
-msgstr "ÏÂÔØ"
+msgstr "ä¸‹è½½"
 
 #: pkgi.c:589
 msgid "Menu"
-msgstr "²Ëµ¥"
+msgstr "èœå•"
 
 #: pkgi.c:589
 msgid "Details"
-msgstr "ÏêÏ¸"
+msgstr "è¯¦ç»†"
 
 #: pkgi.c:589
 msgid "Exit"
-msgstr "ÍË³ö"
+msgstr "é€€å‡º"
 
 #: pkgi.c:678
 msgid "Successfully downloaded PKGi PS3 update"
-msgstr "ÏÂÔØPKGi PS3¸üĞÂ³É¹¦"
+msgstr "ä¸‹è½½PKGi PS3æ›´æ–°æˆåŠŸ"
 
 #: pkgi.c:1051
 msgid "Search"
-msgstr "ËÑË÷"
+msgstr "æœç´¢"
 
 #: pkgi_db.c:145 pkgi_db.c:153
 msgid "failed to download list from"
-msgstr "ÏÂÔØÁĞ±íÊ§°Ü"
+msgstr "ä¸‹è½½åˆ—è¡¨å¤±è´¥"
 
 #: pkgi_db.c:159
 msgid "list is too large... check for newer pkgi version!"
-msgstr "ÁĞ±í¹ı´ó...¼ì²éÊÇ²»ÊÇĞÂµÄpkgi°æ±¾£¡"
+msgstr "åˆ—è¡¨è¿‡å¤§...æ£€æŸ¥æ˜¯ä¸æ˜¯æ–°çš„pkgiç‰ˆæœ¬ï¼"
 
 #: pkgi_db.c:187
 msgid "list is empty... check the DB server"
-msgstr "ÁĞ±íÎª¿Õ...¼ì²éÊı¾İ¿â·şÎñÆ÷"
+msgstr "åˆ—è¡¨ä¸ºç©º...æ£€æŸ¥æ•°æ®åº“æœåŠ¡å™¨"
 
 #: pkgi_db.c:390
 msgid "ERROR: pkgi.txt file(s) missing or bad config.txt file"
-msgstr "´íÎó£ºpkgi.txtÎÄ¼ş¶ªÊ§»òÅäÖÃÎÄ¼ş´íÎó"
+msgstr "é”™è¯¯ï¼špkgi.txtæ–‡ä»¶ä¸¢å¤±æˆ–é…ç½®æ–‡ä»¶é”™è¯¯"
 
 #: pkgi_dialog.c:80
 msgid "Content"
-msgstr "ÄÚÈİ"
+msgstr "å†…å®¹"
 
 #: pkgi_dialog.c:108
 msgid "ERROR"
-msgstr "´íÎó"
+msgstr "é”™è¯¯"
 
 #: pkgi_dialog.c:169
 msgid "Failed to download the update list"
-msgstr "ÏÂÔØ¸üĞÂÁĞ±íÊ§°Ü"
+msgstr "ä¸‹è½½æ›´æ–°åˆ—è¡¨å¤±è´¥"
 
 #: pkgi_dialog.c:174
 msgid "update(s) loaded"
-msgstr "¸üĞÂ¼ÓÔØ"
+msgstr "æ›´æ–°åŠ è½½"
 
 #: pkgi_dialog.c:319
 #, c-format
 msgid "press %s to cancel"
-msgstr "°´%sÈ¡Ïû"
+msgstr "æŒ‰%så–æ¶ˆ"
 
 #: pkgi_dialog.c:333
 #, c-format
 msgid "press %s to close - %s to scan updates"
-msgstr "°´%s¹Ø±Õ - %sÉ¨Ãè¸üĞÂ"
+msgstr "æŒ‰%så…³é—­ - %sæ‰«ææ›´æ–°"
 
 #: pkgi_dialog.c:365
 msgid "Enter"
-msgstr "È·ÈÏ"
+msgstr "ç¡®è®¤"
 
 #: pkgi_dialog.c:365
 msgid "Back"
-msgstr "·µ»Ø"
+msgstr "è¿”å›"
 
 #: pkgi_dialog.c:367
 #, c-format
 msgid "press %s to close"
-msgstr "°´%s¹Ø±Õ"
+msgstr "æŒ‰%så…³é—­"
 
 #: pkgi_download.c:183
 msgid "Install"
-msgstr "°²×°"
+msgstr "å®‰è£…"
 
 #: pkgi_download.c:216 pkgi_download.c:220 pkgi_download.c:226
 msgid "ETA"
@@ -235,156 +235,156 @@ msgstr ""
 
 #: pkgi_download.c:310 pkgi_download.c:392
 msgid "Could not send HTTP request"
-msgstr "ÎŞ·¨·¢ËÍHTTPÇëÇó"
+msgstr "æ— æ³•å‘é€HTTPè¯·æ±‚"
 
 #: pkgi_download.c:317 pkgi_download.c:399
 msgid "HTTP request failed"
-msgstr "HTTPÇëÇóÊ§°Ü"
+msgstr "HTTPè¯·æ±‚å¤±è´¥"
 
 #: pkgi_download.c:322 pkgi_download.c:404
 msgid "HTTP response has unknown length"
-msgstr "Î´ÖªHTTPÏìÓ¦³¤¶È"
+msgstr "æœªçŸ¥HTTPå“åº”é•¿åº¦"
 
 #: pkgi_download.c:331
 msgid "Not enough free space on HDD"
-msgstr "Ó²ÅÌ¿Õ¼ä²»×ã"
+msgstr "ç¡¬ç›˜ç©ºé—´ä¸è¶³"
 
 #: pkgi_download.c:340
 msgid "Could not create task directory on HDD."
-msgstr "ÎŞ·¨ÔÚÓ²ÅÌ´´½¨ÈÎÎñÄ¿Â¼¡£"
+msgstr "æ— æ³•åœ¨ç¡¬ç›˜åˆ›å»ºä»»åŠ¡ç›®å½•ã€‚"
 
 #: pkgi_download.c:348
 msgid "Saving background task..."
-msgstr "±£´æºóÌ¨ÈÎÎñÖĞ..."
+msgstr "ä¿å­˜åå°ä»»åŠ¡ä¸­..."
 
 #: pkgi_download.c:354
 msgid "Could not create PKG file to HDD."
-msgstr "ÎŞ·¨´´½¨PKGÎÄ¼şµ½Ó²ÅÌ¡£"
+msgstr "æ— æ³•åˆ›å»ºPKGæ–‡ä»¶åˆ°ç¡¬ç›˜ã€‚"
 
 #: pkgi_download.c:360
 msgid "Could not create task files to HDD."
-msgstr "ÎŞ·¨´´½¨ÈÎÎñÎÄ¼şµ½Ó²ÅÌ¡£"
+msgstr "æ— æ³•åˆ›å»ºä»»åŠ¡æ–‡ä»¶åˆ°ç¡¬ç›˜ã€‚"
 
 #: pkgi_download.c:425
 msgid "HTTP download error"
-msgstr "HTTPÏÂÔØ´íÎó"
+msgstr "HTTPä¸‹è½½é”™è¯¯"
 
 #: pkgi_download.c:432
 msgid "HTTP connection closed"
-msgstr "HTTPÁ¬½Ó¹Ø±Õ"
+msgstr "HTTPè¿æ¥å…³é—­"
 
 #: pkgi_download.c:445
 msgid "failed to write to"
-msgstr "Ğ´ÈëÊ§°Ü"
+msgstr "å†™å…¥å¤±è´¥"
 
 #: pkgi_download.c:465
 msgid "cannot create folder"
-msgstr "ÎŞ·¨´´½¨ÎÄ¼ş¼Ğ"
+msgstr "æ— æ³•åˆ›å»ºæ–‡ä»¶å¤¹"
 
 #: pkgi_download.c:475
 msgid "cannot create file"
-msgstr "ÎŞ·¨´´½¨ÎÄ¼ş"
+msgstr "æ— æ³•åˆ›å»ºæ–‡ä»¶"
 
 #: pkgi_download.c:490
 msgid "cannot resume file"
-msgstr "ÎŞ·¨»Ö¸´ÎÄ¼ş"
+msgstr "æ— æ³•æ¢å¤æ–‡ä»¶"
 
 #: pkgi_download.c:562
 msgid "pkg integrity failed, try downloading again"
-msgstr "pkgÍêÕûĞÔÊ§°Ü£¬Çë³¢ÊÔÖØĞÂÏÂÔØ"
+msgstr "pkgå®Œæ•´æ€§å¤±è´¥ï¼Œè¯·å°è¯•é‡æ–°ä¸‹è½½"
 
 #: pkgi_download.c:573
 msgid "Creating RAP file"
-msgstr "´´½¨RAPÎÄ¼şÖĞ"
+msgstr "åˆ›å»ºRAPæ–‡ä»¶ä¸­"
 
 #: pkgi_download.c:581 pkgi_download.c:626
 msgid "Cannot save"
-msgstr "ÎŞ·¨±£´æ"
+msgstr "æ— æ³•ä¿å­˜"
 
 #: pkgi_download.c:621
 msgid "Creating RIF file"
-msgstr "´´½¨RIFÎÄ¼şÖĞ"
+msgstr "åˆ›å»ºRIFæ–‡ä»¶ä¸­"
 
 #: pkgi_download.c:646
 msgid "Resuming..."
-msgstr "»Ö¸´ÖĞ..."
+msgstr "æ¢å¤ä¸­..."
 
 #: pkgi_download.c:652
 msgid "Adding background task..."
-msgstr "Ìí¼ÓºóÌ¨ÈÎÎñÖĞ..."
+msgstr "æ·»åŠ åå°ä»»åŠ¡ä¸­..."
 
 #: pkgi_download.c:675
 msgid "Downloading icon"
-msgstr "ÏÂÔØÍ¼±êÖĞ"
+msgstr "ä¸‹è½½å›¾æ ‡ä¸­"
 
 #: pkgi_download.c:713
 msgid "Could not create install directory on HDD."
-msgstr "ÎŞ·¨ÔÚÓ²ÅÌ´´½¨°²×°Ä¿Â¼¡£"
+msgstr "æ— æ³•åœ¨ç¡¬ç›˜åˆ›å»ºå®‰è£…ç›®å½•ã€‚"
 
 #: pkgi_menu.c:102
 msgid "Search..."
-msgstr "ËÑË÷..."
+msgstr "æœç´¢..."
 
 #: pkgi_menu.c:103
 msgid "Sort by:"
-msgstr "ÅÅĞò·½Ê½£º"
+msgstr "æ’åºæ–¹å¼ï¼š"
 
 #: pkgi_menu.c:104
 msgid "Title"
-msgstr "±êÌâ"
+msgstr "æ ‡é¢˜"
 
 #: pkgi_menu.c:105
 msgid "Region"
-msgstr "ÇøÓò"
+msgstr "åŒºåŸŸ"
 
 #: pkgi_menu.c:106
 msgid "Name"
-msgstr "Ãû³Æ"
+msgstr "åç§°"
 
 #: pkgi_menu.c:107
 msgid "Size"
-msgstr "´óĞ¡"
+msgstr "å¤§å°"
 
 #: pkgi_menu.c:108
 msgid "Content:"
-msgstr "ÄÚÈİ£º"
+msgstr "å†…å®¹ï¼š"
 
 #: pkgi_menu.c:110
 msgid "Regions:"
-msgstr "ÇøÓò£º"
+msgstr "åŒºåŸŸï¼š"
 
 #: pkgi_menu.c:111
 msgid "Asia"
-msgstr "ÑÇÖŞ"
+msgstr "äºšæ´²"
 
 #: pkgi_menu.c:112
 msgid "Europe"
-msgstr "Å·ÖŞ"
+msgstr "æ¬§æ´²"
 
 #: pkgi_menu.c:113
 msgid "Japan"
-msgstr "ÈÕ±¾"
+msgstr "æ—¥æœ¬"
 
 #: pkgi_menu.c:114
 msgid "USA"
-msgstr "ÃÀ¹ú"
+msgstr "ç¾å›½"
 
 #: pkgi_menu.c:115
 msgid "Options:"
-msgstr "Ñ¡Ïî£º"
+msgstr "é€‰é¡¹ï¼š"
 
 #: pkgi_menu.c:116
 msgid "Back. DL"
-msgstr "ºóÌ¨ÏÂÔØ"
+msgstr "åå°ä¸‹è½½"
 
 #: pkgi_menu.c:117
 msgid "Music"
-msgstr "ÒôÀÖ"
+msgstr "éŸ³ä¹"
 
 #: pkgi_menu.c:119
 msgid "Refresh..."
-msgstr "Ë¢ĞÂÖĞ..."
+msgstr "åˆ·æ–°ä¸­..."
 
 #: pkgi_menu.c:326
 msgid "Direct DL"
-msgstr "Ö±½ÓÏÂÔØ"
+msgstr "ç›´æ¥ä¸‹è½½"
