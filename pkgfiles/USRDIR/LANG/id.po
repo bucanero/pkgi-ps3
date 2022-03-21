@@ -1,0 +1,393 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PKGi PS3\n"
+"POT-Creation-Date: 2021-10-09 19:00-0300\n"
+"PO-Revision-Date: 2021-10-09 19:00-0300\n"
+"Last-Translator: Fajar Maulana\n"
+"Language-Team: \n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
+"X-Poedit-Basepath: ./source\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Flags-xgettext: --add-comments\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: _\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: pkgi.c:82
+msgid "Installing"
+msgstr "Menginstal"
+
+#: pkgi.c:82
+msgid "Please wait..."
+msgstr "Harap tunggu"
+
+#: pkgi.c:94
+msgid "Installation failed"
+msgstr "Penginstalan gagal"
+
+#: pkgi.c:118
+msgid "Successfully downloaded"
+msgstr "Terunduh dengan sukses"
+
+#: pkgi.c:122
+msgid "Task successfully queued (reboot to start)"
+msgstr "Tugas berhasil ditambahkan ke antrean (reboot untuk memulai)"
+
+#: pkgi.c:163
+msgid "GB"
+msgstr "GB"
+
+#: pkgi.c:167 pkgi_download.c:249
+msgid "MB"
+msgstr "MB"
+
+#: pkgi.c:171 pkgi.c:504 pkgi_download.c:253
+msgid "KB"
+msgstr "KB"
+
+#: pkgi.c:175
+msgid "B"
+msgstr "B"
+
+#: pkgi.c:185
+#, c-format
+msgid "pkg requires %u %s free space, but only %u %s available"
+msgstr "pkg memerlukan ruang kosong sebesar %u %s, tetapi Anda hanya memiliki %u %s ruang yang tersisa"
+
+#: pkgi.c:225 pkgi_menu.c:109 pkgi_menu.c:121
+msgid "All"
+msgstr "Semua"
+
+#: pkgi.c:226 pkgi_menu.c:122
+msgid "Games"
+msgstr "Gim"
+
+#: pkgi.c:227 pkgi_menu.c:123
+msgid "DLCs"
+msgstr "DLC"
+
+#: pkgi.c:228 pkgi_menu.c:124
+msgid "Themes"
+msgstr "Tema"
+
+#: pkgi.c:229 pkgi_menu.c:125
+msgid "Avatars"
+msgstr "Avatar"
+
+#: pkgi.c:230 pkgi_menu.c:126
+msgid "Demos"
+msgstr "Demo"
+
+#: pkgi.c:231 pkgi_menu.c:118 pkgi_menu.c:127
+msgid "Updates"
+msgstr "Pembaruan"
+
+#: pkgi.c:232 pkgi_menu.c:128
+msgid "Emulators"
+msgstr "Emulator"
+
+#: pkgi.c:233 pkgi_menu.c:129
+msgid "Apps"
+msgstr "Aplikasi"
+
+#: pkgi.c:234 pkgi_menu.c:130
+msgid "Tools"
+msgstr "Peralatan"
+
+#: pkgi.c:235
+msgid "Unknown"
+msgstr "Tidak Dikenal"
+
+#: pkgi.c:253
+msgid "Exit to XMB?"
+msgstr "Keluar ke XMB"
+
+#: pkgi.c:436
+msgid "No items!"
+msgstr "Tidak ada item!"
+
+#: pkgi.c:462
+msgid "Item already installed, download again?"
+msgstr "Item sudah terinstal, unduh kembali?"
+
+#: pkgi.c:471 pkgi_download.c:372 pkgi_download.c:652
+msgid "Downloading..."
+msgstr "Mengunduh..."
+
+#: pkgi.c:471 pkgi.c:674
+msgid "Preparing..."
+msgstr "Mempersiapkan..."
+
+#: pkgi.c:504 pkgi.c:508
+msgid "Refreshing"
+msgstr "Menyegarkan"
+
+#: pkgi.c:563 pkgi.c:567
+msgid "Count"
+msgstr "Jumlah"
+
+#: pkgi.c:575
+msgid "Free"
+msgstr "Bebas"
+
+#: pkgi.c:585
+msgid "Select"
+msgstr "Pilih"
+
+#: pkgi.c:585
+msgid "Close"
+msgstr "Tutup"
+
+#: pkgi.c:585
+msgid "Cancel"
+msgstr "Batal"
+
+#: pkgi.c:589 pkgi_download.c:136
+msgid "Download"
+msgstr "Unduh"
+
+#: pkgi.c:589
+msgid "Menu"
+msgstr "Menu"
+
+#: pkgi.c:589
+msgid "Details"
+msgstr "Detail"
+
+#: pkgi.c:589
+msgid "Exit"
+msgstr "Keluar"
+
+#: pkgi.c:678
+msgid "Successfully downloaded PKGi PS3 update"
+msgstr "Pembaruan PKGi PS3 berhasil terunduh"
+
+#: pkgi.c:1051
+msgid "Search"
+msgstr "Cari"
+
+#: pkgi_db.c:145 pkgi_db.c:153
+msgid "failed to download list from"
+msgstr "gagal mengunduh daftar dari"
+
+#: pkgi_db.c:159
+msgid "list is too large... check for newer pkgi version!"
+msgstr "daftar terlalu besar... periksa versi pkgi terbaru!"
+
+#: pkgi_db.c:187
+msgid "list is empty... check the DB server"
+msgstr "daftar kosong... periksa penyedia DB"
+
+#: pkgi_db.c:390
+msgid "ERROR: pkgi.txt file(s) missing or bad config.txt file"
+msgstr "EROR: berkas pkgi.txt tidak ada atau berkas config.txt rusak"
+
+#: pkgi_dialog.c:80
+msgid "Content"
+msgstr "Konten"
+
+#: pkgi_dialog.c:108
+msgid "ERROR"
+msgstr "EROR"
+
+#: pkgi_dialog.c:169
+msgid "Failed to download the update list"
+msgstr "Gagal mengunduh daftar pembaruan"
+
+#: pkgi_dialog.c:174
+msgid "update(s) loaded"
+msgstr "pembaruan dimuat"
+
+#: pkgi_dialog.c:319
+#, c-format
+msgid "press %s to cancel"
+msgstr "tekan %s untuk membatalkan"
+
+#: pkgi_dialog.c:333
+#, c-format
+msgid "press %s to close - %s to scan updates"
+msgstr "tekan %s untuk menutup - %s untuk memindai pembaruan"
+
+#: pkgi_dialog.c:365
+msgid "Enter"
+msgstr "Masuk"
+
+#: pkgi_dialog.c:365
+msgid "Back"
+msgstr "Kembali"
+
+#: pkgi_dialog.c:367
+#, c-format
+msgid "press %s to close"
+msgstr "tekan %s untuk menutup"
+
+#: pkgi_download.c:183
+msgid "Install"
+msgstr "Instal"
+
+#: pkgi_download.c:216 pkgi_download.c:220 pkgi_download.c:226
+msgid "ETA"
+msgstr "Estimasi"
+
+#: pkgi_download.c:310 pkgi_download.c:392
+msgid "Could not send HTTP request"
+msgstr "Tidak dapat mengirim permintaan HTTP"
+
+#: pkgi_download.c:317 pkgi_download.c:399
+msgid "HTTP request failed"
+msgstr "Permintaan HTTP gagal"
+
+#: pkgi_download.c:322 pkgi_download.c:404
+msgid "HTTP response has unknown length"
+msgstr "Panjang respons HTTP tidak diketahui"
+
+#: pkgi_download.c:331
+msgid "Not enough free space on HDD"
+msgstr "Sisa ruang HDD tidak cukup"
+
+#: pkgi_download.c:340
+msgid "Could not create task directory on HDD."
+msgstr "Tidak dapat membuat direktori tugas di HDD."
+
+#: pkgi_download.c:348
+msgid "Saving background task..."
+msgstr "Menyimpan tugas latar belakang..."
+
+#: pkgi_download.c:354
+msgid "Could not create PKG file to HDD."
+msgstr "Tidak dapat menciptakan berkas PKG di HDD."
+
+#: pkgi_download.c:360
+msgid "Could not create task files to HDD."
+msgstr "Tidak dapat menciptakan berkas tugas di HDD."
+
+#: pkgi_download.c:425
+msgid "HTTP download error"
+msgstr "Unduhan HTTP eror"
+
+#: pkgi_download.c:432
+msgid "Koneksi HTTP tertutup"
+msgstr "HTTP connection closed"
+
+#: pkgi_download.c:445
+msgid "gagal menulis ke"
+msgstr "gagal menulis ke"
+
+#: pkgi_download.c:465
+msgid "cannot creat folder"
+msgstr "tidak dapat menciptakan folder"
+
+#: pkgi_download.c:475
+msgid "cannot create file"
+msgstr "tidak dapat menciptakan berkas"
+
+#: pkgi_download.c:490
+msgid "cannot resume file"
+msgstr "tidak dapat melanjutkan berkas"
+
+#: pkgi_download.c:562
+msgid "pkg integrity failed, try downloading again"
+msgstr "integritas pkg gagal, coba unduh kembali"
+
+#: pkgi_download.c:573
+msgid "Creating RAP file"
+msgstr "Menciptakan berkas RAP"
+
+#: pkgi_download.c:581 pkgi_download.c:626
+msgid "Cannot save"
+msgstr ""
+
+#: pkgi_download.c:621
+msgid "Creating RIF file"
+msgstr "Menciptakan berkas RIF"
+
+#: pkgi_download.c:646
+msgid "Resuming..."
+msgstr "Melanjutkan"
+
+#: pkgi_download.c:652
+msgid "Adding background task..."
+msgstr "Menambahkan tugas latar belakang..."
+
+#: pkgi_download.c:675
+msgid "Downloading icon"
+msgstr "Mengunduh ikon"
+
+#: pkgi_download.c:713
+msgid "Could not create install directory on HDD."
+msgstr "Tidak dapat menciptakan direktori pemasangan di HDD."
+
+#: pkgi_menu.c:102
+msgid "Search..."
+msgstr "Cari..."
+
+#: pkgi_menu.c:103
+msgid "Sort by:"
+msgstr "Sortir menurut:"
+
+#: pkgi_menu.c:104
+msgid "Title"
+msgstr "Judul"
+
+#: pkgi_menu.c:105
+msgid "Region"
+msgstr "Region"
+
+#: pkgi_menu.c:106
+msgid "Name"
+msgstr "Nama"
+
+#: pkgi_menu.c:107
+msgid "Size"
+msgstr "Ukuran"
+
+#: pkgi_menu.c:108
+msgid "Content:"
+msgstr "Konten"
+
+#: pkgi_menu.c:110
+msgid "Regions:"
+msgstr "Region:"
+
+#: pkgi_menu.c:111
+msgid "Asia"
+msgstr "Asia"
+
+#: pkgi_menu.c:112
+msgid "Europe"
+msgstr "Eropa"
+
+#: pkgi_menu.c:113
+msgid "Japan"
+msgstr "Jepang"
+
+#: pkgi_menu.c:114
+msgid "USA"
+msgstr "USA"
+
+#: pkgi_menu.c:115
+msgid "Options:"
+msgstr "Pilihan"
+
+#: pkgi_menu.c:116
+msgid "Back. DL"
+msgstr "Unduhan latar"
+
+#: pkgi_menu.c:117
+msgid "Music"
+msgstr "Musik"
+
+#: pkgi_menu.c:119
+msgid "Refresh..."
+msgstr "Segarkan..."
+
+#: pkgi_menu.c:326
+msgid "Direct DL"
+msgstr "Unduh langsung"
+
+#msgid "---translated by---"
+#msgstr "Jeremy Belpois (Fajar Maulana)"
