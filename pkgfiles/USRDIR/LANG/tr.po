@@ -23,7 +23,7 @@ msgstr "Kuruluyor"
 
 #: pkgi.c:82
 msgid "Please wait..."
-msgstr "LÅtfen Bekleyin..."
+msgstr "Lutfen Bekleyin..."
 
 #: pkgi.c:94
 msgid "Installation failed"
@@ -31,11 +31,11 @@ msgstr "Kurulum Basarisiz Oldu"
 
 #: pkgi.c:118
 msgid "Successfully downloaded"
-msgstr "Basariyla YÅklendi"
+msgstr "Basariyla Yuklendi"
 
 #: pkgi.c:122
 msgid "Task successfully queued (reboot to start)"
-msgstr "Gîrev Basariyla Siraya Alindi(Baslatmak iáin yeniden baslatin.)"
+msgstr "Gorev Basariyla Siraya Alindi(Baslatmak icin yeniden baslatin.)"
 
 #: pkgi.c:163
 msgid "GB"
@@ -84,11 +84,11 @@ msgstr "Demolar"
 
 #: pkgi.c:231 pkgi_menu.c:118 pkgi_menu.c:127
 msgid "Updates"
-msgstr "GÅncelle"
+msgstr "Guncellemeler"
 
 #: pkgi.c:232 pkgi_menu.c:128
 msgid "Emulators"
-msgstr "ôykÅnÅcÅler"
+msgstr "Emulatorler"
 
 #: pkgi.c:233 pkgi_menu.c:129
 msgid "Apps"
@@ -96,7 +96,7 @@ msgstr "Uygulamalar"
 
 #: pkgi.c:234 pkgi_menu.c:130
 msgid "Tools"
-msgstr "Araálar"
+msgstr "Araclar"
 
 #: pkgi.c:235
 msgid "Unknown"
@@ -104,15 +104,15 @@ msgstr "Bilinmeyen"
 
 #: pkgi.c:253
 msgid "Exit to XMB?"
-msgstr "XMB'ye dînÅlsÅn mÅ?"
+msgstr "XMB'ye donulsun mu?"
 
 #: pkgi.c:436
 msgid "No items!"
-msgstr "ôge yok!"
+msgstr Oge yok!"
 
 #: pkgi.c:462
 msgid "Item already installed, download again?"
-msgstr "Bu îge zaten indirildi. Yeniden indirilsin mi?"
+msgstr "Bu oge zaten yuklendi. Yeniden indirilsin mi?"
 
 #: pkgi.c:471 pkgi_download.c:372 pkgi_download.c:652
 msgid "Downloading..."
@@ -136,7 +136,7 @@ msgstr "Bos"
 
 #: pkgi.c:585
 msgid "Select"
-msgstr "Seá"
+msgstr "Sec"
 
 #: pkgi.c:585
 msgid "Close"
@@ -152,7 +152,7 @@ msgstr "Indir"
 
 #: pkgi.c:589
 msgid "Menu"
-msgstr "MenÅ"
+msgstr "Menu"
 
 #: pkgi.c:589
 msgid "Details"
@@ -160,11 +160,11 @@ msgstr "Detaylar"
 
 #: pkgi.c:589
 msgid "Exit"
-msgstr "Äikis"
+msgstr "Cikis"
 
 #: pkgi.c:678
 msgid "Successfully downloaded PKGi PS3 update"
-msgstr "PKGi PS3 gÅncellemesi basariyla indirildi"
+msgstr "PKGi PS3 guncellemesi basariyla indirildi"
 
 #: pkgi.c:1051
 msgid "Search"
@@ -176,7 +176,7 @@ msgstr "Liste suradan indirilemedi"
 
 #: pkgi_db.c:159
 msgid "list is too large... check for newer pkgi version!"
-msgstr "liste áok bÅyÅk... yeni pkgi sÅrÅmÅnÅ kontrol edin!"
+msgstr "liste cok buyuk... yeni pkgi surumunu kontrol edin!"
 
 #: pkgi_db.c:187
 msgid "list is empty... check the DB server"
@@ -188,7 +188,7 @@ msgstr "Hata: pkgi.txt dosyasi eksik veya hatali config.txt dosyasi"
 
 #: pkgi_dialog.c:80
 msgid "Content"
-msgstr "Iáerik"
+msgstr "Icerik"
 
 #: pkgi_dialog.c:108
 msgid "ERROR"
@@ -196,21 +196,21 @@ msgstr "HATA"
 
 #: pkgi_dialog.c:169
 msgid "Failed to download the update list"
-msgstr "GÅncelleme listesi indirmesi basarisiz oldu"
+msgstr "Guncelleme listesi indirilemedi"
 
 #: pkgi_dialog.c:174
 msgid "update(s) loaded"
-msgstr "GÅncelleme(ler) yÅklendi"
+msgstr "Guncelleme(ler) yuklendi"
 
 #: pkgi_dialog.c:319
 #, c-format
 msgid "press %s to cancel"
-msgstr "Iptal etmek iáin %s tusuna basin"
+msgstr "Iptal etmek icin %s tusuna basin"
 
 #: pkgi_dialog.c:333
 #, c-format
 msgid "press %s to close - %s to scan updates"
-msgstr "Kapatmak iáin %s tusuna, gÅncellemeleri kontrol etmek iáin %s tusuna basin"
+msgstr "Kapatmak icin %s tusuna, guncellemeleri kontrol etmek icin %s tusuna basin"
 
 #: pkgi_dialog.c:365
 msgid "Enter"
@@ -223,20 +223,20 @@ msgstr "Geri"
 #: pkgi_dialog.c:367
 #, c-format
 msgid "press %s to close"
-msgstr "Kapatmak iáin %s tusuna basin"
+msgstr "Kapatmak icin %s tusuna basin"
 
 #. 00000069 - Display title
 #: pkgi_download.c:183
 msgid "Install"
-msgstr "YÅkle"
+msgstr "Yukle"
 
 #: pkgi_download.c:216 pkgi_download.c:220 pkgi_download.c:226
 msgid "ETA"
-msgstr "ETA"
+msgstr "Tahmini Bitis Suresi"
 
 #: pkgi_download.c:310 pkgi_download.c:392
 msgid "Could not send HTTP request"
-msgstr "HTTP istegi gînderilemedi"
+msgstr "HTTP istegi gonderilemedi"
 
 #: pkgi_download.c:317 pkgi_download.c:399
 msgid "HTTP request failed"
@@ -252,19 +252,19 @@ msgstr "HDD'de yeterli bos alan yok"
 
 #: pkgi_download.c:340
 msgid "Could not create task directory on HDD."
-msgstr "HDD'de gîrev dizini olusturulamadi."
+msgstr "HDD'de gorev dizini olusturulamadi."
 
 #: pkgi_download.c:348
 msgid "Saving background task..."
-msgstr "Arkaplan gîrevi kaydediliyor..."
+msgstr "Arkaplan gorevi kaydediliyor..."
 
 #: pkgi_download.c:354
 msgid "Could not create PKG file to HDD."
-msgstr "PKG dosyasi HDD Åzerinde olusturulamadi."
+msgstr "PKG dosyasi HDD uzerinde olusturulamadi."
 
 #: pkgi_download.c:360
 msgid "Could not create task files to HDD."
-msgstr "Gîrev dosyalari HDD Åzerinde olusturulamadi."
+msgstr "Gorev dosyalari HDD uzerinde olusturulamadi."
 
 #: pkgi_download.c:425
 msgid "HTTP download error"
@@ -280,7 +280,7 @@ msgstr "suraya yazma islemi basarisiz oldu"
 
 #: pkgi_download.c:465
 msgid "cannot create folder"
-msgstr "klasîr olusturulamadi"
+msgstr "klasor olusturulamadi"
 
 #: pkgi_download.c:475
 msgid "cannot create file"
@@ -292,7 +292,7 @@ msgstr "dosya indirme islemine devam edilemedi"
 
 #: pkgi_download.c:562
 msgid "pkg integrity failed, try downloading again"
-msgstr "pkg bÅtÅnlÅgÅ basarisiz oldu, tekrar indirmeyi deneyin"
+msgstr "pkg butunlugu basarisiz oldu, tekrar indirmeyi deneyin"
 
 #: pkgi_download.c:573
 msgid "Creating RAP file"
@@ -304,15 +304,15 @@ msgstr "Kaydedilemedi"
 
 #: pkgi_download.c:621
 msgid "Creating RIF file"
-msgstr "RIF dosyasi olusturulutor"
+msgstr "RIF dosyasi olusturuluyor"
 
 #: pkgi_download.c:646
 msgid "Resuming..."
-msgstr "SÅrdÅrÅlÅyor..."
+msgstr "Devam Ediyor..."
 
 #: pkgi_download.c:652
 msgid "Adding background task..."
-msgstr "Arkaplan gîrevi ekleniyor..."
+msgstr "Arkaplan gorevi ekleniyor..."
 
 #: pkgi_download.c:675
 msgid "Downloading icon"
@@ -320,7 +320,7 @@ msgstr "Simge indiriliyor"
 
 #: pkgi_download.c:713
 msgid "Could not create install directory on HDD."
-msgstr "Dizin HDD Åzerinde olusturulamadi."
+msgstr "Dizin HDD uzerinde olusturulamadi."
 
 #: pkgi_menu.c:102
 msgid "Search..."
@@ -336,7 +336,7 @@ msgstr "Baslik"
 
 #: pkgi_menu.c:105
 msgid "Region"
-msgstr "Bîlge"
+msgstr "Bolge"
 
 #: pkgi_menu.c:106
 msgid "Name"
@@ -348,11 +348,11 @@ msgstr "Boyut"
 
 #: pkgi_menu.c:108
 msgid "Content:"
-msgstr "Iáerik:"
+msgstr "Icerik:"
 
 #: pkgi_menu.c:110
 msgid "Regions:"
-msgstr "Bîlgeler:"
+msgstr "Bolgeler:"
 
 #: pkgi_menu.c:111
 msgid "Asia"
@@ -372,7 +372,7 @@ msgstr "Amerika"
 
 #: pkgi_menu.c:115
 msgid "Options:"
-msgstr "Seáenekler"
+msgstr "Secenekler"
 
 #: pkgi_menu.c:116
 msgid "Back. DL"
@@ -380,7 +380,7 @@ msgstr "Arkaplan"
 
 #: pkgi_menu.c:117
 msgid "Music"
-msgstr "MÅzik"
+msgstr "Muzik"
 
 #: pkgi_menu.c:119
 msgid "Refresh..."
@@ -391,4 +391,4 @@ msgid "Direct DL"
 msgstr "Direkt"
 
 #msgid "---translated by---"
-#msgstr "Cruslan1"
+#msgstr "Cruslan1 and oxy3403"
