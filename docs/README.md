@@ -1,7 +1,7 @@
 # PKGi PS3
 
 [![Downloads][img_downloads]][pkgi_downloads] [![Release][img_latest]][pkgi_latest] [![License][img_license]][pkgi_license]
-
+[![Build package](https://github.com/bucanero/pkgi-ps3/actions/workflows/build.yml/badge.svg)](https://github.com/bucanero/pkgi-ps3/actions/workflows/build.yml)
 
 **PKGi PS3** is a PlayStation 3 port of [pkgi (PSVita)](https://github.com/mmozeiko/pkgi).
 
@@ -208,7 +208,7 @@ You need to have installed:
 - [libcurl](https://github.com/bucanero/ps3libraries/blob/master/scripts/016-libcurl-7.64.1.sh) library (v7.64.1)
 - [MikMod](https://github.com/ps3dev/ps3libraries/blob/master/scripts/011-libmikmod-3.1.11.sh) library
 - [Mini18n](https://github.com/bucanero/mini18n) library
-- [dbglogger](https://github.com/bucanero/psl1ght-libs/tree/master/dbglogger) library (only required for debug logging)
+- [dbglogger](https://github.com/bucanero/dbglogger) library (only required for debug logging)
 
 Run `make` to create a release build. After that, run `make pkg` to create a `.pkg` install file. 
 

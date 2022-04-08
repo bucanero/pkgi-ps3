@@ -700,7 +700,7 @@ static void pkgi_update_check_thread(void)
     pkgi_thread_exit();
 }
 
-void pkgi_load_language(const char* lang)
+static void pkgi_load_language(const char* lang)
 {
     char path[256];
 
@@ -709,9 +709,20 @@ void pkgi_load_language(const char* lang)
     mini18n_set_locale(path);
 }
 
+static int pkgi_security_check()
+{
+    return 0;
+}
+
 int main(int argc, const char* argv[])
 {
     pkgi_start();
+
+    if (!pkgi_security_check())
+    {
+        pkgi_msg_dialog(MDIALOG_OK, "ERROR: Integrity check failed!\n\nGet the latest official release from:\nhttps://github.com/bucanero/pkgi-ps3/");
+        return 0;
+    }
 
     pkgi_load_config(&config, (char*) &refresh_url, sizeof(refresh_url[0]));
     if (config.music)
