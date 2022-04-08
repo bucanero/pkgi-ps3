@@ -29,6 +29,8 @@ jobs:
         curl -sL https://github.com/bucanero/ps3toolchain/releases/download/ubuntu-latest-fad3b5fb/ps3dev-ubuntu-latest-2020-08-31.tar.gz | tar xvz -C ./
         echo "PS3DEV=${GITHUB_WORKSPACE}/ps3dev" >> $GITHUB_ENV
         echo "PSL1GHT=${GITHUB_WORKSPACE}/ps3dev" >> $GITHUB_ENV
+        curl -sLO https://github.com/ps3dev/PSL1GHT/raw/master/ppu/include/sysutil/sysutil.h
+        mv sysutil.h ps3dev/ppu/include/sysutil/sysutil.h
 
     - name: Install ya2d
       working-directory: ya2d_ps3/libya2d
