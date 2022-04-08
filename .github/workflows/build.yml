@@ -16,6 +16,7 @@ jobs:
       run: |
         git clone https://github.com/bucanero/ya2d_ps3.git     --depth 1
         git clone https://github.com/bucanero/mini18n.git      --depth 1
+        git clone https://github.com/bucanero/dbglogger.git    --depth 1
 
     - name: Set env vars
       id: slug
@@ -40,6 +41,12 @@ jobs:
 
     - name: Install mini18n
       working-directory: mini18n
+      run: |
+        make
+        make install
+
+    - name: Install dbglogger
+      working-directory: dbglogger
       run: |
         make
         make install
