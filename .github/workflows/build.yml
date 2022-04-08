@@ -1,0 +1,56 @@
+name: Build package
+
+on: [ push, pull_request, workflow_dispatch ]
+
+jobs:
+  build_pkg:
+    runs-on: ubuntu-20.04
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 1
+
+    - name: Checkout Dependecies
+      run: |
+        git clone https://github.com/bucanero/ya2d_ps3.git     --depth 1
+        git clone https://github.com/bucanero/mini18n.git      --depth 1
+
+    - name: Set env vars
+      id: slug
+      run: |
+        echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
+        echo "pkg_file=pkgi-ps3.pkg" >> $GITHUB_ENV
+
+      # using pre-compiled sdk
+    - name: Download PSL1GHT Toolchain
+      run: |
+        curl -sL https://github.com/bucanero/ps3toolchain/releases/download/ubuntu-latest-fad3b5fb/ps3dev-ubuntu-latest-2020-08-31.tar.gz | tar xvz -C ./
+        echo "PS3DEV=${GITHUB_WORKSPACE}/ps3dev" >> $GITHUB_ENV
+        echo "PSL1GHT=${GITHUB_WORKSPACE}/ps3dev" >> $GITHUB_ENV
+
+    - name: Install ya2d
+      working-directory: ya2d_ps3/libya2d
+      run: |
+        make
+        make install
+
+    - name: Install mini18n
+      working-directory: mini18n
+      run: |
+        make
+        make install
+
+    - name: Build PKGi App Package
+      run: |
+        make pkg
+
+    - name: Push package artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: pkgi-ps3-build_${{ steps.slug.outputs.sha8 }}
+        path: ${{ env.pkg_file }}
+        if-no-files-found: error
+        # don't keep artifacts for too long
+        retention-days: 7
