@@ -1145,6 +1145,8 @@ void pkgi_curl_init(CURL *curl)
     curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 20L);
     // Fail the request if the HTTP code returned is equal to or larger than 400
     curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
+    // request using SSL for the FTP transfer if available
+    curl_easy_setopt(curl, CURLOPT_USE_SSL, CURLUSESSL_TRY);
 }
 
 pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
