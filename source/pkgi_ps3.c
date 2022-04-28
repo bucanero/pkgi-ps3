@@ -647,6 +647,7 @@ void pkgi_start(void)
 
     LOG("initializing SSL");
     sysModuleLoad(SYSMODULE_NET);
+    curl_global_init(CURL_GLOBAL_ALL);
 
     sys_mutex_attr_t mutex_attr;
     mutex_attr.attr_protocol = SYS_MUTEX_PROTOCOL_FIFO;
@@ -762,6 +763,7 @@ void pkgi_end(void)
 {
     if (module) end_music();
 
+    curl_global_cleanup();
     pkgi_stop_debug_log();
 
     pkgi_free_texture(tex_buttons.circle);
@@ -1145,6 +1147,8 @@ void pkgi_curl_init(CURL *curl)
     curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 20L);
     // Fail the request if the HTTP code returned is equal to or larger than 400
     curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
+    // request using SSL for the FTP transfer if available
+    curl_easy_setopt(curl, CURLOPT_USE_SSL, CURLUSESSL_TRY);
 }
 
 pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
