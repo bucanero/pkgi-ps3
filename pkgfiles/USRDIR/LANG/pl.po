@@ -248,7 +248,7 @@ msgstr "Odpowiedz HTTP ma nieznana dlugosc"
 
 #: pkgi_download.c:331
 msgid "Not enough free space on HDD"
-msgstr "Nie wystarczajaca ilosc miejsca na twardym dysku"
+msgstr "Nie wystarczajaca ilosc miejsca na dysku twardym"
 
 #: pkgi_download.c:340
 msgid "Could not create task directory on HDD."
