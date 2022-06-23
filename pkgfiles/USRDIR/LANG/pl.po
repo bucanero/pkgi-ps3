@@ -112,11 +112,11 @@ msgstr "Zadnych danych!"
 
 #: pkgi.c:462
 msgid "Item already installed, download again?"
-msgstr "Element juz zainstalowany, pobrac ponownie?"
+msgstr "Element jest juz zainstalowany, pobrac ponownie?"
 
 #: pkgi.c:471 pkgi_download.c:372 pkgi_download.c:652
 msgid "Downloading..."
-msgstr "Sciaganie..."
+msgstr "Pobieranie..."
 
 #: pkgi.c:471 pkgi.c:674
 msgid "Preparing..."
@@ -128,7 +128,7 @@ msgstr "Odswiezanie"
 
 #: pkgi.c:563 pkgi.c:567
 msgid "Count"
-msgstr "Przeliczanie"
+msgstr "Ilosc"
 
 #: pkgi.c:575
 msgid "Free"
@@ -184,7 +184,7 @@ msgstr "lista jest pusta... sprawdz serwer DB"
 
 #: pkgi_db.c:390
 msgid "ERROR: pkgi.txt file(s) missing or bad config.txt file"
-msgstr "BLAD: brak pliku(�w) pkgi.txt lub zly plik config.txt"
+msgstr "BLAD: brak pliku(ow) pkgi.txt lub zly plik config.txt"
 
 #: pkgi_dialog.c:80
 msgid "Content"
@@ -248,7 +248,7 @@ msgstr "Odpowiedz HTTP ma nieznana dlugosc"
 
 #: pkgi_download.c:331
 msgid "Not enough free space on HDD"
-msgstr "Nie wystarczajaca ilosc miejsca na dysku twardym"
+msgstr "Nie wystarczajaca ilosc miejsca na twardym dysku"
 
 #: pkgi_download.c:340
 msgid "Could not create task directory on HDD."
@@ -264,7 +264,7 @@ msgstr "Nie mozna utworzyc pliku PKG na HDD."
 
 #: pkgi_download.c:360
 msgid "Could not create task files to HDD."
-msgstr "Nie mozna utworzyc plik�w zadan na HDD."
+msgstr "Nie mozna utworzyc plikow zadan na HDD."
 
 #: pkgi_download.c:425
 msgid "HTTP download error"
@@ -316,7 +316,7 @@ msgstr "Dodawanie zadania w tle..."
 
 #: pkgi_download.c:675
 msgid "Downloading icon"
-msgstr "Ikona pobierania"
+msgstr "Pobieranie ikony"
 
 #: pkgi_download.c:713
 msgid "Could not create install directory on HDD."
@@ -388,7 +388,7 @@ msgstr "Odswiez..."
 
 #: pkgi_menu.c:326
 msgid "Direct DL"
-msgstr "Skieruj DL"
+msgstr "Bezposrednie DL"
 
 #msgid "---translated by---"
 #msgstr "DEX357"
