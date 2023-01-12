@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PKGi PS3\n"
 "POT-Creation-Date: 2021-10-09 19:00-0300\n"
 "PO-Revision-Date: 2021-10-09 19:00-0300\n"
-"Last-Translator: Algol\n"
+"Last-Translator: alaska16\n"
 "Language-Team: \n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -27,15 +27,15 @@ msgstr "Attendez SVP..."
 
 #: pkgi.c:94
 msgid "Installation failed"
-msgstr "Installation a ‚chou‚e"
+msgstr "Installation a â€šchouâ€še"
 
 #: pkgi.c:118
 msgid "Successfully downloaded"
-msgstr "T‚l‚chargement r‚ussi"
+msgstr "Tâ€šlâ€šchargement râ€šussi"
 
 #: pkgi.c:122
 msgid "Task successfully queued (reboot to start)"
-msgstr "Tƒche mise en file d'attente avec succŠs (red‚marrage pour d‚marrer)"
+msgstr "TÆ’che mise en file d'attente avec succÅ s (redâ€šmarrage pour dâ€šmarrer)"
 
 #: pkgi.c:163
 msgid "GB"
@@ -72,7 +72,7 @@ msgstr ""
 
 #: pkgi.c:228 pkgi_menu.c:124
 msgid "Themes"
-msgstr "ThŠmes"
+msgstr "ThÅ mes"
 
 #: pkgi.c:229 pkgi_menu.c:125
 msgid "Avatars"
@@ -80,11 +80,11 @@ msgstr ""
 
 #: pkgi.c:230 pkgi_menu.c:126
 msgid "Demos"
-msgstr "D‚mos"
+msgstr "Dâ€šmos"
 
 #: pkgi.c:231 pkgi_menu.c:118 pkgi_menu.c:127
 msgid "Updates"
-msgstr "Mises … jour"
+msgstr "Mises â€¦ jour"
 
 #: pkgi.c:232 pkgi_menu.c:128
 msgid "Emulators"
@@ -104,39 +104,39 @@ msgstr "Inconnu"
 
 #: pkgi.c:253
 msgid "Exit to XMB?"
-msgstr "Sortir vers XMB?"
+msgstr "Quitter vers XMB?"
 
 #: pkgi.c:436
 msgid "No items!"
-msgstr "pas d'article!"
+msgstr "Pas d'article!"
 
 #: pkgi.c:462
 msgid "Item already installed, download again?"
-msgstr "Article d‚j… install‚, t‚l‚charger … nouveau?"
+msgstr "Article dâ€šjâ€¦ installâ€š, tâ€šlâ€šcharger â€¦ nouveau?"
 
 #: pkgi.c:471 pkgi_download.c:372 pkgi_download.c:652
 msgid "Downloading..."
-msgstr "T‚l‚chargement..."
+msgstr "Tâ€šlâ€šchargement..."
 
 #: pkgi.c:471 pkgi.c:674
 msgid "Preparing..."
-msgstr "Pr‚paration en cours..."
+msgstr "Prâ€šparation en cours..."
 
 #: pkgi.c:504 pkgi.c:508
 msgid "Refreshing"
-msgstr "RafraŒchissement en cours"
+msgstr "RafraÅ’chissement en cours"
 
 #: pkgi.c:563 pkgi.c:567
 msgid "Count"
-msgstr "Compter"
+msgstr "Quantitâ€š"
 
 #: pkgi.c:575
 msgid "Free"
-msgstr "Vide"
+msgstr "Libre"
 
 #: pkgi.c:585
 msgid "Select"
-msgstr "S‚lection"
+msgstr "Sâ€šlection"
 
 #: pkgi.c:585
 msgid "Close"
@@ -156,7 +156,7 @@ msgstr ""
 
 #: pkgi.c:589
 msgid "Details"
-msgstr "D‚tails"
+msgstr "Dâ€štails"
 
 #: pkgi.c:589
 msgid "Exit"
@@ -164,7 +164,7 @@ msgstr "Sortie"
 
 #: pkgi.c:678
 msgid "Successfully downloaded PKGi PS3 update"
-msgstr "Mise … jour PKGi PS3 t‚l‚charg‚e avec succŠs"
+msgstr "Mise â€¦ jour PKGi PS3 tâ€šlâ€šchargâ€še avec succÅ s"
 
 #: pkgi.c:1051
 msgid "Search"
@@ -172,19 +172,19 @@ msgstr "Recherche"
 
 #: pkgi_db.c:145 pkgi_db.c:153
 msgid "failed to download list from"
-msgstr "‚chec du t‚l‚chargement de la liste depuis"
+msgstr "â€šchec du tâ€šlâ€šchargement de la liste depuis"
 
 #: pkgi_db.c:159
 msgid "list is too large... check for newer pkgi version!"
-msgstr "la liste est trop longue... v‚rifiez la nouvelle version de pkgi!"
+msgstr "la liste est trop longue... vâ€šrifiez la nouvelle version de pkgi!"
 
 #: pkgi_db.c:187
 msgid "list is empty... check the DB server"
-msgstr "la liste est vide... v‚rifiez le serveur de base de donn‚es"
+msgstr "la liste est vide... vâ€šrifiez le serveur de base de donnâ€šes"
 
 #: pkgi_db.c:390
 msgid "ERROR: pkgi.txt file(s) missing or bad config.txt file"
-msgstr "ERREURÿ: fichier(s) pkgi.txt manquant(s) ou fichier config.txt incorrect"
+msgstr "ERREURÃ¿: fichier(s) pkgi.txt manquant(s) ou fichier config.txt incorrect"
 
 #: pkgi_dialog.c:80
 msgid "Content"
@@ -196,11 +196,11 @@ msgstr "ERREUR"
 
 #: pkgi_dialog.c:169
 msgid "Failed to download the update list"
-msgstr "chec du t‚l‚chargement de la liste des mises … jour"
+msgstr "Âchec du tâ€šlâ€šchargement de la liste des mises â€¦ jour"
 
 #: pkgi_dialog.c:174
 msgid "update(s) loaded"
-msgstr "Mise … jour(s) charg‚e(s)"
+msgstr "Mise â€¦ jour(s) chargâ€še(s)"
 
 #: pkgi_dialog.c:319
 #, c-format
@@ -218,7 +218,7 @@ msgstr "Entrer"
 
 #: pkgi_dialog.c:365
 msgid "Back"
-msgstr "ArriŠre"
+msgstr "Retour"
 
 #: pkgi_dialog.c:367
 #, c-format
@@ -235,15 +235,15 @@ msgstr ""
 
 #: pkgi_download.c:310 pkgi_download.c:392
 msgid "Could not send HTTP request"
-msgstr "Impossible d'envoyer la requˆte HTTP"
+msgstr "Impossible d'envoyer la requË†te HTTP"
 
 #: pkgi_download.c:317 pkgi_download.c:399
 msgid "HTTP request failed"
-msgstr "chec de la requˆte HTTP"
+msgstr "Âchec de la requË†te HTTP"
 
 #: pkgi_download.c:322 pkgi_download.c:404
 msgid "HTTP response has unknown length"
-msgstr "La r‚ponse HTTP a une longueur inconnue"
+msgstr "La râ€šponse HTTP a une longueur inconnue"
 
 #: pkgi_download.c:331
 msgid "Not enough free space on HDD"
@@ -251,39 +251,39 @@ msgstr "Pas assez d'espace libre sur le disque dur"
 
 #: pkgi_download.c:340
 msgid "Could not create task directory on HDD."
-msgstr "Impossible de cr‚er le r‚pertoire des tƒches sur le disque dur"
+msgstr "Impossible de crâ€šer le râ€špertoire des tÆ’ches sur le disque dur"
 
 #: pkgi_download.c:348
 msgid "Saving background task..."
-msgstr "Enregistrement de la tƒche en arriŠre-plan..."
+msgstr "Enregistrement de la tÆ’che en arriÅ re-plan..."
 
 #: pkgi_download.c:354
 msgid "Could not create PKG file to HDD."
-msgstr "Impossible de cr‚er le fichier PKG sur le disque dur"
+msgstr "Impossible de crâ€šer le fichier PKG sur le disque dur"
 
 #: pkgi_download.c:360
 msgid "Could not create task files to HDD."
-msgstr "Impossible de cr‚er des fichiers de tƒches sur le disque dur"
+msgstr "Impossible de crâ€šer des fichiers de tÆ’ches sur le disque dur"
 
 #: pkgi_download.c:425
 msgid "HTTP download error"
-msgstr "Erreur de t‚l‚chargement HTTP"
+msgstr "Erreur de tâ€šlâ€šchargement HTTP"
 
 #: pkgi_download.c:432
 msgid "HTTP connection closed"
-msgstr "Connexion HTTP ferm‚e"
+msgstr "Connexion HTTP fermâ€še"
 
 #: pkgi_download.c:445
 msgid "failed to write to"
-msgstr "omis d'‚crire …"
+msgstr "Erreur â€šcriture â€¦"
 
 #: pkgi_download.c:465
 msgid "cannot create folder"
-msgstr "impossible de cr‚er un dossier"
+msgstr "impossible de crâ€šer un dossier"
 
 #: pkgi_download.c:475
 msgid "cannot create file"
-msgstr "impossible de cr‚er un fichier"
+msgstr "impossible de crâ€šer un fichier"
 
 #: pkgi_download.c:490
 msgid "cannot resume file"
@@ -291,19 +291,19 @@ msgstr "impossible de reprendre le fichier"
 
 #: pkgi_download.c:562
 msgid "pkg integrity failed, try downloading again"
-msgstr "chec de l'int‚grit‚ de pkg, essayez … nouveau de t‚l‚charger"
+msgstr "Âchec de l'intâ€šgritâ€š de pkg, essayez â€¦ nouveau de tâ€šlâ€šcharger"
 
 #: pkgi_download.c:573
 msgid "Creating RAP file"
-msgstr "Cr‚ation fichier RAP"
+msgstr "Crâ€šation fichier RAP"
 
 #: pkgi_download.c:581 pkgi_download.c:626
 msgid "Cannot save"
-msgstr "Impossible de sauver"
+msgstr "Impossible d'enregistrer"
 
 #: pkgi_download.c:621
 msgid "Creating RIF file"
-msgstr "Cr‚ation fichier RIF"
+msgstr "Crâ€šation fichier RIF"
 
 #: pkgi_download.c:646
 msgid "Resuming..."
@@ -311,15 +311,15 @@ msgstr "Reprise..."
 
 #: pkgi_download.c:652
 msgid "Adding background task..."
-msgstr "Ajout d'une tƒche en arriŠre-plan..."
+msgstr "Ajout d'une tÆ’che en arriÅ re-plan..."
 
 #: pkgi_download.c:675
 msgid "Downloading icon"
-msgstr "T‚l‚chargement ic“ne"
+msgstr "Tâ€šlâ€šchargement icâ€œne"
 
 #: pkgi_download.c:713
 msgid "Could not create install directory on HDD."
-msgstr "Impossible de cr‚er le r‚pertoire d'installation sur le disque dur"
+msgstr "Impossible de crâ€šer le râ€špertoire d'installation sur le disque dur"
 
 #: pkgi_menu.c:102
 msgid "Search..."
@@ -335,7 +335,7 @@ msgstr "Titre"
 
 #: pkgi_menu.c:105
 msgid "Region"
-msgstr "R‚gion"
+msgstr "Râ€šgion"
 
 #: pkgi_menu.c:106
 msgid "Name"
@@ -351,7 +351,7 @@ msgstr "Contenu:"
 
 #: pkgi_menu.c:110
 msgid "Regions:"
-msgstr "R‚gions:"
+msgstr "Râ€šgions:"
 
 #: pkgi_menu.c:111
 msgid "Asia"
@@ -375,7 +375,7 @@ msgstr ""
 
 #: pkgi_menu.c:116
 msgid "Back. DL"
-msgstr "DL en arriŠre plan"
+msgstr "DL en arriÅ re plan"
 
 #: pkgi_menu.c:117
 msgid "Music"
@@ -383,8 +383,8 @@ msgstr "Musique"
 
 #: pkgi_menu.c:119
 msgid "Refresh..."
-msgstr "RafraŒchir..."
+msgstr "RafraÅ’chir..."
 
 #: pkgi_menu.c:326
 msgid "Direct DL"
-msgstr "T‚l‚chargement Direct"
+msgstr "Tâ€šlâ€šchargement Direct"
