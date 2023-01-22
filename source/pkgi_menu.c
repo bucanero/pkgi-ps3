@@ -151,8 +151,8 @@ int pkgi_do_menu(pkgi_input* input)
 
     if (menu_width != 0)
     {
-        pkgi_draw_fill_rect_z(VITA_WIDTH - menu_width, 25, PKGI_MENU_Z, menu_width, PKGI_MENU_HEIGHT, PKGI_COLOR_MENU_BACKGROUND);
-        pkgi_draw_rect_z(VITA_WIDTH - menu_width, 25, PKGI_MENU_Z, menu_width, PKGI_MENU_HEIGHT, PKGI_COLOR_MENU_BORDER);
+        pkgi_draw_fill_rect_z(VITA_WIDTH - (menu_width + PKGI_MAIN_HMARGIN), PKGI_MAIN_VMARGIN, PKGI_MENU_Z, menu_width, PKGI_MENU_HEIGHT, PKGI_COLOR_MENU_BACKGROUND);
+        pkgi_draw_rect_z(VITA_WIDTH - (menu_width + PKGI_MAIN_HMARGIN), PKGI_MAIN_VMARGIN, PKGI_MENU_Z, menu_width, PKGI_MENU_HEIGHT, PKGI_COLOR_MENU_BORDER);
     }
 
     if (input->active & PKGI_BUTTON_UP)
@@ -291,9 +291,7 @@ int pkgi_do_menu(pkgi_input* input)
             y += font_height;
         }
 
-        uint32_t color = menu_selected == i ? PKGI_COLOR_TEXT_MENU_SELECTED : PKGI_COLOR_TEXT_MENU;
-
-        int x = VITA_WIDTH - PKGI_MENU_WIDTH + PKGI_MENU_LEFT_PADDING;
+        int x = VITA_WIDTH - (PKGI_MENU_WIDTH + PKGI_MAIN_HMARGIN) + PKGI_MENU_LEFT_PADDING;
 
         char text[64];
         if (type == MenuSearch || type == MenuSearchClear || type == MenuText || type == MenuRefresh)
@@ -340,7 +338,7 @@ int pkgi_do_menu(pkgi_input* input)
             pkgi_snprintf(text, sizeof(text), PKGI_UTF8_CLEAR " %s", content_entries[menu_config.content].text);
         }
         
-        pkgi_draw_text_z(x, y, PKGI_MENU_TEXT_Z, color, text);
+        pkgi_draw_text_z(x, y, PKGI_MENU_TEXT_Z, (menu_selected == i) ? PKGI_COLOR_TEXT_MENU_SELECTED : PKGI_COLOR_TEXT_MENU, text);
 
         y += font_height;
     }

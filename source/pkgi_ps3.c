@@ -282,17 +282,6 @@ static int sys_game_get_temperature(int sel, u32 *temperature)
     return_to_user_prog(int);
 }
 
-static void pkgi_temperature_thread(void)
-{
-    while (1)
-    {
-        sys_game_get_temperature(0, &cpu_temp_c[0]);
-        sys_game_get_temperature(1, &cpu_temp_c[1]);
-        usleep(10 * 1000 * 1000);
-    }
-    pkgi_thread_exit();
-}
-
 int pkgi_dialog_lock(void)
 {
     int res = sysMutexLock(g_dialog_lock, 0);
@@ -673,8 +662,6 @@ void pkgi_start(void)
         g_cancel_button = PKGI_BUTTON_O;
     }
     
-    pkgi_start_thread("temperature_thread", &pkgi_temperature_thread);
-
 	ya2d_init();
 
 	ya2d_paddata[0].ANA_L_H = ANALOG_CENTER;
@@ -784,6 +771,14 @@ void pkgi_end(void)
 
 int pkgi_get_temperature(uint8_t cpu)
 {
+    static uint32_t t = 0;
+
+    if (t++ % 0x100 == 0)
+    {
+        sys_game_get_temperature(0, &cpu_temp_c[0]);
+        sys_game_get_temperature(1, &cpu_temp_c[1]);
+    }
+
     return cpu_temp_c[cpu];
 }
 
@@ -795,9 +790,16 @@ int pkgi_temperature_is_high(void)
 uint64_t pkgi_get_free_space(void)
 {
     u32 blockSize;
-    u64 freeSize;
-    sysFsGetFreeSize("/dev_hdd0/", &blockSize, &freeSize);
-    return (blockSize * freeSize);
+    static uint32_t t = 0;
+    static uint64_t freeSize = 0;
+
+    if (t++ % 0x200 == 0)
+    {
+        sysFsGetFreeSize("/dev_hdd0/", &blockSize, &freeSize);
+        freeSize *= blockSize;
+    }
+
+    return (freeSize);
 }
 
 const char* pkgi_get_config_folder(void)
@@ -997,8 +999,9 @@ void pkgi_draw_texture(pkgi_texture texture, int x, int y)
     ya2d_drawTexture((ya2d_Texture*) texture, x, y);
 }
 
-void pkgi_draw_background(pkgi_texture texture) {
-    ya2d_drawTextureZ((ya2d_Texture*) texture, -70, -30, YA2D_DEFAULT_Z, 0.54f);
+void pkgi_draw_background(pkgi_texture texture)
+{
+    ya2d_drawTextureEx((ya2d_Texture*) texture, 0, 0, YA2D_DEFAULT_Z, VITA_WIDTH, VITA_HEIGHT);
 }
 
 void pkgi_draw_texture_z(pkgi_texture texture, int x, int y, int z, float scale)
