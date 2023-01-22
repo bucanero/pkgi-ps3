@@ -10,14 +10,14 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#define MAX_DB_SIZE (8*1024*1024)
-#define MAX_DB_ITEMS 32768
+#define MAX_DB_SIZE (32*1024*1024)
+#define MAX_DB_ITEMS 0x20000
 #define MAX_DB_COLUMNS 32
 
 #define EXTDB_ID_LENGTH 110
 #define EXTDB_ID_SHA256 "\x7d\x24\x89\x6f\x50\xf2\xb2\x3b\x7f\xbd\x12\xc4\x7c\x67\x93\xcd\xb5\x92\x55\x7c\x1c\x09\xaf\xf3\x25\xf5\x46\x5a\x35\x7f\xc9\x64"
 
-static char db_data[MAX_DB_SIZE];
+static char* db_data = NULL;
 static uint32_t db_total;
 static uint32_t db_size;
 
@@ -164,7 +164,7 @@ int update_database(const char* update_url, const char* path, char* error, uint3
         }
         else
         {
-            if (length > (int64_t)sizeof(db_data) - 1)
+            if (length > (int64_t)(MAX_DB_SIZE - 1))
             {
                 pkgi_snprintf(error, error_size, _("list is too large... check for newer pkgi version!"));
             }
@@ -200,7 +200,7 @@ int update_database(const char* update_url, const char* path, char* error, uint3
     return 1;
 }
 
-int load_database(uint8_t db_id)
+static int load_database(uint8_t db_id)
 {
     uint8_t column = 0;
     dbFormat dbf = { ',', 8, (ColumnType*)default_format, entries };
@@ -208,7 +208,7 @@ int load_database(uint8_t db_id)
     char path[256];
     pkgi_snprintf(path, sizeof(path), "%s/dbformat.txt", pkgi_get_config_folder());
 
-    int loaded = pkgi_load(path, db_data, sizeof(db_data) - 1);
+    int loaded = pkgi_load(path, db_data, MAX_DB_SIZE - 1);
     if (loaded > 0)
     {
         char* ptr = db_data;
@@ -257,7 +257,7 @@ int load_database(uint8_t db_id)
 
     LOG("loading database from %s", path);
     
-    loaded = pkgi_load(path, db_data+db_size, sizeof(db_data) - 1);
+    loaded = pkgi_load(path, db_data+db_size, MAX_DB_SIZE - 1);
     if (loaded > 0)
     {
         uint8_t check[SHA256_DIGEST_SIZE];
@@ -346,9 +346,13 @@ int load_database(uint8_t db_id)
 int pkgi_db_update(const char* update_url, uint32_t update_len, char* error, uint32_t error_size)
 {
     char path[256];
-    int i;
 
-    for (i = 0; i < MAX_CONTENT_TYPES; i++)
+    if (!db_data)
+    {
+        return 0;
+    }
+
+    for (int i = 0; i < MAX_CONTENT_TYPES; i++)
     {
         const char* tmp_url = update_url + update_len*i;
 
@@ -364,15 +368,20 @@ int pkgi_db_update(const char* update_url, uint32_t update_len, char* error, uin
 
 int pkgi_db_reload(char* error, uint32_t error_size)
 {
+    char path[256];
+
     db_total = 0;
     db_size = 0;
     db_count = 0;
     db_item_count = 0;
 
-    char path[256];
-    int i;
+    if (!db_data && (db_data = malloc(MAX_DB_SIZE)) == NULL)
+    {
+        pkgi_snprintf(error, error_size, "failed to allocate memory for database");
+        return 0;
+    }
 
-    for (i = 0; i < MAX_CONTENT_TYPES; i++)
+    for (int i = 0; i < MAX_CONTENT_TYPES; i++)
     {
         pkgi_snprintf(path, sizeof(path), "%s/pkgi%s.txt", pkgi_get_config_folder(), pkgi_content_tag(i));
 
