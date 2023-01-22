@@ -134,7 +134,7 @@ void pkgi_dialog_update_progress(const char* text, const char* extra, const char
     pkgi_strncpy(dialog_extra, sizeof(dialog_extra), extra ? extra : "");
     pkgi_strncpy(dialog_eta, sizeof(dialog_eta), eta ? eta : "");
 
-    dialog_progress = progress;
+    dialog_progress = (progress > 1.0f) ? 1.0f : progress;
 
     pkgi_dialog_unlock();
 }
