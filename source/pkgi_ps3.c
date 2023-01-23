@@ -634,7 +634,7 @@ void pkgi_start(void)
     
     netInitialize();
 
-    LOG("initializing SSL");
+    LOG("initializing Network");
     sysModuleLoad(SYSMODULE_NET);
     curl_global_init(CURL_GLOBAL_ALL);
 

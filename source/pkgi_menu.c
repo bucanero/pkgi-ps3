@@ -14,6 +14,7 @@ static MenuResult menu_result;
 
 static int32_t menu_width;
 static int32_t menu_delta;
+static int32_t pkgi_menu_width = 0;
 
 typedef enum {
     MenuSearch,
@@ -91,6 +92,15 @@ void pkgi_menu_get(Config* config)
     *config = menu_config;
 }
 
+static void set_max_width(const MenuEntry* entries, int size)
+{
+    for (int j, i = 0; i < size; i++)
+    {
+        if ((j = pkgi_text_width(entries[i].text) + PKGI_MENU_LEFT_PADDING*2) > pkgi_menu_width)
+            pkgi_menu_width = j;
+    }
+}
+
 void pkgi_menu_start(int search_clear, const Config* config)
 {
     menu_search_clear = search_clear;
@@ -128,6 +138,13 @@ void pkgi_menu_start(int search_clear, const Config* config)
     content_entries[7].text = _("Emulators");
     content_entries[8].text = _("Apps");
     content_entries[9].text = _("Tools");
+
+    if (pkgi_menu_width)
+        return;
+
+    pkgi_menu_width = PKGI_MENU_WIDTH;
+    set_max_width(menu_entries, PKGI_COUNTOF(menu_entries));
+    set_max_width(content_entries, PKGI_COUNTOF(content_entries));
 }
 
 int pkgi_do_menu(pkgi_input* input)
@@ -142,9 +159,9 @@ int pkgi_do_menu(pkgi_input* input)
             menu_delta = 0;
             return 0;
         }
-        else if (menu_delta > 0 && menu_width >= PKGI_MENU_WIDTH)
+        else if (menu_delta > 0 && menu_width >= pkgi_menu_width)
         {
-            menu_width = PKGI_MENU_WIDTH;
+            menu_width = pkgi_menu_width;
             menu_delta = 0;
         }
     }
@@ -261,7 +278,7 @@ int pkgi_do_menu(pkgi_input* input)
         }
     }
 
-    if (menu_width != PKGI_MENU_WIDTH)
+    if (menu_width != pkgi_menu_width)
     {
         return 1;
     }
@@ -291,7 +308,7 @@ int pkgi_do_menu(pkgi_input* input)
             y += font_height;
         }
 
-        int x = VITA_WIDTH - (PKGI_MENU_WIDTH + PKGI_MAIN_HMARGIN) + PKGI_MENU_LEFT_PADDING;
+        int x = VITA_WIDTH - (pkgi_menu_width + PKGI_MAIN_HMARGIN) + PKGI_MENU_LEFT_PADDING;
 
         char text[64];
         if (type == MenuSearch || type == MenuSearchClear || type == MenuText || type == MenuRefresh)
