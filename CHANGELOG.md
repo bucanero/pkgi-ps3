@@ -4,6 +4,19 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 ## [Unreleased]()
 
+## [v1.2.4](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.2.4) - 2023-01-23
+
+### Added
+
+* Explicit FTP over TLS support
+* Increased database memory limit to 32 Mb
+* Variable Menu width (auto-adjusted to translated text width)
+
+### Fixed
+
+* Progress bar not showing correct values when resuming a file
+* Proper screen aspect ratio (Tiny3D issue)
+
 ## [v1.2.2](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.2.2) - 2021-10-22
 
 ### Added
