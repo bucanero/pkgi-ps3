@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PKGi PS3\n"
 "POT-Creation-Date: 2021-10-09 17:56-0300\n"
-"PO-Revision-Date: 2021-10-09 18:00-0300\n"
+"PO-Revision-Date: 2023-02-05 20:08-0300\n"
 "Last-Translator: DEX357\n"
 "Language-Team: \n"
 "Language: pl\n"
@@ -39,19 +39,19 @@ msgstr "Zadanie pomyslnie umieszczone w kolejce (uruchom ponownie, aby rozpoczac
 
 #: pkgi.c:163
 msgid "GB"
-msgstr ""
+msgstr "GB"
 
 #: pkgi.c:167 pkgi_download.c:249
 msgid "MB"
-msgstr ""
+msgstr "MB"
 
 #: pkgi.c:171 pkgi.c:504 pkgi_download.c:253
 msgid "KB"
-msgstr ""
+msgstr "KB"
 
 #: pkgi.c:175
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: pkgi.c:185
 #, c-format
@@ -108,7 +108,7 @@ msgstr "Wyjsc do XMB?"
 
 #: pkgi.c:436
 msgid "No items!"
-msgstr "Zadnych danych!"
+msgstr "Brak danych!"
 
 #: pkgi.c:462
 msgid "Item already installed, download again?"
@@ -116,11 +116,11 @@ msgstr "Element juz zainstalowany, pobrac ponownie?"
 
 #: pkgi.c:471 pkgi_download.c:372 pkgi_download.c:652
 msgid "Downloading..."
-msgstr "Sciaganie..."
+msgstr "Pobieranie..."
 
 #: pkgi.c:471 pkgi.c:674
 msgid "Preparing..."
-msgstr "Przygotowanie..."
+msgstr "Przygotowywanie..."
 
 #: pkgi.c:504 pkgi.c:508
 msgid "Refreshing"
@@ -128,11 +128,11 @@ msgstr "Odswiezanie"
 
 #: pkgi.c:563 pkgi.c:567
 msgid "Count"
-msgstr "Przeliczanie"
+msgstr "Ilosc"
 
 #: pkgi.c:575
 msgid "Free"
-msgstr "Darmowy"
+msgstr "Wolne"
 
 #: pkgi.c:585
 msgid "Select"
@@ -172,7 +172,7 @@ msgstr "Szukaj"
 
 #: pkgi_db.c:145 pkgi_db.c:153
 msgid "failed to download list from"
-msgstr "nie udalo sie pobrac z listy"
+msgstr "nie udalo sie pobrac listy z"
 
 #: pkgi_db.c:159
 msgid "list is too large... check for newer pkgi version!"
@@ -184,7 +184,7 @@ msgstr "lista jest pusta... sprawdz serwer DB"
 
 #: pkgi_db.c:390
 msgid "ERROR: pkgi.txt file(s) missing or bad config.txt file"
-msgstr "BLAD: brak pliku(�w) pkgi.txt lub zly plik config.txt"
+msgstr "BLAD: brak pliku(ow) pkgi.txt lub zly plik config.txt"
 
 #: pkgi_dialog.c:80
 msgid "Content"
@@ -264,7 +264,7 @@ msgstr "Nie mozna utworzyc pliku PKG na HDD."
 
 #: pkgi_download.c:360
 msgid "Could not create task files to HDD."
-msgstr "Nie mozna utworzyc plik�w zadan na HDD."
+msgstr "Nie mozna utworzyc plikow zadan na HDD."
 
 #: pkgi_download.c:425
 msgid "HTTP download error"
@@ -316,7 +316,7 @@ msgstr "Dodawanie zadania w tle..."
 
 #: pkgi_download.c:675
 msgid "Downloading icon"
-msgstr "Ikona pobierania"
+msgstr "Pobieranie ikon"
 
 #: pkgi_download.c:713
 msgid "Could not create install directory on HDD."
@@ -376,7 +376,7 @@ msgstr "Opcje:"
 
 #: pkgi_menu.c:116
 msgid "Back. DL"
-msgstr "Przywroc. DL"
+msgstr "DL w tle"
 
 #: pkgi_menu.c:117
 msgid "Music"
@@ -388,7 +388,7 @@ msgstr "Odswiez..."
 
 #: pkgi_menu.c:326
 msgid "Direct DL"
-msgstr "Skieruj DL"
+msgstr "DL bezposr."
 
 #msgid "---translated by---"
-#msgstr "DEX357"
+#msgstr "DEX357, PoliPyc, olokos"
