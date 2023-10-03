@@ -1,3 +1,4 @@
+#include <mini18n.h>
 #include "pkgi_menu.h"
 #include "pkgi_config.h"
 #include "pkgi_style.h"
@@ -13,6 +14,7 @@ static MenuResult menu_result;
 
 static int32_t menu_width;
 static int32_t menu_delta;
+static int32_t pkgi_menu_width = 0;
 
 typedef enum {
     MenuSearch,
@@ -33,7 +35,7 @@ typedef struct {
     uint32_t value;
 } MenuEntry;
 
-static const MenuEntry menu_entries[] =
+static MenuEntry menu_entries[] =
 {
     { MenuSearch, "Search...", 0 },
     { MenuSearchClear, PKGI_UTF8_CLEAR " clear", 0 },
@@ -61,7 +63,7 @@ static const MenuEntry menu_entries[] =
     { MenuRefresh, "Refresh...", 0 },
 };
 
-static const MenuEntry content_entries[] = 
+static MenuEntry content_entries[] = 
 {
     { MenuFilter, "All", DbFilterAllContent },
     { MenuFilter, "Games", DbFilterContentGame },
@@ -69,7 +71,7 @@ static const MenuEntry content_entries[] =
     { MenuFilter, "Themes", DbFilterContentTheme },
     { MenuFilter, "Avatars", DbFilterContentAvatar },
     { MenuFilter, "Demos", DbFilterContentDemo },
-    { MenuFilter, "Managers", DbFilterContentManager },
+    { MenuFilter, "Updates", DbFilterContentUpdate },
     { MenuFilter, "Emulators", DbFilterContentEmulator },
     { MenuFilter, "Apps", DbFilterContentApp },
     { MenuFilter, "Tools", DbFilterContentTool }
@@ -90,6 +92,15 @@ void pkgi_menu_get(Config* config)
     *config = menu_config;
 }
 
+static void set_max_width(const MenuEntry* entries, int size)
+{
+    for (int j, i = 0; i < size; i++)
+    {
+        if ((j = pkgi_text_width(entries[i].text) + PKGI_MENU_LEFT_PADDING*2) > pkgi_menu_width)
+            pkgi_menu_width = j;
+    }
+}
+
 void pkgi_menu_start(int search_clear, const Config* config)
 {
     menu_search_clear = search_clear;
@@ -97,6 +108,43 @@ void pkgi_menu_start(int search_clear, const Config* config)
     menu_delta = 1;
     menu_config = *config;
     menu_allow_refresh = config->allow_refresh;
+
+    menu_entries[0].text = _("Search...");
+    menu_entries[2].text = _("Sort by:");
+    menu_entries[3].text = _("Title");
+    menu_entries[4].text = _("Region");
+    menu_entries[5].text = _("Name");
+    menu_entries[6].text = _("Size");
+    menu_entries[7].text = _("Content:");
+    menu_entries[8].text = _("All");
+    menu_entries[9].text = _("Regions:");
+    menu_entries[10].text = _("Asia");
+    menu_entries[11].text = _("Europe");
+    menu_entries[12].text = _("Japan");
+    menu_entries[13].text = _("USA");
+    menu_entries[14].text = _("Options:");
+    menu_entries[15].text = _("Back. DL");
+    menu_entries[16].text = _("Music");
+    menu_entries[17].text = _("Updates");
+    menu_entries[18].text = _("Refresh...");
+
+    content_entries[0].text = _("All");
+    content_entries[1].text = _("Games");
+    content_entries[2].text = _("DLCs");
+    content_entries[3].text = _("Themes");
+    content_entries[4].text = _("Avatars");
+    content_entries[5].text = _("Demos");
+    content_entries[6].text = _("Updates");
+    content_entries[7].text = _("Emulators");
+    content_entries[8].text = _("Apps");
+    content_entries[9].text = _("Tools");
+
+    if (pkgi_menu_width)
+        return;
+
+    pkgi_menu_width = PKGI_MENU_WIDTH;
+    set_max_width(menu_entries, PKGI_COUNTOF(menu_entries));
+    set_max_width(content_entries, PKGI_COUNTOF(content_entries));
 }
 
 int pkgi_do_menu(pkgi_input* input)
@@ -111,17 +159,17 @@ int pkgi_do_menu(pkgi_input* input)
             menu_delta = 0;
             return 0;
         }
-        else if (menu_delta > 0 && menu_width >= PKGI_MENU_WIDTH)
+        else if (menu_delta > 0 && menu_width >= pkgi_menu_width)
         {
-            menu_width = PKGI_MENU_WIDTH;
+            menu_width = pkgi_menu_width;
             menu_delta = 0;
         }
     }
 
     if (menu_width != 0)
     {
-        pkgi_draw_fill_rect_z(VITA_WIDTH - menu_width, 25, PKGI_MENU_Z, menu_width, PKGI_MENU_HEIGHT, PKGI_COLOR_MENU_BACKGROUND);
-        pkgi_draw_rect_z(VITA_WIDTH - menu_width, 25, PKGI_MENU_Z, menu_width, PKGI_MENU_HEIGHT, PKGI_COLOR_MENU_BORDER);
+        pkgi_draw_fill_rect_z(VITA_WIDTH - (menu_width + PKGI_MAIN_HMARGIN), PKGI_MAIN_VMARGIN, PKGI_MENU_Z, menu_width, PKGI_MENU_HEIGHT, PKGI_COLOR_MENU_BACKGROUND);
+        pkgi_draw_rect_z(VITA_WIDTH - (menu_width + PKGI_MAIN_HMARGIN), PKGI_MAIN_VMARGIN, PKGI_MENU_Z, menu_width, PKGI_MENU_HEIGHT, PKGI_COLOR_MENU_BORDER);
     }
 
     if (input->active & PKGI_BUTTON_UP)
@@ -230,7 +278,7 @@ int pkgi_do_menu(pkgi_input* input)
         }
     }
 
-    if (menu_width != PKGI_MENU_WIDTH)
+    if (menu_width != pkgi_menu_width)
     {
         return 1;
     }
@@ -260,9 +308,7 @@ int pkgi_do_menu(pkgi_input* input)
             y += font_height;
         }
 
-        uint32_t color = menu_selected == i ? PKGI_COLOR_TEXT_MENU_SELECTED : PKGI_COLOR_TEXT_MENU;
-
-        int x = VITA_WIDTH - PKGI_MENU_WIDTH + PKGI_MENU_LEFT_PADDING;
+        int x = VITA_WIDTH - (pkgi_menu_width + PKGI_MAIN_HMARGIN) + PKGI_MENU_LEFT_PADDING;
 
         char text[64];
         if (type == MenuSearch || type == MenuSearchClear || type == MenuText || type == MenuRefresh)
@@ -292,7 +338,7 @@ int pkgi_do_menu(pkgi_input* input)
         else if (type == MenuMode)
         {
             pkgi_snprintf(text, sizeof(text), PKGI_UTF8_CLEAR " %s",
-                menu_config.dl_mode_background == entry->value ? entry->text : "Direct DL");            
+                menu_config.dl_mode_background == entry->value ? entry->text : _("Direct DL"));
         }
         else if (type == MenuMusic)
         {
@@ -309,7 +355,7 @@ int pkgi_do_menu(pkgi_input* input)
             pkgi_snprintf(text, sizeof(text), PKGI_UTF8_CLEAR " %s", content_entries[menu_config.content].text);
         }
         
-        pkgi_draw_text_z(x, y, PKGI_MENU_TEXT_Z, color, text);
+        pkgi_draw_text_z(x, y, PKGI_MENU_TEXT_Z, (menu_selected == i) ? PKGI_COLOR_TEXT_MENU_SELECTED : PKGI_COLOR_TEXT_MENU, text);
 
         y += font_height;
     }

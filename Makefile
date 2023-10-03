@@ -13,7 +13,7 @@ endif
 TITLE		:=	PKGi PS3
 APPID		:=	NP00PKGI3
 CONTENTID	:=	UP0001-$(APPID)_00-0000000000000000
-ICON0		:=	ICON0.PNG
+ICON0		:=	pkgfiles/ICON0.PNG
 SFOXML		:=	sfo.xml
 
 include $(PSL1GHT)/ppu_rules
@@ -33,12 +33,13 @@ SOURCES		:=	source
 DATA		:=	data
 SHADERS		:=	shaders
 INCLUDES	:=	include
-
+PKGFILES	:=	pkgfiles
 
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS		:=	-lya2d -lfont -ltiny3d -lsimdmath -lgcm_sys -lio -lsysutil -lrt -llv2 -lpngdec -lsysmodule -lm -lsysfs  -ljpgdec -ldbglogger -lnet -lhttp -lhttputil -lssl -lfreetype -lz -lmikmod -laudio
+LIBS		:=	-lcurl -lxml2 -lya2d -lfont3d -ltiny3d -lsimdmath -lgcm_sys -lio -lsysutil -lrt -llv2 -lpngdec -lsysmodule -lm -lsysfs  -ljpgdec \
+				-lnet -lfreetype -lz -lmikmod -laudio -lpolarssl -lmini18n -ljson-c
 
 
 #---------------------------------------------------------------------------------
@@ -52,6 +53,7 @@ LDFLAGS		=	$(MACHDEP) -Wl,-Map,$(notdir $@).map
 
 ifdef DEBUGLOG
 CFLAGS		+=	-DPKGI_ENABLE_LOGGING
+LIBS		+=	-ldbglogger
 endif
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -108,6 +110,8 @@ export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
 export INCLUDE	:=	$(foreach dir,$(INCLUDES), -I$(CURDIR)/$(dir)) \
 					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
 					$(LIBPSL1GHT_INC) \
+					-I$(PORTLIBS)/include/freetype2 \
+					-I$(PORTLIBS)/include/libxml2 \
 					-I$(CURDIR)/$(BUILD) -I$(PORTLIBS)/include
 
 #---------------------------------------------------------------------------------
@@ -143,6 +147,12 @@ npdrm: $(BUILD)
 	@$(SELF_NPDRM) $(SCETOOL_FLAGS) --np-content-id=$(CONTENTID) --encrypt $(BUILDDIR)/$(basename $(notdir $(OUTPUT))).elf $(BUILDDIR)/../EBOOT.BIN
 
 #---------------------------------------------------------------------------------
+
+quickpkg:
+	$(VERB) if [ -n "$(PKGFILES)" -a -d "$(PKGFILES)" ]; then cp -rf $(PKGFILES)/* $(BUILDDIR)/pkg/; fi
+	$(VERB) $(PKG) --contentid $(CONTENTID) $(BUILDDIR)/pkg/ $(TARGET).pkg >> /dev/null
+	$(VERB) cp $(TARGET).pkg $(TARGET).gnpdrm.pkg
+	$(VERB) $(PACKAGE_FINALIZE) $(TARGET).gnpdrm.pkg
 
 else
 

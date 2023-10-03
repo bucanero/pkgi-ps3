@@ -1,0 +1,394 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PKGi PS3\n"
+"POT-Creation-Date: 2021-10-09 19:00-0300\n"
+"PO-Revision-Date: 2021-10-09 19:00-0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
+"X-Poedit-Basepath: ./source\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Flags-xgettext: --add-comments\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: _\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: pkgi.c:82
+msgid "Installing"
+msgstr "Kuruluyor"
+
+#: pkgi.c:82
+msgid "Please wait..."
+msgstr "LÅtfen Bekleyin..."
+
+#: pkgi.c:94
+msgid "Installation failed"
+msgstr "Kurulum Basarisiz Oldu"
+
+#: pkgi.c:118
+msgid "Successfully downloaded"
+msgstr "Basariyla YÅklendi"
+
+#: pkgi.c:122
+msgid "Task successfully queued (reboot to start)"
+msgstr "Gîrev Basariyla Siraya Alindi(Baslatmak iáin yeniden baslatin.)"
+
+#: pkgi.c:163
+msgid "GB"
+msgstr "GB"
+
+#: pkgi.c:167 pkgi_download.c:249
+msgid "MB"
+msgstr "MB"
+
+#: pkgi.c:171 pkgi.c:504 pkgi_download.c:253
+msgid "KB"
+msgstr "KB"
+
+#: pkgi.c:175
+msgid "B"
+msgstr "B"
+
+#: pkgi.c:185
+#, c-format
+msgid "pkg requires %u %s free space, but only %u %s available"
+msgstr "PKG %u %s kadar bos alan gerektirir ancak %u %s kadar alan mevcut"
+
+#: pkgi.c:225 pkgi_menu.c:109 pkgi_menu.c:121
+msgid "All"
+msgstr "Hepsi"
+
+#: pkgi.c:226 pkgi_menu.c:122
+msgid "Games"
+msgstr "Oyunlar"
+
+#: pkgi.c:227 pkgi_menu.c:123
+msgid "DLCs"
+msgstr "DLC'ler"
+
+#: pkgi.c:228 pkgi_menu.c:124
+msgid "Themes"
+msgstr "Temalar"
+
+#: pkgi.c:229 pkgi_menu.c:125
+msgid "Avatars"
+msgstr "Karakterler"
+
+#: pkgi.c:230 pkgi_menu.c:126
+msgid "Demos"
+msgstr "Demolar"
+
+#: pkgi.c:231 pkgi_menu.c:118 pkgi_menu.c:127
+msgid "Updates"
+msgstr "GÅncelle"
+
+#: pkgi.c:232 pkgi_menu.c:128
+msgid "Emulators"
+msgstr "ôykÅnÅcÅler"
+
+#: pkgi.c:233 pkgi_menu.c:129
+msgid "Apps"
+msgstr "Uygulamalar"
+
+#: pkgi.c:234 pkgi_menu.c:130
+msgid "Tools"
+msgstr "Araálar"
+
+#: pkgi.c:235
+msgid "Unknown"
+msgstr "Bilinmeyen"
+
+#: pkgi.c:253
+msgid "Exit to XMB?"
+msgstr "XMB'ye dînÅlsÅn mÅ?"
+
+#: pkgi.c:436
+msgid "No items!"
+msgstr "ôge yok!"
+
+#: pkgi.c:462
+msgid "Item already installed, download again?"
+msgstr "Bu îge zaten indirildi. Yeniden indirilsin mi?"
+
+#: pkgi.c:471 pkgi_download.c:372 pkgi_download.c:652
+msgid "Downloading..."
+msgstr "Indiriliyor..."
+
+#: pkgi.c:471 pkgi.c:674
+msgid "Preparing..."
+msgstr "Hazirlaniyor..."
+
+#: pkgi.c:504 pkgi.c:508
+msgid "Refreshing"
+msgstr "Yenileniyor"
+
+#: pkgi.c:563 pkgi.c:567
+msgid "Count"
+msgstr "Sayi"
+
+#: pkgi.c:575
+msgid "Free"
+msgstr "Bos"
+
+#: pkgi.c:585
+msgid "Select"
+msgstr "Seá"
+
+#: pkgi.c:585
+msgid "Close"
+msgstr "Kapat"
+
+#: pkgi.c:585
+msgid "Cancel"
+msgstr "Iptal Et"
+
+#: pkgi.c:589 pkgi_download.c:136
+msgid "Download"
+msgstr "Indir"
+
+#: pkgi.c:589
+msgid "Menu"
+msgstr "MenÅ"
+
+#: pkgi.c:589
+msgid "Details"
+msgstr "Detaylar"
+
+#: pkgi.c:589
+msgid "Exit"
+msgstr "Äikis"
+
+#: pkgi.c:678
+msgid "Successfully downloaded PKGi PS3 update"
+msgstr "PKGi PS3 gÅncellemesi basariyla indirildi"
+
+#: pkgi.c:1051
+msgid "Search"
+msgstr "Ara"
+
+#: pkgi_db.c:145 pkgi_db.c:153
+msgid "failed to download list from"
+msgstr "Liste suradan indirilemedi"
+
+#: pkgi_db.c:159
+msgid "list is too large... check for newer pkgi version!"
+msgstr "liste áok bÅyÅk... yeni pkgi sÅrÅmÅnÅ kontrol edin!"
+
+#: pkgi_db.c:187
+msgid "list is empty... check the DB server"
+msgstr "liste bos... veritabanini kontrol edin"
+
+#: pkgi_db.c:390
+msgid "ERROR: pkgi.txt file(s) missing or bad config.txt file"
+msgstr "Hata: pkgi.txt dosyasi eksik veya hatali config.txt dosyasi"
+
+#: pkgi_dialog.c:80
+msgid "Content"
+msgstr "Iáerik"
+
+#: pkgi_dialog.c:108
+msgid "ERROR"
+msgstr "HATA"
+
+#: pkgi_dialog.c:169
+msgid "Failed to download the update list"
+msgstr "GÅncelleme listesi indirmesi basarisiz oldu"
+
+#: pkgi_dialog.c:174
+msgid "update(s) loaded"
+msgstr "GÅncelleme(ler) yÅklendi"
+
+#: pkgi_dialog.c:319
+#, c-format
+msgid "press %s to cancel"
+msgstr "Iptal etmek iáin %s tusuna basin"
+
+#: pkgi_dialog.c:333
+#, c-format
+msgid "press %s to close - %s to scan updates"
+msgstr "Kapatmak iáin %s tusuna, gÅncellemeleri kontrol etmek iáin %s tusuna basin"
+
+#: pkgi_dialog.c:365
+msgid "Enter"
+msgstr "Onayla"
+
+#: pkgi_dialog.c:365
+msgid "Back"
+msgstr "Geri"
+
+#: pkgi_dialog.c:367
+#, c-format
+msgid "press %s to close"
+msgstr "Kapatmak iáin %s tusuna basin"
+
+#. 00000069 - Display title
+#: pkgi_download.c:183
+msgid "Install"
+msgstr "YÅkle"
+
+#: pkgi_download.c:216 pkgi_download.c:220 pkgi_download.c:226
+msgid "ETA"
+msgstr "ETA"
+
+#: pkgi_download.c:310 pkgi_download.c:392
+msgid "Could not send HTTP request"
+msgstr "HTTP istegi gînderilemedi"
+
+#: pkgi_download.c:317 pkgi_download.c:399
+msgid "HTTP request failed"
+msgstr "HTTP istegi basarisiz oldu"
+
+#: pkgi_download.c:322 pkgi_download.c:404
+msgid "HTTP response has unknown length"
+msgstr "HTTP cevabi bilinmeyen uzunlukta"
+
+#: pkgi_download.c:331
+msgid "Not enough free space on HDD"
+msgstr "HDD'de yeterli bos alan yok"
+
+#: pkgi_download.c:340
+msgid "Could not create task directory on HDD."
+msgstr "HDD'de gîrev dizini olusturulamadi."
+
+#: pkgi_download.c:348
+msgid "Saving background task..."
+msgstr "Arkaplan gîrevi kaydediliyor..."
+
+#: pkgi_download.c:354
+msgid "Could not create PKG file to HDD."
+msgstr "PKG dosyasi HDD Åzerinde olusturulamadi."
+
+#: pkgi_download.c:360
+msgid "Could not create task files to HDD."
+msgstr "Gîrev dosyalari HDD Åzerinde olusturulamadi."
+
+#: pkgi_download.c:425
+msgid "HTTP download error"
+msgstr "HTTP indirme hatasi"
+
+#: pkgi_download.c:432
+msgid "HTTP connection closed"
+msgstr "HTTP baglantisi kapandi"
+
+#: pkgi_download.c:445
+msgid "failed to write to"
+msgstr "suraya yazma islemi basarisiz oldu"
+
+#: pkgi_download.c:465
+msgid "cannot create folder"
+msgstr "klasîr olusturulamadi"
+
+#: pkgi_download.c:475
+msgid "cannot create file"
+msgstr "dosya olusturulamadi"
+
+#: pkgi_download.c:490
+msgid "cannot resume file"
+msgstr "dosya indirme islemine devam edilemedi"
+
+#: pkgi_download.c:562
+msgid "pkg integrity failed, try downloading again"
+msgstr "pkg bÅtÅnlÅgÅ basarisiz oldu, tekrar indirmeyi deneyin"
+
+#: pkgi_download.c:573
+msgid "Creating RAP file"
+msgstr "RAP dosyasi olusturuluyor"
+
+#: pkgi_download.c:581 pkgi_download.c:626
+msgid "Cannot save"
+msgstr "Kaydedilemedi"
+
+#: pkgi_download.c:621
+msgid "Creating RIF file"
+msgstr "RIF dosyasi olusturulutor"
+
+#: pkgi_download.c:646
+msgid "Resuming..."
+msgstr "SÅrdÅrÅlÅyor..."
+
+#: pkgi_download.c:652
+msgid "Adding background task..."
+msgstr "Arkaplan gîrevi ekleniyor..."
+
+#: pkgi_download.c:675
+msgid "Downloading icon"
+msgstr "Simge indiriliyor"
+
+#: pkgi_download.c:713
+msgid "Could not create install directory on HDD."
+msgstr "Dizin HDD Åzerinde olusturulamadi."
+
+#: pkgi_menu.c:102
+msgid "Search..."
+msgstr "Ara..."
+
+#: pkgi_menu.c:103
+msgid "Sort by:"
+msgstr "Sirala:"
+
+#: pkgi_menu.c:104
+msgid "Title"
+msgstr "Baslik"
+
+#: pkgi_menu.c:105
+msgid "Region"
+msgstr "Bîlge"
+
+#: pkgi_menu.c:106
+msgid "Name"
+msgstr "Isim"
+
+#: pkgi_menu.c:107
+msgid "Size"
+msgstr "Boyut"
+
+#: pkgi_menu.c:108
+msgid "Content:"
+msgstr "Iáerik:"
+
+#: pkgi_menu.c:110
+msgid "Regions:"
+msgstr "Bîlgeler:"
+
+#: pkgi_menu.c:111
+msgid "Asia"
+msgstr "Asya"
+
+#: pkgi_menu.c:112
+msgid "Europe"
+msgstr "Avrupa"
+
+#: pkgi_menu.c:113
+msgid "Japan"
+msgstr "Japonya"
+
+#: pkgi_menu.c:114
+msgid "USA"
+msgstr "Amerika"
+
+#: pkgi_menu.c:115
+msgid "Options:"
+msgstr "Seáenekler"
+
+#: pkgi_menu.c:116
+msgid "Back. DL"
+msgstr "Arkaplan"
+
+#: pkgi_menu.c:117
+msgid "Music"
+msgstr "MÅzik"
+
+#: pkgi_menu.c:119
+msgid "Refresh..."
+msgstr "Yenile..."
+
+#: pkgi_menu.c:326
+msgid "Direct DL"
+msgstr "Direkt"
+
+#msgid "---translated by---"
+#msgstr "Cruslan1"

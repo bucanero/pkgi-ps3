@@ -38,14 +38,14 @@ typedef enum {
     DbFilterContentTheme    = 0x000400,
     DbFilterContentAvatar   = 0x000800,
     DbFilterContentDemo     = 0x001000,
-    DbFilterContentManager  = 0x002000,
+    DbFilterContentUpdate   = 0x002000,
     DbFilterContentEmulator = 0x004000,
     DbFilterContentApp      = 0x008000,
     DbFilterContentTool     = 0x010000,
 
     DbFilterAllRegions = DbFilterRegionUSA | DbFilterRegionEUR | DbFilterRegionJPN | DbFilterRegionASA,
     DbFilterAllContent = DbFilterContentGame | DbFilterContentDLC | DbFilterContentTheme | DbFilterContentAvatar | 
-                         DbFilterContentDemo | DbFilterContentManager | DbFilterContentEmulator | DbFilterContentApp | DbFilterContentTool,
+                         DbFilterContentDemo | DbFilterContentUpdate | DbFilterContentEmulator | DbFilterContentApp | DbFilterContentTool,
     DbFilterAll = DbFilterAllRegions | DbFilterAllContent | DbFilterInstalled | DbFilterMissing,
 } DbFilter;
 
@@ -56,7 +56,7 @@ typedef enum {
     ContentTheme,
     ContentAvatar,
     ContentDemo,
-    ContentManager,
+    ContentUpdate,
     ContentEmulator,
     ContentApp,
     ContentTool
@@ -91,12 +91,14 @@ typedef struct Config {
     uint8_t dl_mode_background;
     uint8_t music;
     uint8_t allow_refresh;
+    char language[3];
 } Config;
 
 
 int pkgi_db_reload(char* error, uint32_t error_size);
 int pkgi_db_update(const char* update_url, uint32_t update_len, char* error, uint32_t error_size);
 void pkgi_db_get_update_status(uint32_t* updated, uint32_t* total);
+int pkgi_db_load_xml_updates(const char* content_id, const char* name);
 
 void pkgi_db_configure(const char* search, const Config* config);
 

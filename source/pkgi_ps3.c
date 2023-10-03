@@ -5,11 +5,12 @@
 #include <sys/thread.h>
 #include <sys/mutex.h>
 #include <sys/memory.h>
+#include <sys/process.h>
 #include <sysutil/osk.h>
 
-#include <http/https.h>
 #include <io/pad.h>
 #include <lv2/sysfs.h>
+#include <lv2/process.h>
 #include <net/net.h>
 
 #include <unistd.h>
@@ -17,6 +18,7 @@
 #include <stdio.h>
 
 #include <ya2d/ya2d.h>
+#include <curl/curl.h>
 
 #include "ttf_render.h"
 
@@ -45,14 +47,9 @@
 struct pkgi_http
 {
     int used;
-    int local;
-
-    void* fd;
     uint64_t size;
     uint64_t offset;
-
-    httpClientId client;
-    httpTransId transaction;
+    CURL *curl;
 };
 
 typedef struct 
@@ -65,11 +62,9 @@ typedef struct
 
 typedef struct
 {
-    void* http_pool;
-    void* ssl_pool;
-    httpsData* caList;
-    void* cert_buffer;
-} t_http_pools;
+    char *memory;
+    size_t size;
+} curl_memory_t;
 
 
 static sys_mutex_t g_dialog_lock;
@@ -96,7 +91,6 @@ static uint16_t g_ime_input[SCE_IME_DIALOG_MAX_TEXT_LENGTH + 1];
 
 static pkgi_http g_http[4];
 static t_tex_buttons tex_buttons;
-static t_http_pools http_pools;
 
 static MREADER *mem_reader;
 static MODULE *module;
@@ -197,6 +191,8 @@ static void pkgi_start_debug_log(void)
 #ifdef PKGI_ENABLE_LOGGING
     dbglogger_init();
     LOG("PKGi PS3 logging initialized");
+
+    dbglogger_failsafe("9999");
 #endif
 }
 
@@ -284,17 +280,6 @@ static int sys_game_get_temperature(int sel, u32 *temperature)
     lv2syscall2(383, (u64) sel, (u64) &temp); 
     *temperature = (temp >> 24);
     return_to_user_prog(int);
-}
-
-static void pkgi_temperature_thread(void)
-{
-    while (1)
-    {
-        sys_game_get_temperature(0, &cpu_temp_c[0]);
-        sys_game_get_temperature(1, &cpu_temp_c[1]);
-        usleep(10 * 1000 * 1000);
-    }
-    pkgi_thread_exit();
 }
 
 int pkgi_dialog_lock(void)
@@ -626,55 +611,21 @@ void load_ttf_fonts()
 	ya2d_texturePointer = (u32*) init_ttf_table((u16*) ya2d_texturePointer);
 }
 
-void init_http_pool(void)
+static void sys_callback(uint64_t status, uint64_t param, void* userdata)
 {
-    int ret;
-	s32 cert_size=0;
+    switch (status) {
+        case SYSUTIL_EXIT_GAME:
+            pkgi_end();
+            sysProcessExit(1);
+            break;
+        
+        case SYSUTIL_MENU_OPEN:
+        case SYSUTIL_MENU_CLOSE:
+            break;
 
-    LOG("initializing HTTP");
-    http_pools.http_pool = malloc(0x10000);
-    if(http_pools.http_pool) {
-        ret = httpInit(http_pools.http_pool, 0x10000);
-        if(ret < 0) {
-            LOG("Error: httpInit failed (%x)", ret);
-        }
+        default:
+            break;
     }
-
-    LOG("initializing HTTPS");
-	http_pools.ssl_pool = malloc(0x40000);
-    if(http_pools.ssl_pool) {
-		ret = sslInit(http_pools.ssl_pool, 0x40000);
-		if (ret < 0) {
-			LOG("Error : sslInit failed (%x)", ret);
-        }
-    }
-
-	ret = sslCertificateLoader(SSL_LOAD_CERT_ALL, NULL, 0, &cert_size);
-	if (ret < 0) {
-		LOG("Error : sslCertificateLoader failed (%x)", ret);
-	}
-
-	http_pools.cert_buffer = malloc(cert_size);
-	if (http_pools.cert_buffer==NULL) {
-		LOG("Error : out of memory (cert_buffer)");
-	}
-
-	ret = sslCertificateLoader(SSL_LOAD_CERT_ALL, http_pools.cert_buffer, cert_size, NULL);
-	if (ret < 0) {
-		LOG("Error : sslCertificateLoader failed (%x)", ret);
-	}
-
-    http_pools.caList = (httpsData *)malloc(sizeof(httpsData));
-    if (http_pools.caList) {
-    	(&http_pools.caList[0])->ptr = http_pools.cert_buffer;
-	    (&http_pools.caList[0])->size = cert_size;
-	}
-
-	ret = httpsInit(1, (httpsData *) http_pools.caList);
-	if (ret < 0) {
-		LOG("Error : httpsInit failed (%x)", ret);
-	}
-    return;
 }
 
 void pkgi_start(void)
@@ -683,18 +634,14 @@ void pkgi_start(void)
     
     netInitialize();
 
-    LOG("initializing SSL");
-//    sysModuleLoad(SYSMODULE_NET);
-    sysModuleLoad(SYSMODULE_HTTP);
-    sysModuleLoad(SYSMODULE_HTTPS);
-    sysModuleLoad(SYSMODULE_SSL);
-
-    init_http_pool();
+    LOG("initializing Network");
+    sysModuleLoad(SYSMODULE_NET);
+    curl_global_init(CURL_GLOBAL_ALL);
 
     sys_mutex_attr_t mutex_attr;
     mutex_attr.attr_protocol = SYS_MUTEX_PROTOCOL_FIFO;
     mutex_attr.attr_recursive = SYS_MUTEX_ATTR_NOT_RECURSIVE;
-    mutex_attr.attr_pshared = SYS_MUTEX_ATTR_PSHARED;
+    mutex_attr.attr_pshared = SYS_MUTEX_ATTR_NOT_PSHARED;
     mutex_attr.attr_adaptive = SYS_MUTEX_ATTR_ADAPTIVE;
     strcpy(mutex_attr.name, "dialog");
 
@@ -703,8 +650,8 @@ void pkgi_start(void)
         LOG("mutex create error (%x)", ret);
     }
 
-//    if (config.enterButtonAssign == SCE_SYSTEM_PARAM_ENTER_BUTTON_CIRCLE)
-    if (false)
+    sysUtilGetSystemParamInt(SYSUTIL_SYSTEMPARAM_ID_ENTER_BUTTON_ASSIGN, &ret);
+    if (ret == 0)
     {
         g_ok_button = PKGI_BUTTON_O;
         g_cancel_button = PKGI_BUTTON_X;
@@ -715,8 +662,6 @@ void pkgi_start(void)
         g_cancel_button = PKGI_BUTTON_O;
     }
     
-    pkgi_start_thread("temperature_thread", &pkgi_temperature_thread);
-
 	ya2d_init();
 
 	ya2d_paddata[0].ANA_L_H = ANALOG_CENTER;
@@ -737,6 +682,9 @@ void pkgi_start(void)
 
     init_music();
 
+    // register exit callback
+    sysUtilRegisterCallback(SYSUTIL_EVENT_SLOT0, sys_callback, NULL);
+
     g_time = pkgi_time_msec();
 }
 
@@ -745,30 +693,20 @@ int pkgi_update(pkgi_input* input)
 	ya2d_controlsRead();
     
     uint32_t previous = input->down;
-    input->down = 0;
+    memcpy(&input->down, &ya2d_paddata[0].button[2], sizeof(uint32_t));
 
-    if (ya2d_paddata[0].BTN_CROSS)      input->down |= PKGI_BUTTON_X;
-    if (ya2d_paddata[0].BTN_TRIANGLE)   input->down |= PKGI_BUTTON_T;
-    if (ya2d_paddata[0].BTN_CIRCLE)     input->down |= PKGI_BUTTON_O;
-    if (ya2d_paddata[0].BTN_SQUARE)     input->down |= PKGI_BUTTON_S;
-    if (ya2d_paddata[0].BTN_SELECT)     input->down |= PKGI_BUTTON_SELECT;
-    if (ya2d_paddata[0].BTN_START)      input->down |= PKGI_BUTTON_START;
- 
-    if (ya2d_paddata[0].BTN_UP || (ya2d_paddata[0].ANA_L_V < ANALOG_MIN))
+    if (ya2d_paddata[0].ANA_L_V < ANALOG_MIN)
         input->down |= PKGI_BUTTON_UP;
         
-    if (ya2d_paddata[0].BTN_DOWN || (ya2d_paddata[0].ANA_L_V > ANALOG_MAX))
+    if (ya2d_paddata[0].ANA_L_V > ANALOG_MAX)
         input->down |= PKGI_BUTTON_DOWN;
         
-    if (ya2d_paddata[0].BTN_LEFT || (ya2d_paddata[0].ANA_L_H < ANALOG_MIN))
+    if (ya2d_paddata[0].ANA_L_H < ANALOG_MIN)
         input->down |= PKGI_BUTTON_LEFT;
         
-    if (ya2d_paddata[0].BTN_RIGHT || (ya2d_paddata[0].ANA_L_H > ANALOG_MAX))
+    if (ya2d_paddata[0].ANA_L_H > ANALOG_MAX)
         input->down |= PKGI_BUTTON_RIGHT;
 
-    if (ya2d_paddata[0].BTN_L1 || ya2d_paddata[0].BTN_L2)      input->down |= PKGI_BUTTON_LT;
-    if (ya2d_paddata[0].BTN_R1 || ya2d_paddata[0].BTN_R2)      input->down |= PKGI_BUTTON_RT;
- 
     input->pressed = input->down & ~previous;
     input->active = input->pressed;
 
@@ -812,6 +750,7 @@ void pkgi_end(void)
 {
     if (module) end_music();
 
+    curl_global_cleanup();
     pkgi_stop_debug_log();
 
     pkgi_free_texture(tex_buttons.circle);
@@ -821,26 +760,25 @@ void pkgi_end(void)
 
 	ya2d_deinit();
 
-    httpsEnd();
-    sslEnd();
-    httpEnd();
-
-    if (http_pools.cert_buffer) free(http_pools.cert_buffer);
-    if (http_pools.caList)      free(http_pools.caList);
-    if (http_pools.ssl_pool)    free(http_pools.ssl_pool);
-    if (http_pools.http_pool)   free(http_pools.http_pool);
-
     sysMutexDestroy(g_dialog_lock);
 
-    sysModuleUnload(SYSMODULE_SSL);
-    sysModuleUnload(SYSMODULE_HTTPS);
-    sysModuleUnload(SYSMODULE_HTTP);
+#ifdef PKGI_ENABLE_LOGGING
+    sysProcessExitSpawn2("/dev_hdd0/game/PSL145310/RELOAD.SELF", NULL, NULL, NULL, 0, 1001, SYS_PROCESS_SPAWN_STACK_SIZE_1M);
+#endif
 
-//    sceKernelExitProcess(0);
+    sysProcessExit(0);
 }
 
 int pkgi_get_temperature(uint8_t cpu)
 {
+    static uint32_t t = 0;
+
+    if (t++ % 0x100 == 0)
+    {
+        sys_game_get_temperature(0, &cpu_temp_c[0]);
+        sys_game_get_temperature(1, &cpu_temp_c[1]);
+    }
+
     return cpu_temp_c[cpu];
 }
 
@@ -852,9 +790,16 @@ int pkgi_temperature_is_high(void)
 uint64_t pkgi_get_free_space(void)
 {
     u32 blockSize;
-    u64 freeSize;
-    sysFsGetFreeSize("/dev_hdd0/", &blockSize, &freeSize);
-    return (blockSize * freeSize);
+    static uint32_t t = 0;
+    static uint64_t freeSize = 0;
+
+    if (t++ % 0x200 == 0)
+    {
+        sysFsGetFreeSize("/dev_hdd0/", &blockSize, &freeSize);
+        freeSize *= blockSize;
+    }
+
+    return (freeSize);
 }
 
 const char* pkgi_get_config_folder(void)
@@ -893,10 +838,10 @@ int pkgi_dir_exists(const char* path)
     return 0;
 }
 
-int pkgi_is_installed(const char* titleid)
+int pkgi_is_installed(const char* content)
 {    
     char path[128];
-    snprintf(path, sizeof(path), "/dev_hdd0/game/%s", titleid);
+    snprintf(path, sizeof(path), "/dev_hdd0/game/%.9s", content + 7);
 
     return (pkgi_dir_exists(path));
 }
@@ -1018,7 +963,7 @@ void pkgi_unlock_process(void)
 
 pkgi_texture pkgi_load_jpg_raw(const void* data, uint32_t size)
 {
-	ya2d_Texture *tex = ya2d_loadJPGfromBuffer((void *)data, size);
+    ya2d_Texture *tex = ya2d_loadJPGfromBuffer(data, size);
 
     if (!tex)
     {
@@ -1029,11 +974,22 @@ pkgi_texture pkgi_load_jpg_raw(const void* data, uint32_t size)
 
 pkgi_texture pkgi_load_png_raw(const void* data, uint32_t size)
 {
-	ya2d_Texture *tex = ya2d_loadPNGfromBuffer((void *)data, size);
+    ya2d_Texture *tex = ya2d_loadPNGfromBuffer(data, size);
 
     if (!tex)
     {
         LOG("failed to load texture");
+    }
+    return tex;
+}
+
+pkgi_texture pkgi_load_png_file(const char* filename)
+{
+    ya2d_Texture *tex = ya2d_loadPNGfromFile(filename);
+
+    if (!tex)
+    {
+        LOG("failed to load texture file %s", filename);
     }
     return tex;
 }
@@ -1043,8 +999,9 @@ void pkgi_draw_texture(pkgi_texture texture, int x, int y)
     ya2d_drawTexture((ya2d_Texture*) texture, x, y);
 }
 
-void pkgi_draw_background(pkgi_texture texture) {
-    ya2d_drawTextureZ((ya2d_Texture*) texture, -70, -30, YA2D_DEFAULT_Z, 0.54f);
+void pkgi_draw_background(pkgi_texture texture)
+{
+    ya2d_drawTextureEx((ya2d_Texture*) texture, 0, 0, YA2D_DEFAULT_Z, VITA_WIDTH, VITA_HEIGHT);
 }
 
 void pkgi_draw_texture_z(pkgi_texture texture, int x, int y, int z, float scale)
@@ -1167,15 +1124,34 @@ int pkgi_validate_url(const char* url)
     {
         return 0;
     }
-    if (pkgi_strstr(url, "http://") == url)
-    {
-        return 1;
-    }
-    if (pkgi_strstr(url, "https://") == url)
+    if ((pkgi_strstr(url, "http://") == url) || (pkgi_strstr(url, "https://") == url) ||
+        (pkgi_strstr(url, "ftp://") == url)  || (pkgi_strstr(url, "ftps://") == url))
     {
         return 1;
     }
     return 0;
+}
+
+void pkgi_curl_init(CURL *curl)
+{
+    // Set user agent string
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, PKGI_USER_AGENT);
+    // don't verify the certificate's name against host
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+    // don't verify the peer's SSL certificate
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+    // Set SSL VERSION to TLS 1.2
+    curl_easy_setopt(curl, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+    // Set timeout for the connection to build
+    curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 20L);
+    // Follow redirects
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    // maximum number of redirects allowed
+    curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 20L);
+    // Fail the request if the HTTP code returned is equal to or larger than 400
+    curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
+    // request using SSL for the FTP transfer if available
+    curl_easy_setopt(curl, CURLOPT_USE_SSL, CURLUSESSL_TRY);
 }
 
 pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
@@ -1204,219 +1180,92 @@ pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
         return NULL;
     }
 
-    char path[256];
-
-    if (content)
+    http->curl = curl_easy_init();
+    if (!http->curl)
     {
-        pkgi_snprintf(path, sizeof(path), "%s%s.pkg", pkgi_get_temp_folder(), strrchr(url, '/'));
-
-        int64_t fsize = pkgi_get_size(path);
-        if (fsize < 0)
-        {
-            LOG("trying shorter name (%s)", content);
-            pkgi_snprintf(path, sizeof(path), "%s/%s.pkg", pkgi_get_temp_folder(), content);
-            fsize = pkgi_get_size(path);
-        }
-
-        if (fsize > 0)
-        {
-            LOG("%s found, using it", path);
-
-            http->fd = pkgi_open(path);
-            http->used = 1;
-            http->local = 1;
-            http->offset = 0;
-            http->size = fsize;
-
-            return(http);
-        }
-        else
-        {
-            LOG("%s not found, downloading url", path);
-        }
-    }
-    else
-    {
-        http->fd = NULL;
+        LOG("curl init error");
+        return NULL;
     }
 
-    httpClientId clientID;
-    httpTransId transID = 0;
-    httpUri uri;
-    int ret;
-    void *uri_p = NULL;
-    s32 pool_size = 0;
+    pkgi_curl_init(http->curl);
+    curl_easy_setopt(http->curl, CURLOPT_URL, url);
 
     LOG("starting http GET request for %s", url);
 
-    ret = httpCreateClient(&clientID);
-    if (ret < 0)
-    {
-        LOG("httpCreateClient failed: 0x%08x", ret);
-        goto bail;
-    }
-    httpClientSetConnTimeout(clientID, 10 * 1000 * 1000);
-    httpClientSetUserAgent(clientID, PKGI_USER_AGENT);
-	httpClientSetAutoRedirect(clientID, 1);
-
-    ret = httpUtilParseUri(&uri, url, NULL, 0, &pool_size);
-    if (ret < 0)
-    {
-        LOG("httpUtilParseUri failed: 0x%08x", ret);
-        goto bail;
-    }
-
-    uri_p = malloc(pool_size);
-    if (!uri_p) goto bail;
-
-    ret = httpUtilParseUri(&uri, url, uri_p, pool_size, NULL);
-    if (ret < 0)
-    {
-        LOG("httpUtilParseUri failed: 0x%08x", ret);
-        goto bail;
-    }
-        
-    ret = httpCreateTransaction(&transID, clientID, HTTP_METHOD_GET, &uri);
-    if (ret < 0)
-    {
-        LOG("httpCreateTransaction failed: 0x%08x", ret);
-        goto bail;
-    }
-        
-    free(uri_p);
-    uri_p = NULL;
-
     if (offset != 0)
     {
-        char range[64];
-        pkgi_snprintf(range, sizeof(range), "bytes=%llu-", offset);
-        httpHeader reqHead;
-        reqHead.name = "Range";
-        reqHead.value = range;
-        ret = httpRequestAddHeader(transID, &reqHead);
-        if (ret < 0)
-        {
-            LOG("httpRequestAddHeader failed: 0x%08x", ret);
-            goto bail;
-        }
+        LOG("setting http offset %ld", offset);
+        /* resuming upload at this position */
+        curl_easy_setopt(http->curl, CURLOPT_RESUME_FROM_LARGE, (curl_off_t) offset);
     }
-
-    ret = httpSendRequest(transID, NULL, 0, NULL);
-    if (ret < 0)
-    {
-        LOG("httpSendRequest failed: 0x%08x", ret);
-        goto bail;
-    }
-
-/*
-        int code;
-        
-        ret = httpResponseGetStatusCode(transID, &code);
-        if (ret < 0) goto bail;
-        
-        if (code == HTTP_STATUS_CODE_Not_Found || code == HTTP_STATUS_CODE_Forbidden) {ret=-4; goto bail;}
-*/
-
-/*
-        if ((err = sceHttpSendRequest(req, NULL, 0)) < 0)
-        {
-            LOG("sceHttpSendRequest failed: 0x%08x", err);
-            goto bail;
-        }
-*/
 
     http->used = 1;
-    http->local = 0;
-    http->client = clientID;
-    http->transaction = transID;
-
     return(http);
-
-bail:
-    if (uri_p) free(uri_p);
-    if (transID) httpDestroyTransaction(transID);
-    if (clientID) httpDestroyClient(clientID);
-
-    return NULL;
 }
 
 int pkgi_http_response_length(pkgi_http* http, int64_t* length)
 {
-    if (http->local)
+    CURLcode res;
+
+    // do the download request without getting the body
+    curl_easy_setopt(http->curl, CURLOPT_NOBODY, 1L);
+    curl_easy_setopt(http->curl, CURLOPT_NOPROGRESS, 1L);
+
+    // Perform the request
+    res = curl_easy_perform(http->curl);
+
+    if(res != CURLE_OK)
     {
-        *length = (int64_t)http->size;
-        return 1;
-    }
-    else
-    {
-        int res;
-        int status;
-        if ((res = httpResponseGetStatusCode(http->transaction, &status)) < 0)
-        {
-            LOG("httpResponseGetStatusCode failed: 0x%08x", res);
-            return 0;
-        }
-
-        LOG("http status code = %d", status);
-
-        if (status == HTTP_STATUS_CODE_OK || status == HTTP_STATUS_CODE_Partial_Content)
-        {
-            uint64_t content_length;
-
-	        res = httpResponseGetContentLength(http->transaction, &content_length);
-            if (res < 0)
-            {
-                LOG("httpResponseGetContentLength failed: 0x%08x", res);
-                return 0;
-            }
-            else
-            {
-                LOG("http response length = %llu", content_length);
-                *length = (int64_t)content_length;
-                http->size=content_length;
-            }
-            return 1;
-        }
+        LOG("curl_easy_perform() failed: %s", curl_easy_strerror(res));
         return 0;
     }
+
+    long status = 0;
+    curl_easy_getinfo(http->curl, CURLINFO_RESPONSE_CODE, &status);
+    LOG("http status code = %d", status);
+
+    curl_easy_getinfo(http->curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, length);
+    LOG("http response length = %llu", *length);
+    http->size = *length;
+
+    return 1;
 }
 
-int pkgi_http_read(pkgi_http* http, void* buffer, uint32_t size)
+int pkgi_http_read(pkgi_http* http, void* write_func, void* xferinfo_func)
 {
-    if (http->local)
-    {
-        int read = pkgi_read(http->fd, buffer, size);
-        http->offset += read;
-        return read;
-    }
-    else
-    {
-        // LOG("http asking to read %u bytes", size);
-        s32 recv;
-        int res = httpRecvResponse(http->transaction, buffer, size, &recv);
+    CURLcode res;
 
-//        LOG("http read (%d) %d bytes", size, recv);
-        
-        if (recv < 0)
-        {
-            LOG("httpRecvResponse failed: 0x%08x", res);
-        }
-        return recv;
+    curl_easy_setopt(http->curl, CURLOPT_NOBODY, 0L);
+    // The function that will be used to write the data
+    curl_easy_setopt(http->curl, CURLOPT_WRITEFUNCTION, write_func);
+    // The data file descriptor which will be written to
+    curl_easy_setopt(http->curl, CURLOPT_WRITEDATA, NULL);
+
+    if (xferinfo_func)
+    {
+        /* pass the struct pointer into the xferinfo function */
+        curl_easy_setopt(http->curl, CURLOPT_XFERINFOFUNCTION, xferinfo_func);
+        curl_easy_setopt(http->curl, CURLOPT_XFERINFODATA, NULL);
+        curl_easy_setopt(http->curl, CURLOPT_NOPROGRESS, 0L);
     }
+
+    // Perform the request
+    res = curl_easy_perform(http->curl);
+
+    if(res != CURLE_OK)
+    {
+        LOG("curl_easy_perform() failed: %s", curl_easy_strerror(res));
+        return 0;
+    }
+
+    return 1;
 }
 
 void pkgi_http_close(pkgi_http* http)
 {
     LOG("http close");
-    if (http->local)
-    {
-        pkgi_close(http->fd);
-    }
-    else
-    {
-        httpDestroyTransaction(http->transaction);        
-        httpDestroyClient(http->client);
-    }
+    curl_easy_cleanup(http->curl);
+
     http->used = 0;
 }
 
@@ -1463,8 +1312,7 @@ void pkgi_rm(const char* file)
     if (stat(file, &sb) == 0) {
         LOG("removing file %s", file);
 
-        int err = sysFsUnlink(file);
-        //int err = remove(file);
+        int err = unlink(file);
         if (err < 0)
         {
             LOG("error removing %s file, err=0x%08x", err);
@@ -1565,4 +1413,138 @@ void pkgi_close(void* f)
     {
         LOG("close error 0x%08x", err);
     }
+}
+
+static size_t curl_write_memory(void *contents, size_t size, size_t nmemb, void *userp)
+{
+    size_t realsize = size * nmemb;
+    curl_memory_t *mem = (curl_memory_t *)userp;
+
+    char *ptr = realloc(mem->memory, mem->size + realsize + 1);
+    if(!ptr)
+    {
+        /* out of memory! */
+        LOG("not enough memory (realloc)");
+        return 0;
+    }
+
+    mem->memory = ptr;
+    memcpy(&(mem->memory[mem->size]), contents, realsize);
+    mem->size += realsize;
+    mem->memory[mem->size] = 0;
+
+    return realsize;
+}
+
+char * pkgi_http_download_buffer(const char* url, uint32_t* buf_size)
+{
+    CURL *curl;
+    CURLcode res;
+    curl_memory_t chunk;
+
+    curl = curl_easy_init();
+    if(!curl)
+    {
+        LOG("cURL init error");
+        return NULL;
+    }
+    
+    chunk.memory = malloc(1);   /* will be grown as needed by the realloc above */
+    chunk.size = 0;             /* no data at this point */
+
+    pkgi_curl_init(curl);
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
+    // The function that will be used to write the data
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write_memory);
+    // The data file descriptor which will be written to
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+
+    // Perform the request
+    res = curl_easy_perform(curl);
+
+    if(res != CURLE_OK)
+    {
+        LOG("curl_easy_perform() failed: %s", curl_easy_strerror(res));
+        curl_easy_cleanup(curl);
+        free(chunk.memory);
+        return NULL;
+    }
+
+    LOG("%lu bytes retrieved", (unsigned long)chunk.size);
+    // clean-up
+    curl_easy_cleanup(curl);
+
+    *buf_size = chunk.size;
+    return (chunk.memory);
+}
+
+const char * pkgi_get_user_language()
+{
+    int language;
+
+    if(sysUtilGetSystemParamInt(SYSUTIL_SYSTEMPARAM_ID_LANG, &language) < 0)
+        return "en";
+
+    switch (language)
+    {
+    case SYSUTIL_LANG_JAPANESE:             //  0   Japanese
+        return "ja";
+
+    case SYSUTIL_LANG_ENGLISH_US:           //  1   English (United States)
+    case SYSUTIL_LANG_ENGLISH_GB:           // 18   English (United Kingdom)
+        return "en";
+
+    case SYSUTIL_LANG_FRENCH:               //  2   French
+        return "fr";
+
+    case SYSUTIL_LANG_SPANISH:              //  3   Spanish
+        return "es";
+
+    case SYSUTIL_LANG_GERMAN:               //  4   German
+        return "de";
+
+    case SYSUTIL_LANG_ITALIAN:              //  5   Italian
+        return "it";
+
+    case SYSUTIL_LANG_DUTCH:                //  6   Dutch
+        return "nl";
+
+    case SYSUTIL_LANG_RUSSIAN:              //  8   Russian
+        return "ru";
+
+    case SYSUTIL_LANG_KOREAN:               //  9   Korean
+        return "ko";
+
+    case SYSUTIL_LANG_CHINESE_T:            // 10   Chinese (traditional)
+    case SYSUTIL_LANG_CHINESE_S:            // 11   Chinese (simplified)
+        return "ch";
+
+    case SYSUTIL_LANG_FINNISH:              // 12   Finnish
+        return "fi";
+
+    case SYSUTIL_LANG_SWEDISH:              // 13   Swedish
+        return "sv";
+
+    case SYSUTIL_LANG_DANISH:               // 14   Danish
+        return "da";
+
+    case SYSUTIL_LANG_NORWEGIAN:            // 15   Norwegian
+        return "no";
+
+    case SYSUTIL_LANG_POLISH:               // 16   Polish
+        return "pl";
+
+    case SYSUTIL_LANG_PORTUGUESE_PT:        //  7   Portuguese (Portugal)
+    case SYSUTIL_LANG_PORTUGUESE_BR:        // 17   Portuguese (Brazil)
+        return "pt";
+
+    case SYSUTIL_LANG_TURKISH:              // 19   Turkish
+        return "tr";
+
+    default:
+        break;
+    }
+
+    return "en";
 }

@@ -5,24 +5,24 @@
 #include "pkgi_dialog.h"
 
 #define PKGI_UPDATE_URL     "https://api.github.com/repos/bucanero/pkgi-ps3/releases/latest"
-#define PKGI_VERSION        "1.1.2"
+#define PKGI_VERSION        "1.2.4"
 
-// values compatible with psp2/ctrl.h header
-#define PKGI_BUTTON_SELECT 0x00000001
-#define PKGI_BUTTON_START  0x00000008
+#define PKGI_BUTTON_SELECT 0x00010000
+#define PKGI_BUTTON_START  0x00080000
+#define PKGI_BUTTON_UP     0x00100000
+#define PKGI_BUTTON_RIGHT  0x00200000
+#define PKGI_BUTTON_DOWN   0x00400000
+#define PKGI_BUTTON_LEFT   0x00800000
 
-#define PKGI_BUTTON_UP    0x00000010
-#define PKGI_BUTTON_RIGHT 0x00000020
-#define PKGI_BUTTON_DOWN  0x00000040
-#define PKGI_BUTTON_LEFT  0x00000080
+#define PKGI_BUTTON_LT     0x00000004 // L1
+#define PKGI_BUTTON_RT     0x00000008 // R1
+#define PKGI_BUTTON_L2     0x00000001
+#define PKGI_BUTTON_R2     0x00000002
 
-#define PKGI_BUTTON_LT 0x00000100
-#define PKGI_BUTTON_RT 0x00000200
-
-#define PKGI_BUTTON_X 0x00004000 // cross
-#define PKGI_BUTTON_O 0x00002000 // circle
-#define PKGI_BUTTON_T 0x00001000 // triangle
-#define PKGI_BUTTON_S 0x00008000 // square
+#define PKGI_BUTTON_X 0x00000040 // cross
+#define PKGI_BUTTON_O 0x00000020 // circle
+#define PKGI_BUTTON_T 0x00000010 // triangle
+#define PKGI_BUTTON_S 0x00000080 // square
 
 #define PKGI_UNUSED(x) (void)(x)
 
@@ -105,7 +105,7 @@ typedef struct pkgi_http pkgi_http;
 int pkgi_validate_url(const char* url);
 pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset);
 int pkgi_http_response_length(pkgi_http* http, int64_t* length);
-int pkgi_http_read(pkgi_http* http, void* buffer, uint32_t size);
+int pkgi_http_read(pkgi_http* http, void* write_func, void* xferinfo_func);
 void pkgi_http_close(pkgi_http* http);
 
 int pkgi_mkdirs(const char* path);
@@ -138,6 +138,7 @@ void pkgi_stop_music(void);
 
 pkgi_texture pkgi_load_png_raw(const void* data, uint32_t size);
 pkgi_texture pkgi_load_jpg_raw(const void* data, uint32_t size);
+pkgi_texture pkgi_load_png_file(const char* filename);
 void pkgi_draw_background(pkgi_texture texture);
 void pkgi_draw_texture(pkgi_texture texture, int x, int y);
 void pkgi_draw_texture_z(pkgi_texture texture, int x, int y, int z, float scale);

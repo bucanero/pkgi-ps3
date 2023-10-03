@@ -1,0 +1,390 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PKGi PS3\n"
+"POT-Creation-Date: 2021-10-09 19:00-0300\n"
+"PO-Revision-Date: 2021-10-09 19:00-0300\n"
+"Last-Translator: Venos\n"
+"Language-Team: \n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
+"X-Poedit-Basepath: ./source\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Flags-xgettext: --add-comments\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: _\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: pkgi.c:82
+msgid "Installing"
+msgstr "Installazione in corso"
+
+#: pkgi.c:82
+msgid "Please wait..."
+msgstr "Attendere prego..."
+
+#: pkgi.c:94
+msgid "Installation failed"
+msgstr "Installazione fallita"
+
+#: pkgi.c:118
+msgid "Successfully downloaded"
+msgstr "Download completato"
+
+#: pkgi.c:122
+msgid "Task successfully queued (reboot to start)"
+msgstr "Task accodato con successo (riavvia per iniziare)"
+
+#: pkgi.c:163
+msgid "GB"
+msgstr ""
+
+#: pkgi.c:167 pkgi_download.c:249
+msgid "MB"
+msgstr ""
+
+#: pkgi.c:171 pkgi.c:504 pkgi_download.c:253
+msgid "KB"
+msgstr ""
+
+#: pkgi.c:175
+msgid "B"
+msgstr ""
+
+#: pkgi.c:185
+#, c-format
+msgid "pkg requires %u %s free space, but only %u %s available"
+msgstr " pkg necessita di %u %s di spazio libero, ma solo %u %s risultano disponibili"
+
+#: pkgi.c:225 pkgi_menu.c:109 pkgi_menu.c:121
+msgid "All"
+msgstr "Tutti"
+
+#: pkgi.c:226 pkgi_menu.c:122
+msgid "Games"
+msgstr "Giochi"
+
+#: pkgi.c:227 pkgi_menu.c:123
+msgid "DLCs"
+msgstr ""
+
+#: pkgi.c:228 pkgi_menu.c:124
+msgid "Themes"
+msgstr "Temi"
+
+#: pkgi.c:229 pkgi_menu.c:125
+msgid "Avatars"
+msgstr "Avatar"
+
+#: pkgi.c:230 pkgi_menu.c:126
+msgid "Demos"
+msgstr "Demo"
+
+#: pkgi.c:231 pkgi_menu.c:118 pkgi_menu.c:127
+msgid "Updates"
+msgstr "Aggiornamenti"
+
+#: pkgi.c:232 pkgi_menu.c:128
+msgid "Emulators"
+msgstr "Emulatori"
+
+#: pkgi.c:233 pkgi_menu.c:129
+msgid "Apps"
+msgstr "Applicazioni"
+
+#: pkgi.c:234 pkgi_menu.c:130
+msgid "Tools"
+msgstr "Strumenti"
+
+#: pkgi.c:235
+msgid "Unknown"
+msgstr "Sconosciuto"
+
+#: pkgi.c:253
+msgid "Exit to XMB?"
+msgstr "Ritornare alla XMB?"
+
+#: pkgi.c:436
+msgid "No items!"
+msgstr "Nessun elemento!"
+
+#: pkgi.c:462
+msgid "Item already installed, download again?"
+msgstr "Elemento gi… installato, scaricarlo di nuovo?"
+
+#: pkgi.c:471 pkgi_download.c:372 pkgi_download.c:652
+msgid "Downloading..."
+msgstr "Download in corso..."
+
+#: pkgi.c:471 pkgi.c:674
+msgid "Preparing..."
+msgstr "Preparazione..."
+
+#: pkgi.c:504 pkgi.c:508
+msgid "Refreshing"
+msgstr "Aggiornamento"
+
+#: pkgi.c:563 pkgi.c:567
+msgid "Count"
+msgstr "Quantit…"
+
+#: pkgi.c:575
+msgid "Free"
+msgstr "Libero"
+
+#: pkgi.c:585
+msgid "Select"
+msgstr "Seleziona"
+
+#: pkgi.c:585
+msgid "Close"
+msgstr "Chiudi"
+
+#: pkgi.c:585
+msgid "Cancel"
+msgstr "Annulla"
+
+#: pkgi.c:589 pkgi_download.c:136
+msgid "Download"
+msgstr "Scarica"
+
+#: pkgi.c:589
+msgid "Menu"
+msgstr ""
+
+#: pkgi.c:589
+msgid "Details"
+msgstr "Dettagli"
+
+#: pkgi.c:589
+msgid "Exit"
+msgstr "Uscita"
+
+#: pkgi.c:678
+msgid "Successfully downloaded PKGi PS3 update"
+msgstr "Aggiornamento di PKGi PS3 scaricato"
+
+#: pkgi.c:1051
+msgid "Search"
+msgstr "Cerca"
+
+#: pkgi_db.c:145 pkgi_db.c:153
+msgid "failed to download list from"
+msgstr "Download della lista fallito da"
+
+#: pkgi_db.c:159
+msgid "list is too large... check for newer pkgi version!"
+msgstr "La lista Š troppo larga... verifica l'esistenza di una versione pi— recente di pkgi!"
+
+#: pkgi_db.c:187
+msgid "list is empty... check the DB server"
+msgstr "La lista Š vuota... verifica il server DB"
+
+#: pkgi_db.c:390
+msgid "ERROR: pkgi.txt file(s) missing or bad config.txt file"
+msgstr " ERRORE: file(s) pkgi.txt mancante o file config.txt non valido"
+
+#: pkgi_dialog.c:80
+msgid "Content"
+msgstr "Contenuto"
+
+#: pkgi_dialog.c:108
+msgid "ERROR"
+msgstr "ERRORE"
+
+#: pkgi_dialog.c:169
+msgid "Failed to download the update list"
+msgstr "Download lista aggiornamenti fallito"
+
+#: pkgi_dialog.c:174
+msgid "update(s) loaded"
+msgstr " Aggiornamento(i) caricato"
+
+#: pkgi_dialog.c:319
+#, c-format
+msgid "press %s to cancel"
+msgstr "Premi %s per annullare"
+
+#: pkgi_dialog.c:333
+#, c-format
+msgid "press %s to close - %s to scan updates"
+msgstr "Premi %s per chiudere - %s per cercare aggiornamenti"
+
+#: pkgi_dialog.c:365
+msgid "Enter"
+msgstr "Conferma"
+
+#: pkgi_dialog.c:365
+msgid "Back"
+msgstr "Indietro"
+
+#: pkgi_dialog.c:367
+#, c-format
+msgid "press %s to close"
+msgstr "Premi %s per chiudere"
+
+#: pkgi_download.c:183
+msgid "Install"
+msgstr "Installa"
+
+#: pkgi_download.c:216 pkgi_download.c:220 pkgi_download.c:226
+msgid "ETA"
+msgstr "Tempo rimanente"
+
+#: pkgi_download.c:310 pkgi_download.c:392
+msgid "Could not send HTTP request"
+msgstr "Impossibile inviare la richiesta HTTP"
+
+#: pkgi_download.c:317 pkgi_download.c:399
+msgid "HTTP request failed"
+msgstr "Richiesta HTTP fallita"
+
+#: pkgi_download.c:322 pkgi_download.c:404
+msgid "HTTP response has unknown length"
+msgstr "La risposta HTTP ha una lunghezza sconosciuta"
+
+#: pkgi_download.c:331
+msgid "Not enough free space on HDD"
+msgstr "Spazio insufficiente sul disco"
+
+#: pkgi_download.c:340
+msgid "Could not create task directory on HDD."
+msgstr "Impossibile creare la directory del task sul disco"
+
+#: pkgi_download.c:348
+msgid "Saving background task..."
+msgstr "Salvataggio del task in background"
+
+#: pkgi_download.c:354
+msgid "Could not create PKG file to HDD."
+msgstr "Impossibile creare il file PKG sul disco"
+
+#: pkgi_download.c:360
+msgid "Could not create task files to HDD."
+msgstr "Impossibile creare i files del task sul disco"
+
+#: pkgi_download.c:425
+msgid "HTTP download error"
+msgstr "Errore nel download HTTP"
+
+#: pkgi_download.c:432
+msgid "HTTP connection closed"
+msgstr "Connessione HTTP terminata"
+
+#: pkgi_download.c:445
+msgid "failed to write to"
+msgstr "Errore durante la scrittura di"
+
+#: pkgi_download.c:465
+msgid "cannot create folder"
+msgstr "Impossibile creare la cartella"
+
+#: pkgi_download.c:475
+msgid "cannot create file"
+msgstr "Impossibile creare il file"
+
+#: pkgi_download.c:490
+msgid "cannot resume file"
+msgstr "Impossibile ripristinare il file"
+
+#: pkgi_download.c:562
+msgid "pkg integrity failed, try downloading again"
+msgstr "Integrit… del pkg non valida, provare a scaricarlo di nuovo"
+
+#: pkgi_download.c:573
+msgid "Creating RAP file"
+msgstr "Creazione del file RAP in corso"
+
+#: pkgi_download.c:581 pkgi_download.c:626
+msgid "Cannot save"
+msgstr "Impossibile salvare"
+
+#: pkgi_download.c:621
+msgid "Creating RIF file"
+msgstr "Creazione del file RIF in corso"
+
+#: pkgi_download.c:646
+msgid "Resuming..."
+msgstr "Ripristino in corso..."
+
+#: pkgi_download.c:652
+msgid "Adding background task..."
+msgstr "Aggiunta del task in background..."
+
+#: pkgi_download.c:675
+msgid "Downloading icon"
+msgstr "Scaricamento icona"
+
+#: pkgi_download.c:713
+msgid "Could not create install directory on HDD."
+msgstr "Impossibile creare la directory di installazione sul disco"
+
+#: pkgi_menu.c:102
+msgid "Search..."
+msgstr "Cerca..."
+
+#: pkgi_menu.c:103
+msgid "Sort by:"
+msgstr "Ordina per:"
+
+#: pkgi_menu.c:104
+msgid "Title"
+msgstr "Titolo"
+
+#: pkgi_menu.c:105
+msgid "Region"
+msgstr "Regione"
+
+#: pkgi_menu.c:106
+msgid "Name"
+msgstr "Nome"
+
+#: pkgi_menu.c:107
+msgid "Size"
+msgstr "Dimensioni"
+
+#: pkgi_menu.c:108
+msgid "Content:"
+msgstr "Contenuto:"
+
+#: pkgi_menu.c:110
+msgid "Regions:"
+msgstr "Regioni:"
+
+#: pkgi_menu.c:111
+msgid "Asia"
+msgstr ""
+
+#: pkgi_menu.c:112
+msgid "Europe"
+msgstr "Europa"
+
+#: pkgi_menu.c:113
+msgid "Japan"
+msgstr "Giappone"
+
+#: pkgi_menu.c:114
+msgid "USA"
+msgstr ""
+
+#: pkgi_menu.c:115
+msgid "Options:"
+msgstr "Opzioni"
+
+#: pkgi_menu.c:116
+msgid "Back. DL"
+msgstr "DL in secondo piano"
+
+#: pkgi_menu.c:117
+msgid "Music"
+msgstr "Musica"
+
+#: pkgi_menu.c:119
+msgid "Refresh..."
+msgstr "Aggiorna..."
+
+#: pkgi_menu.c:326
+msgid "Direct DL"
+msgstr "DL diretto"

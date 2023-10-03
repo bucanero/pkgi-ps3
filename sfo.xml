@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <sfo>
 	<value name="APP_VER" type="string">
-		01.12
+		01.24
 	</value>
 	<value name="ATTRIBUTE" type="integer">
 		0
@@ -10,7 +10,7 @@
 		1
 	</value>
 	<value name="CATEGORY" type="string">
-		HG
+		CB
 	</value>
 	<value name="LICENSE" type="string">
 		This application was created with the official non-official SDK called PSL1GHT, for more information visit http://www.psl1ght.com/ . This is in no way associated with Sony Computer Entertainment Inc., please do not contact them for help, they will not be able to provide it.
@@ -34,6 +34,6 @@
 		NP00PKGI3
 	</value>
 	<value name="VERSION" type="string">
-		01.12
+		01.24
 	</value>
 </sfo>

@@ -6,15 +6,18 @@
 #include "pkgi_download.h"
 
 #include <stddef.h>
+#include <mini18n.h>
+#include <libxml/parser.h>
+#include <libxml/tree.h>
 
-#define MAX_DB_SIZE (6*1024*1024)
-#define MAX_DB_ITEMS 20000
+#define MAX_DB_SIZE (32*1024*1024)
+#define MAX_DB_ITEMS 0x20000
 #define MAX_DB_COLUMNS 32
 
 #define EXTDB_ID_LENGTH 110
 #define EXTDB_ID_SHA256 "\x7d\x24\x89\x6f\x50\xf2\xb2\x3b\x7f\xbd\x12\xc4\x7c\x67\x93\xcd\xb5\x92\x55\x7c\x1c\x09\xaf\xf3\x25\xf5\x46\x5a\x35\x7f\xc9\x64"
 
-static char db_data[MAX_DB_SIZE];
+static char* db_data = NULL;
 static uint32_t db_total;
 static uint32_t db_size;
 
@@ -130,6 +133,16 @@ static char* generate_contentid(void)
     return cid;
 }
 
+static size_t write_update_data(void *buffer, size_t size, size_t nmemb, void *stream)
+{
+    size_t realsize = size * nmemb;
+
+    pkgi_memcpy(db_data + db_size, buffer, realsize);
+    db_size += realsize;
+
+    return (realsize);
+}
+
 int update_database(const char* update_url, const char* path, char* error, uint32_t error_size)
 {
     db_total = 0;
@@ -139,7 +152,7 @@ int update_database(const char* update_url, const char* path, char* error, uint3
     pkgi_http* http = pkgi_http_get(update_url, NULL, 0);
     if (!http)
     {
-        pkgi_snprintf(error, error_size, "failed to download list from\n%s", update_url);
+        pkgi_snprintf(error, error_size, "%s\n%s", _("failed to download list from"), update_url);
         return 0;
     }
     else
@@ -147,41 +160,29 @@ int update_database(const char* update_url, const char* path, char* error, uint3
         int64_t length;
         if (!pkgi_http_response_length(http, &length))
         {
-            pkgi_snprintf(error, error_size, "failed to download list from\n%s", update_url);
+            pkgi_snprintf(error, error_size, "%s\n%s", _("failed to download list from"), update_url);
         }
         else
         {
-            if (length > (int64_t)sizeof(db_data) - 1)
+            if (length > (int64_t)(MAX_DB_SIZE - 1))
             {
-                pkgi_snprintf(error, error_size, "list is too large... check for newer pkgi version!");
+                pkgi_snprintf(error, error_size, _("list is too large... check for newer pkgi version!"));
             }
             else if (length != 0)
             {
                 db_total = (uint32_t)length;
-            }
+                error[0] = 0;
 
-            error[0] = 0;
-
-            for (;;)
-            {
-                uint32_t want = (uint32_t)min64(1 << 16, sizeof(db_data) - 1 - db_size);
-                int read = pkgi_http_read(http, db_data + db_size, want);
-                if (read == 0)
+                if (!pkgi_http_read(http, &write_update_data, NULL))
                 {
-                        break;
-                }
-                else if (read < 0)
-                {
-                    pkgi_snprintf(error, error_size, "HTTP error 0x%08x", read);
+                    pkgi_snprintf(error, error_size, "%s", _("HTTP download error"));
                     db_size = 0;
-                    break;
                 }
-                db_size += read;
             }
 
             if (error[0] == 0 && db_size == 0)
             {
-                pkgi_snprintf(error, error_size, "list is empty... check the DB server");
+                pkgi_snprintf(error, error_size, _("list is empty... check the DB server"));
             }
         }
 
@@ -199,7 +200,7 @@ int update_database(const char* update_url, const char* path, char* error, uint3
     return 1;
 }
 
-int load_database(uint8_t db_id)
+static int load_database(uint8_t db_id)
 {
     uint8_t column = 0;
     dbFormat dbf = { ',', 8, (ColumnType*)default_format, entries };
@@ -207,8 +208,9 @@ int load_database(uint8_t db_id)
     char path[256];
     pkgi_snprintf(path, sizeof(path), "%s/dbformat.txt", pkgi_get_config_folder());
 
-    int loaded = pkgi_load(path, db_data, sizeof(db_data) - 1);
-    if (loaded > 0) {
+    int loaded = pkgi_load(path, db_data, MAX_DB_SIZE - 1);
+    if (loaded > 0)
+    {
         char* ptr = db_data;
         char* end = db_data + loaded + 1;
         column = 0;
@@ -255,15 +257,12 @@ int load_database(uint8_t db_id)
 
     LOG("loading database from %s", path);
     
-    loaded = pkgi_load(path, db_data+db_size, sizeof(db_data) - 1);
+    loaded = pkgi_load(path, db_data+db_size, MAX_DB_SIZE - 1);
     if (loaded > 0)
     {
-        sha256_ctx sha;
         uint8_t check[SHA256_DIGEST_SIZE];
 
-        sha256_init(&sha);
-        sha256_update(&sha, (uint8_t*)db_data+db_size, EXTDB_ID_LENGTH);
-        sha256_finish(&sha, check);
+        sha256((uint8_t*)db_data+db_size, EXTDB_ID_LENGTH, check, 0);
 
         if (pkgi_memequ(EXTDB_ID_SHA256, check, SHA256_DIGEST_SIZE))
         {
@@ -347,9 +346,13 @@ int load_database(uint8_t db_id)
 int pkgi_db_update(const char* update_url, uint32_t update_len, char* error, uint32_t error_size)
 {
     char path[256];
-    int i;
 
-    for (i = 0; i < MAX_CONTENT_TYPES; i++)
+    if (!db_data)
+    {
+        return 0;
+    }
+
+    for (int i = 0; i < MAX_CONTENT_TYPES; i++)
     {
         const char* tmp_url = update_url + update_len*i;
 
@@ -365,15 +368,20 @@ int pkgi_db_update(const char* update_url, uint32_t update_len, char* error, uin
 
 int pkgi_db_reload(char* error, uint32_t error_size)
 {
+    char path[256];
+
     db_total = 0;
     db_size = 0;
     db_count = 0;
     db_item_count = 0;
 
-    char path[256];
-    int i;
+    if (!db_data && (db_data = malloc(MAX_DB_SIZE)) == NULL)
+    {
+        pkgi_snprintf(error, error_size, "failed to allocate memory for database");
+        return 0;
+    }
 
-    for (i = 0; i < MAX_CONTENT_TYPES; i++)
+    for (int i = 0; i < MAX_CONTENT_TYPES; i++)
     {
         pkgi_snprintf(path, sizeof(path), "%s/pkgi%s.txt", pkgi_get_config_folder(), pkgi_content_tag(i));
 
@@ -387,7 +395,7 @@ int pkgi_db_reload(char* error, uint32_t error_size)
 
     if (db_count == 0)
     {
-        pkgi_snprintf(error, error_size, "ERROR: pkgi.txt file(s) missing or bad config.txt file");
+        pkgi_snprintf(error, error_size, _("ERROR: pkgi.txt file(s) missing or bad config.txt file"));
         return 0;
     }
     return 1;
@@ -413,7 +421,7 @@ static int matches(GameRegion region, ContentType content, uint32_t filter)
         || (content == ContentTheme && (filter & DbFilterContentTheme))
         || (content == ContentAvatar && (filter & DbFilterContentAvatar))
         || (content == ContentDemo && (filter & DbFilterContentDemo))
-        || (content == ContentManager && (filter & DbFilterContentManager))
+        || (content == ContentUpdate && (filter & DbFilterContentUpdate))
         || (content == ContentEmulator && (filter & DbFilterContentEmulator))
         || (content == ContentApp && (filter & DbFilterContentApp))
         || (content == ContentTool && (filter & DbFilterContentTool))
@@ -604,4 +612,93 @@ ContentType pkgi_get_content_type(uint32_t content)
         return (ContentType)content;
 
     return ContentUnknown;
+}
+
+int pkgi_db_load_xml_updates(const char* content_id, const char* name)
+{
+    xmlDoc *doc = NULL;
+    xmlNode *root_element = NULL;
+    xmlNode *cur_node = NULL;
+    char *value;
+    char updUrl[256];
+    uint32_t size, updates = 0;
+
+    pkgi_snprintf(updUrl, sizeof(updUrl), "https://a0.ww.np.dl.playstation.net/tpl/np/%.9s/%.9s-ver.xml", content_id + 7, content_id + 7);
+    LOG("Loading update xml (%s)...", updUrl);
+
+    char * buffer = pkgi_http_download_buffer(updUrl, &size);
+
+    if (!buffer)
+        return (-1);
+
+    /*parse the file and get the DOM */
+    doc = xmlParseMemory(buffer, size);
+
+    if (!doc)
+    {
+        LOG("XML: could not parse file %s", updUrl);
+        free(buffer);
+        return 0;
+    }
+
+    /*Get the root element node */
+    root_element = xmlDocGetRootElement(doc);
+    cur_node = root_element->children;
+
+    if (xmlStrcasecmp(cur_node->name, BAD_CAST "tag") == 0)
+        cur_node = cur_node->children;
+
+    for (; cur_node; cur_node = cur_node->next)
+    {
+        if (cur_node->type != XML_ELEMENT_NODE)
+            continue;
+
+        if ((xmlStrcasecmp(cur_node->name, BAD_CAST "package") == 0) && (db_count < MAX_DB_ITEMS))
+        {
+            memset(&db[db_count], 0, sizeof(DbItem));
+            db[db_count].type = ContentUpdate;
+
+            value = (char*) xmlGetProp(cur_node, BAD_CAST "version");
+            size = pkgi_strlen(value) + 1;
+            pkgi_memcpy(db_data + db_size, value, size);
+            db[db_count].description = db_data + db_size;
+            db_size += size;
+
+            // append the version to content-id
+            pkgi_snprintf(db_data + db_size, 1024, "%s_%s", content_id, value);
+            db[db_count].content = db_data + db_size;
+            db_size += (pkgi_strlen(db[db_count].content) + 1);
+
+            pkgi_snprintf(db_data + db_size, 1024, "%s (%s)", name, value);
+            db[db_count].name = db_data + db_size;
+            db_size += (pkgi_strlen(db[db_count].name) + 1);
+
+            value = (char*) xmlGetProp(cur_node, BAD_CAST "url");
+            size = pkgi_strlen(value) + 1;
+            pkgi_memcpy(db_data + db_size, value, size);
+            db[db_count].url = db_data + db_size;
+            db_size += size;
+
+            value = (char*) xmlGetProp(cur_node, BAD_CAST "size");
+            db[db_count].size = pkgi_strtoll(value);
+
+//            value = (char*) xmlGetProp(cur_node, BAD_CAST "ps3_system_ver");
+//            value = (char*) xmlGetProp(cur_node, BAD_CAST "sha1sum");
+//            LOG("SHA1 (%s)", value);
+//            db[db_count].digest = pkgi_hexbytes(value, SHA1_DIGEST_SIZE);
+
+            LOG("Update: '%s' [%d] %s", db[db_count].name, db[db_count].size, db[db_count].url);
+
+            db_item[db_count] = db + db_count;
+            db_count++;
+            updates++;
+        }
+    }
+
+    /*free the document */
+    xmlFreeDoc(doc);
+    xmlCleanupParser();
+    free(buffer);
+
+    return updates;
 }
