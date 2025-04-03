@@ -1,5 +1,6 @@
 import os
 import socket
+import urllib.parse
 
 def get_nas_ip():
     nas_ip = input("Enter the IP address of your NAS: ").strip()
@@ -30,7 +31,8 @@ def generate_tsv(nas_ip, protocol, port):
         for file in os.listdir():
             if file.endswith(".pkg"):
                 file_size = os.path.getsize(file)
-                pkg_link = f"{protocol}://{nas_ip}:{port}/{file}"
+                encoded_file = urllib.parse.quote(file)  # URL encode file name
+                pkg_link = f"{protocol}://{nas_ip}:{port}/{encoded_file}"
                 f.write(f"\t\t{file}\t{pkg_link}\t\t\t\t\t{file_size}\t\n")
     
     print(f"TSV file '{tsv_file}' generated successfully.")
