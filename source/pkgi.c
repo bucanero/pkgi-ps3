@@ -202,19 +202,19 @@ static void pkgi_friendly_size(char* text, uint32_t textlen, int64_t size)
     }
     else if (size < 1000LL)
     {
-        pkgi_snprintf(text, textlen, "%u " PKGI_UTF8_B, (uint32_t)size);
+        pkgi_snprintf(text, textlen, "%u %s", (uint32_t)size, _(PKGI_UTF8_B));
     }
     else if (size < 1000LL * 1000)
     {
-        pkgi_snprintf(text, textlen, "%.2f " PKGI_UTF8_KB, size / 1024.f);
+        pkgi_snprintf(text, textlen, "%.2f %s", size / 1024.f, _(PKGI_UTF8_KB));
     }
     else if (size < 1000LL * 1000 * 1000)
     {
-        pkgi_snprintf(text, textlen, "%.2f " PKGI_UTF8_MB, size / 1024.f / 1024.f);
+        pkgi_snprintf(text, textlen, "%.2f %s", size / 1024.f / 1024.f, _(PKGI_UTF8_MB));
     }
     else
     {
-        pkgi_snprintf(text, textlen, "%.2f " PKGI_UTF8_GB, size / 1024.f / 1024.f / 1024.f);
+        pkgi_snprintf(text, textlen, "%.2f %s", size / 1024.f / 1024.f / 1024.f, _(PKGI_UTF8_GB));
     }
 }
 
