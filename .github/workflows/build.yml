@@ -4,7 +4,7 @@ on: [ push, pull_request, workflow_dispatch ]
 
 jobs:
   build_pkg:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
 
     - name: Checkout
@@ -27,6 +27,7 @@ jobs:
         echo "sha_name=$(echo ${GITHUB_SHA} | cut -c1-8)" >> $GITHUB_ENV
         echo "PS3DEV=${GITHUB_WORKSPACE}/ps3dev" >> $GITHUB_ENV
         echo "PSL1GHT=${GITHUB_WORKSPACE}/ps3dev" >> $GITHUB_ENV
+        sudo apt install python2.7
 
       # using pre-compiled sdk
     - name: Download PSL1GHT Toolchain
@@ -54,5 +55,3 @@ jobs:
         name: pkgi-ps3-build_${{ env.sha_name }}
         path: pkgi-ps3.pkg
         if-no-files-found: error
-        # don't keep artifacts for too long
-        retention-days: 7
