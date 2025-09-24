@@ -35,7 +35,7 @@ msgstr "Pobrano pomyslnie"
 
 #: pkgi.c:122
 msgid "Task successfully queued (reboot to start)"
-msgstr "Zadanie umieszczone w kolejce. (Zrestartuj, aby rozpoczac)"
+msgstr "Zadanie w kolejce. (Zrestartuj, aby rozpoczac)"
 
 #: pkgi.c:163
 msgid "GB"
@@ -112,7 +112,7 @@ msgstr "Brak danych!"
 
 #: pkgi.c:462
 msgid "Item already installed, download again?"
-msgstr "Element juz zainstalowany, pobrac ponownie?"
+msgstr "Element jest juz zainstalowany, pobrac ponownie?"
 
 #: pkgi.c:471 pkgi_download.c:372 pkgi_download.c:652
 msgid "Downloading..."
@@ -176,7 +176,7 @@ msgstr "nie udalo sie pobrac listy z"
 
 #: pkgi_db.c:159
 msgid "list is too large... check for newer pkgi version!"
-msgstr "lista jest za duza... sprawdz nowsza wersje pkgi!"
+msgstr "lista jest za dluga... sprawdz czy nie ma nowszej wersji pkgi!"
 
 #: pkgi_db.c:187
 msgid "list is empty... check the DB server"
@@ -248,15 +248,15 @@ msgstr "Odpowiedz HTTP ma nieznana dlugosc"
 
 #: pkgi_download.c:331
 msgid "Not enough free space on HDD"
-msgstr "Nie wystarczajaca ilosc miejsca na dysku twardym"
+msgstr "Za malo wolnego miejsca na dysku twardym"
 
 #: pkgi_download.c:340
 msgid "Could not create task directory on HDD."
-msgstr "Nie mozna utworzyc katalogu zadan na dysku twardym."
+msgstr "Nie mozna utworzyc folderu roboczego na dysku twardym."
 
 #: pkgi_download.c:348
 msgid "Saving background task..."
-msgstr "Zapisywanie w tle..."
+msgstr "Zapisywanie zadania w tle..."
 
 #: pkgi_download.c:354
 msgid "Could not create PKG file to HDD."
@@ -264,7 +264,7 @@ msgstr "Nie mozna utworzyc pliku PKG na HDD."
 
 #: pkgi_download.c:360
 msgid "Could not create task files to HDD."
-msgstr "Nie mozna utworzyc plikow zadan na HDD."
+msgstr "Nie mozna utworzyc plikow roboczych na HDD."
 
 #: pkgi_download.c:425
 msgid "HTTP download error"
@@ -284,7 +284,7 @@ msgstr "nie mozna utworzyc folderu"
 
 #: pkgi_download.c:475
 msgid "cannot create file"
-msgstr "nie mozna stworzyc pliku"
+msgstr "nie mozna utworzyc pliku"
 
 #: pkgi_download.c:490
 msgid "cannot resume file"
@@ -292,7 +292,7 @@ msgstr "nie mozna wznowic pliku"
 
 #: pkgi_download.c:562
 msgid "pkg integrity failed, try downloading again"
-msgstr "Integralnosc pakietu nie powiodla sie, sprobuj pobrac ponownie"
+msgstr "Wystapil problem z integralnoscia pkg, sprobuj pobrac ponownie"
 
 #: pkgi_download.c:573
 msgid "Creating RAP file"
@@ -316,11 +316,11 @@ msgstr "Dodawanie zadania w tle..."
 
 #: pkgi_download.c:675
 msgid "Downloading icon"
-msgstr "Pobieranie ikon"
+msgstr "Pobieranie ikony"
 
 #: pkgi_download.c:713
 msgid "Could not create install directory on HDD."
-msgstr "Nie mozna utworzyc katalogu instalacyjnego na dysku twardym."
+msgstr "Nie mozna utworzyc folderu instalacyjnego na dysku twardym."
 
 #: pkgi_menu.c:102
 msgid "Search..."
@@ -332,19 +332,19 @@ msgstr "Sortuj wedlug:"
 
 #: pkgi_menu.c:104
 msgid "Title"
-msgstr "Tytul"
+msgstr "Tytulu"
 
 #: pkgi_menu.c:105
 msgid "Region"
-msgstr "Region"
+msgstr "Regionu"
 
 #: pkgi_menu.c:106
 msgid "Name"
-msgstr "Nazwa"
+msgstr "Nazwy"
 
 #: pkgi_menu.c:107
 msgid "Size"
-msgstr "Rozmiar"
+msgstr "Rozmiaru"
 
 #: pkgi_menu.c:108
 msgid "Content:"
@@ -372,11 +372,11 @@ msgstr "USA"
 
 #: pkgi_menu.c:115
 msgid "Options:"
-msgstr "Opcje:"
+msgstr "Ustawienia:"
 
 #: pkgi_menu.c:116
 msgid "Back. DL"
-msgstr "DL w tle"
+msgstr "Pob. w tle"
 
 #: pkgi_menu.c:117
 msgid "Music"
@@ -388,7 +388,7 @@ msgstr "Odswiez..."
 
 #: pkgi_menu.c:326
 msgid "Direct DL"
-msgstr "DL bezposr."
+msgstr "Pob. bezposr."
 
 #msgid "---translated by---"
-#msgstr "DEX357, PoliPyc, olokos"
+#msgstr "DEX357, PoliPyc, olokos, hackzy"
