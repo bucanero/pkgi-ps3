@@ -46,7 +46,7 @@ msgid "MB"
 msgstr ""
 
 #: pkgi.c:171 pkgi.c:504 pkgi_download.c:253
-msgid "KB"
+msgid "kB"
 msgstr ""
 
 #: pkgi.c:175
