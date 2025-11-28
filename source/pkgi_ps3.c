@@ -43,6 +43,9 @@
 
 #define PKGI_USER_AGENT "Mozilla/5.0 (PLAYSTATION 3; 1.00)"
 
+#define PKGI_CURL_BUFFER_SIZE   (256 * 1024L)
+#define PKGI_FILE_BUFFER_SIZE   (256 * 1024)
+
 
 struct pkgi_http
 {
@@ -1152,6 +1155,12 @@ void pkgi_curl_init(CURL *curl)
     curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
     // request using SSL for the FTP transfer if available
     curl_easy_setopt(curl, CURLOPT_USE_SSL, CURLUSESSL_TRY);
+
+    curl_easy_setopt(curl, CURLOPT_BUFFERSIZE, PKGI_CURL_BUFFER_SIZE);
+    curl_easy_setopt(curl, CURLOPT_TCP_NODELAY, 1L);
+    curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
+    curl_easy_setopt(curl, CURLOPT_TCP_KEEPIDLE, 60L);
+    curl_easy_setopt(curl, CURLOPT_TCP_KEEPINTVL, 30L);
 }
 
 pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
@@ -1341,6 +1350,7 @@ void* pkgi_create(const char* path)
         LOG("cannot create %s, err=0x%08x", path, fd);
         return NULL;
     }
+    setvbuf(fd, NULL, _IOFBF, PKGI_FILE_BUFFER_SIZE);
     LOG("fopen returned fd=%d", fd);
 
     return (void*)fd;
@@ -1369,6 +1379,7 @@ void* pkgi_append(const char* path)
         LOG("cannot append %s, err=0x%08x", path, fd);
         return NULL;
     }
+    setvbuf(fd, NULL, _IOFBF, PKGI_FILE_BUFFER_SIZE);
     LOG("fopen returned fd=%d", fd);
 
     return (void*)fd;
