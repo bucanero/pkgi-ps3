@@ -215,6 +215,18 @@ Run `make` to create a release build. After that, run `make pkg` to create a `.p
 You can also set the environment variable `PS3LOAD=tcp:x.x.x.x` to the PS3's IP address;
 that will allow you to use `make run` and send `pkgi-ps3.self` directly to the [PS3LoadX listener](https://github.com/bucanero/ps3loadx).
 
+## Building with Docker
+
+If you don't have the PS3 toolchain installed, you can build using Docker:
+
+```
+make -f Makefile.docker docker-pkg
+```
+
+This builds the Docker image (cached) and compiles the project inside the container. The output `.pkg` file will be in the project directory.
+
+To build without creating the package: `make -f Makefile.docker docker-build`
+
 ## Debugging
 
 To enable debug logging, build PKGi PS3 with `make DEBUGLOG=1`. The application will send debug messages to

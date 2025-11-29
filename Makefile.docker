@@ -1,0 +1,32 @@
+#---------------------------------------------------------------------------------
+# Docker-based build system for PKGi PS3
+# Usage: make -f Makefile.docker [target]
+#---------------------------------------------------------------------------------
+
+DOCKER_IMAGE := ps3dev-pkgi
+
+.PHONY: docker-image docker-build docker-pkg clean help
+
+help:
+	@echo "PKGi PS3 Docker Build System"
+	@echo ""
+	@echo "Available targets:"
+	@echo "  docker-image  - Build the Docker image with PS3 toolchain"
+	@echo "  docker-build  - Build the project (no package)"
+	@echo "  docker-pkg    - Build the project and create .pkg file"
+	@echo "  clean         - Clean build artifacts"
+	@echo ""
+	@echo "Usage: make -f Makefile.docker [target]"
+
+docker-image:
+	@docker build -t $(DOCKER_IMAGE) .
+
+docker-build: docker-image
+	@docker run --rm --platform linux/amd64 -v "$(CURDIR)":/src -w /src $(DOCKER_IMAGE) make
+
+docker-pkg: docker-image
+	@docker run --rm --platform linux/amd64 -v "$(CURDIR)":/src -w /src $(DOCKER_IMAGE) make pkg
+
+clean:
+	@echo "Cleaning build artifacts..."
+	@rm -rf build *.elf *.self EBOOT.BIN *.pkg *.gnpdrm.pkg
