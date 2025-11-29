@@ -1,27 +1,8 @@
+#---------------------------------------------------------------------------------
+# Clear the implicit built in rules
+#---------------------------------------------------------------------------------
 .SUFFIXES:
-
-# Docker targets (host only)
-ifneq ($(wildcard /.dockerenv),/.dockerenv)
-DOCKER_IMAGE := ps3dev-pkgi
-
-.PHONY: docker-image docker-build docker-pkg
-
-docker-image:
-	@docker build -t $(DOCKER_IMAGE) .
-
-docker-build: docker-image
-	@docker run --rm --platform linux/amd64 -v "$(CURDIR)":/src -w /src $(DOCKER_IMAGE) make build
-
-docker-pkg: docker-image
-	@docker run --rm --platform linux/amd64 -v "$(CURDIR)":/src -w /src $(DOCKER_IMAGE) make pkg
-endif
-
-DOCKER_TARGETS := docker-image docker-build docker-pkg
-ifneq ($(filter $(DOCKER_TARGETS),$(MAKECMDGOALS)),)
-  PSL1GHT_SKIP := 1
-endif
-
-ifndef PSL1GHT_SKIP
+#---------------------------------------------------------------------------------
 ifeq ($(strip $(PSL1GHT)),)
 $(error "Please set PSL1GHT in your environment. export PSL1GHT=<path>")
 endif
@@ -209,4 +190,3 @@ $(OUTPUT).elf:	$(OFILES)
 endif
 #---------------------------------------------------------------------------------
 
-endif
