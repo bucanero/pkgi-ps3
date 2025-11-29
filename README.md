@@ -220,12 +220,12 @@ that will allow you to use `make run` and send `pkgi-ps3.self` directly to the [
 If you don't have the PS3 toolchain installed, you can build using Docker:
 
 ```
-make docker-build
+make docker-pkg
 ```
 
 This builds the Docker image (cached) and compiles the project inside the container. The output `.pkg` file will be in the project directory.
 
-To clean: `make docker-clean`
+To build without creating the package: `make docker-build`
 
 ## Debugging
 

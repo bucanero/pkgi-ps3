@@ -4,7 +4,7 @@
 ifneq ($(wildcard /.dockerenv),/.dockerenv)
 DOCKER_IMAGE := ps3dev-pkgi
 
-.PHONY: docker-image docker-build docker-clean docker-pkg
+.PHONY: docker-image docker-build docker-pkg
 
 docker-image:
 	@docker build -t $(DOCKER_IMAGE) .
@@ -14,12 +14,9 @@ docker-build: docker-image
 
 docker-pkg: docker-image
 	@docker run --rm --platform linux/amd64 -v "$(CURDIR)":/src -w /src $(DOCKER_IMAGE) make pkg
-
-docker-clean:
-	@docker run --rm --platform linux/amd64 -v "$(CURDIR)":/src -w /src $(DOCKER_IMAGE) make clean
 endif
 
-DOCKER_TARGETS := docker-image docker-build docker-clean docker-pkg
+DOCKER_TARGETS := docker-image docker-build docker-pkg
 ifneq ($(filter $(DOCKER_TARGETS),$(MAKECMDGOALS)),)
   PSL1GHT_SKIP := 1
 endif
@@ -32,7 +29,7 @@ endif
 #---------------------------------------------------------------------------------
 #  TITLE, APPID, CONTENTID, ICON0 SFOXML before ppu_rules.
 #---------------------------------------------------------------------------------
-TITLE		:=	PKGi PS3
+TITLE		:=	PKGi PS3 fast
 APPID		:=	NP00PKGI3
 CONTENTID	:=	UP0001-$(APPID)_00-0000000000000000
 ICON0		:=	pkgfiles/ICON0.PNG
