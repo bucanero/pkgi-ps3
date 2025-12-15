@@ -17,9 +17,9 @@
 #define PKGI_UTF8_PARTIAL   "\x09"//"\xe2\x97\x8b" // 0x25cb
 
 #define PKGI_UTF8_B  "B"
-#define PKGI_UTF8_KB "Kb" // "\xe3\x8e\x85" // 0x3385
-#define PKGI_UTF8_MB "Mb" // "\xe3\x8e\x86" // 0x3386
-#define PKGI_UTF8_GB "Gb" // "\xe3\x8e\x87" // 0x3387
+#define PKGI_UTF8_KB "KB" // "\xe3\x8e\x85" // 0x3385
+#define PKGI_UTF8_MB "MB" // "\xe3\x8e\x86" // 0x3386
+#define PKGI_UTF8_GB "GB" // "\xe3\x8e\x87" // 0x3387
 
 #define PKGI_UTF8_CLEAR "\xaf" // 0x00d7
 
