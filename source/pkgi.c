@@ -160,19 +160,19 @@ static const char* friendly_size_str(uint64_t size)
 {
     if (size > 10ULL * 1000 * 1024 * 1024)
     {
-        return _("GB");
+        return _(PKGI_UTF8_GB);
     }
     else if (size > 10 * 1000 * 1024)
     {
-        return _("MB");
+        return _(PKGI_UTF8_MB);
     }
     else if (size > 10 * 1000)
     {
-        return _("KB");
+        return _(PKGI_UTF8_KB);
     }
     else
     {
-        return _("B");
+        return _(PKGI_UTF8_B);
     }
 }
 
