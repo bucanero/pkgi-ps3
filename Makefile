@@ -39,7 +39,7 @@ PKGFILES	:=	pkgfiles
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
 LIBS		:=	-lcurl -lxml2 -lya2d -lfont3d -ltiny3d -lsimdmath -lgcm_sys -lio -lsysutil -lrt -llv2 -lpngdec -lsysmodule -lm -lsysfs  -ljpgdec \
-				-lnet -lfreetype -lz -lmikmod -laudio -lpolarssl -lmini18n -ljson-c
+				-lnet -lfreetype -lz -lmikmod -laudio -lpolarssl -lmini18n -ljson-c -lnetctl
 
 
 #---------------------------------------------------------------------------------

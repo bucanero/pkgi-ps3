@@ -1,0 +1,390 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PKGi PS3\n"
+"POT-Creation-Date: 2021-10-09 19:00-0300\n"
+"PO-Revision-Date: 2021-10-09 19:00-0300\n"
+"Last-Translator: C-Husky\n"
+"Language-Team: \n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
+"X-Poedit-Basepath: ./source\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Flags-xgettext: --add-comments\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: _\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: pkgi.c:82
+msgid "Installing"
+msgstr "Telepítés"
+
+#: pkgi.c:82
+msgid "Please wait..."
+msgstr "Várjon..."
+
+#: pkgi.c:94
+msgid "Installation failed"
+msgstr "Sikertelen telepítés"
+
+#: pkgi.c:118
+msgid "Successfully downloaded"
+msgstr "Sikeres letöltes"
+
+#: pkgi.c:122
+msgid "Task successfully queued (reboot to start)"
+msgstr "Feladat sikeresen várólistára került (újraindítás a kezdéshez)"
+
+#: pkgi.c:163
+msgid "GB"
+msgstr "GB"
+
+#: pkgi.c:167 pkgi_download.c:249
+msgid "MB"
+msgstr "MB"
+
+#: pkgi.c:171 pkgi.c:504 pkgi_download.c:253
+msgid "KB"
+msgstr "KB"
+
+#: pkgi.c:175
+msgid "B"
+msgstr "B"
+
+#: pkgi.c:185
+#, c-format
+msgid "pkg requires %u %s free space, but only %u %s available"
+msgstr "pkg-nek %u %s szabad tárhely kellene, de csak %u %s elérhető"
+
+#: pkgi.c:225 pkgi_menu.c:109 pkgi_menu.c:121
+msgid "All"
+msgstr "Összes"
+
+#: pkgi.c:226 pkgi_menu.c:122
+msgid "Games"
+msgstr "Játékok"
+
+#: pkgi.c:227 pkgi_menu.c:123
+msgid "DLCs"
+msgstr "DLC-k"
+
+#: pkgi.c:228 pkgi_menu.c:124
+msgid "Themes"
+msgstr "Témák"
+
+#: pkgi.c:229 pkgi_menu.c:125
+msgid "Avatars"
+msgstr "Avatárok"
+
+#: pkgi.c:230 pkgi_menu.c:126
+msgid "Demos"
+msgstr "Demó-k"
+
+#: pkgi.c:231 pkgi_menu.c:118 pkgi_menu.c:127
+msgid "Updates"
+msgstr "Frissítések"
+
+#: pkgi.c:232 pkgi_menu.c:128
+msgid "Emulators"
+msgstr "Emulátorok"
+
+#: pkgi.c:233 pkgi_menu.c:129
+msgid "Apps"
+msgstr "Alkalmazások"
+
+#: pkgi.c:234 pkgi_menu.c:130
+msgid "Tools"
+msgstr "Eszközök"
+
+#: pkgi.c:235
+msgid "Unknown"
+msgstr "Ismeretlen"
+
+#: pkgi.c:253
+msgid "Exit to XMB?"
+msgstr "Kilépés az XMB-be?"
+
+#: pkgi.c:436
+msgid "No items!"
+msgstr "Nincsenek tételek!"
+
+#: pkgi.c:462
+msgid "Item already installed, download again?"
+msgstr "Tétel már telepítve van, letöltés újra?"
+
+#: pkgi.c:471 pkgi_download.c:372 pkgi_download.c:652
+msgid "Downloading..."
+msgstr "Letöltés..."
+
+#: pkgi.c:471 pkgi.c:674
+msgid "Preparing..."
+msgstr "Elökészítés..."
+
+#: pkgi.c:504 pkgi.c:508
+msgid "Refreshing"
+msgstr "Újratoltés"
+
+#: pkgi.c:563 pkgi.c:567
+msgid "Count"
+msgstr "Mennyiség"
+
+#: pkgi.c:575
+msgid "Free"
+msgstr "Szabad"
+
+#: pkgi.c:585
+msgid "Select"
+msgstr "Kiválasztás"
+
+#: pkgi.c:585
+msgid "Close"
+msgstr "Bezárás"
+
+#: pkgi.c:585
+msgid "Cancel"
+msgstr "Mégse"
+
+#: pkgi.c:589 pkgi_download.c:136
+msgid "Download"
+msgstr "Letöltés"
+
+#: pkgi.c:589
+msgid "Menu"
+msgstr "Menü"
+
+#: pkgi.c:589
+msgid "Details"
+msgstr "Részletek"
+
+#: pkgi.c:589
+msgid "Exit"
+msgstr "Kilépés"
+
+#: pkgi.c:678
+msgid "Successfully downloaded PKGi PS3 update"
+msgstr "PKGi PS3 frissítés sikeresen letöltve"
+
+#: pkgi.c:1051
+msgid "Search"
+msgstr "Keresés"
+
+#: pkgi_db.c:145 pkgi_db.c:153
+msgid "failed to download list from"
+msgstr "nem sikerült letölteni a listát innen:"
+
+#: pkgi_db.c:159
+msgid "list is too large... check for newer pkgi version!"
+msgstr "lista túl nagy... keressen újabb pkgi verziót!"
+
+#: pkgi_db.c:187
+msgid "list is empty... check the DB server"
+msgstr "lista üres... elenőrizze a DB szervert"
+
+#: pkgi_db.c:390
+msgid "ERROR: pkgi.txt file(s) missing or bad config.txt file"
+msgstr "HIBA: pkgi.txt fájl(ok) hiányoznak vagy rossz config.txt fájl"
+
+#: pkgi_dialog.c:80
+msgid "Content"
+msgstr "Tartalom"
+
+#: pkgi_dialog.c:108
+msgid "ERROR"
+msgstr "HIBA"
+
+#: pkgi_dialog.c:169
+msgid "Failed to download the update list"
+msgstr "Frissítési lista letöltése sikertelen"
+
+#: pkgi_dialog.c:174
+msgid "update(s) loaded"
+msgstr "frissítés(ek) betöltve"
+
+#: pkgi_dialog.c:319
+#, c-format
+msgid "press %s to cancel"
+msgstr "nyomja meg a(z) %s gombot a megszakításhoz"
+
+#: pkgi_dialog.c:333
+#, c-format
+msgid "press %s to close - %s to scan updates"
+msgstr "nyomja meg a(z) %s gombot a bezáráshoz - %s gombot a frissítések kereséséhez"
+
+#: pkgi_dialog.c:365
+msgid "Enter"
+msgstr "Enter"
+
+#: pkgi_dialog.c:365
+msgid "Back"
+msgstr "Vissza"
+
+#: pkgi_dialog.c:367
+#, c-format
+msgid "press %s to close"
+msgstr "nyomja meg a(z) %s gombot a bezáráshoz"
+
+#: pkgi_download.c:183
+msgid "Install"
+msgstr "Telepítés"
+
+#: pkgi_download.c:216 pkgi_download.c:220 pkgi_download.c:226
+msgid "ETA"
+msgstr "ETA"
+
+#: pkgi_download.c:310 pkgi_download.c:392
+msgid "Could not send HTTP request"
+msgstr "Nem lehetett a HTTP kérést elküldeni"
+
+#: pkgi_download.c:317 pkgi_download.c:399
+msgid "HTTP request failed"
+msgstr "HTTP kérés sikertelen"
+
+#: pkgi_download.c:322 pkgi_download.c:404
+msgid "HTTP response has unknown length"
+msgstr "HTTP válasz hossza ismeretlen "
+
+#: pkgi_download.c:331
+msgid "Not enough free space on HDD"
+msgstr "Nincs elég szabad tárhely a merevlemezen (HDD-n)"
+
+#: pkgi_download.c:340
+msgid "Could not create task directory on HDD."
+msgstr "Nem sikerült feladatkönyvtárat létrehozni a merevlemezen (HDD-n)."
+
+#: pkgi_download.c:348
+msgid "Saving background task..."
+msgstr "Háttér feladat mentése..."
+
+#: pkgi_download.c:354
+msgid "Could not create PKG file to HDD."
+msgstr "Nem sikerült PKG fájlt létrehozni a merevlemezre (HDD-re)."
+
+#: pkgi_download.c:360
+msgid "Could not create task files to HDD."
+msgstr "Nem sikerült feladat fájlokat létrehozni a merevlemezre (HDD-re)."
+
+#: pkgi_download.c:425
+msgid "HTTP download error"
+msgstr "sikertelen HTTP letöltesi hiba"
+
+#: pkgi_download.c:432
+msgid "HTTP connection closed"
+msgstr "HTTP csatlakozás lezárva"
+
+#: pkgi_download.c:445
+msgid "failed to write to"
+msgstr "nem sikerült írni a"
+
+#: pkgi_download.c:465
+msgid "cannot create folder"
+msgstr "nem sikerült mappát létrehozni"
+
+#: pkgi_download.c:475
+msgid "cannot create file"
+msgstr "nem sikerült fájlt létrehozni"
+
+#: pkgi_download.c:490
+msgid "cannot resume file"
+msgstr "nem sikerült a fájlt folytatni"
+
+#: pkgi_download.c:562
+msgid "pkg integrity failed, try downloading again"
+msgstr "pkg integritás hibás, probálja meg újra letölteni"
+
+#: pkgi_download.c:573
+msgid "Creating RAP file"
+msgstr "RAP fájl készítése"
+
+#: pkgi_download.c:581 pkgi_download.c:626
+msgid "Cannot save"
+msgstr "Nem sikerült menteni"
+
+#: pkgi_download.c:621
+msgid "Creating RIF file"
+msgstr "RIF fájl készítése"
+
+#: pkgi_download.c:646
+msgid "Resuming..."
+msgstr "Folytatás..."
+
+#: pkgi_download.c:652
+msgid "Adding background task..."
+msgstr "Háttér feladat hozzáadása..."
+
+#: pkgi_download.c:675
+msgid "Downloading icon"
+msgstr "Ikon letöltése"
+
+#: pkgi_download.c:713
+msgid "Could not create install directory on HDD."
+msgstr "Nem sikerült telepítési könyvtárat létrehozni a merevlemezen (HDD-n)."
+
+#: pkgi_menu.c:102
+msgid "Search..."
+msgstr "Keresés..."
+
+#: pkgi_menu.c:103
+msgid "Sort by:"
+msgstr "Rendezés:"
+
+#: pkgi_menu.c:104
+msgid "Title"
+msgstr "Cím"
+
+#: pkgi_menu.c:105
+msgid "Region"
+msgstr "Régió"
+
+#: pkgi_menu.c:106
+msgid "Name"
+msgstr "Név"
+
+#: pkgi_menu.c:107
+msgid "Size"
+msgstr "Méret"
+
+#: pkgi_menu.c:108
+msgid "Content:"
+msgstr "Tartalom:"
+
+#: pkgi_menu.c:110
+msgid "Regions:"
+msgstr "Régiók:"
+
+#: pkgi_menu.c:111
+msgid "Asia"
+msgstr "Ázsia"
+
+#: pkgi_menu.c:112
+msgid "Europe"
+msgstr "Európa"
+
+#: pkgi_menu.c:113
+msgid "Japan"
+msgstr "Japán"
+
+#: pkgi_menu.c:114
+msgid "USA"
+msgstr "USA"
+
+#: pkgi_menu.c:115
+msgid "Options:"
+msgstr "Opciók:"
+
+#: pkgi_menu.c:116
+msgid "Back. DL"
+msgstr "Vissza. DL"
+
+#: pkgi_menu.c:117
+msgid "Music"
+msgstr "Zene"
+
+#: pkgi_menu.c:119
+msgid "Refresh..."
+msgstr "Újratoltés..."
+
+#: pkgi_menu.c:326
+msgid "Direct DL"
+msgstr "Közvetleni DL"
