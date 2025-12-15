@@ -149,7 +149,7 @@ int update_database(const char* update_url, const char* path, char* error, uint3
     db_size = 0;
     LOG("downloading update from %s", update_url);
 
-    pkgi_http* http = pkgi_http_get(update_url, NULL, 0);
+    pkgi_http* http = pkgi_http_get(update_url, 0);
     if (!http)
     {
         pkgi_snprintf(error, error_size, "%s\n%s", _("failed to download list from"), update_url);
