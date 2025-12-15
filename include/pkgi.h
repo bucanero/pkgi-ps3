@@ -36,6 +36,7 @@
 #define PKGI_COUNTOF(arr) (sizeof(arr)/sizeof(0[arr]))
 
 #ifdef PKGI_ENABLE_LOGGING
+#include <stddef.h>
 #include <dbglogger.h>
 #define LOG dbglogger_log
 #else
@@ -103,7 +104,7 @@ int pkgi_check_free_space(uint64_t http_length);
 typedef struct pkgi_http pkgi_http;
 
 int pkgi_validate_url(const char* url);
-pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset);
+pkgi_http* pkgi_http_get(const char* url, uint64_t offset);
 int pkgi_http_response_length(pkgi_http* http, int64_t* length);
 int pkgi_http_read(pkgi_http* http, void* write_func, void* xferinfo_func);
 void pkgi_http_close(pkgi_http* http);
