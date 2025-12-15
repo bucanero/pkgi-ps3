@@ -319,7 +319,7 @@ static int queue_pkg_task(void)
     int64_t http_length;
 
     LOG("requesting %s @ %llu", db_item->url, initial_offset);
-    http = pkgi_http_get(db_item->url, db_item->content, initial_offset);
+    http = pkgi_http_get(db_item->url, initial_offset);
     if (!http)
     {
         pkgi_dialog_error(_("Could not send HTTP request"));
