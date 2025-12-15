@@ -12,6 +12,7 @@
 #include <lv2/sysfs.h>
 #include <lv2/process.h>
 #include <net/net.h>
+#include <net/netctl.h>
 
 #include <unistd.h>
 #include <string.h>
@@ -1134,6 +1135,8 @@ int pkgi_validate_url(const char* url)
 
 void pkgi_curl_init(CURL *curl)
 {
+    union net_ctl_info proxy_info;
+
     // Set user agent string
     curl_easy_setopt(curl, CURLOPT_USERAGENT, PKGI_USER_AGENT);
     // don't verify the certificate's name against host
@@ -1152,9 +1155,25 @@ void pkgi_curl_init(CURL *curl)
     curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
     // request using SSL for the FTP transfer if available
     curl_easy_setopt(curl, CURLOPT_USE_SSL, CURLUSESSL_TRY);
+
+    // check for proxy settings
+    memset(&proxy_info, 0, sizeof(proxy_info));
+    netCtlGetInfo(NET_CTL_INFO_HTTP_PROXY_CONFIG, &proxy_info);
+
+    if (proxy_info.http_proxy_config == NET_CTL_HTTP_PROXY_ON)
+    {
+        memset(&proxy_info, 0, sizeof(proxy_info));
+        netCtlGetInfo(NET_CTL_INFO_HTTP_PROXY_SERVER, &proxy_info);
+        curl_easy_setopt(curl, CURLOPT_PROXY, proxy_info.http_proxy_server);
+        curl_easy_setopt(curl, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
+
+        memset(&proxy_info, 0, sizeof(proxy_info));
+        netCtlGetInfo(NET_CTL_INFO_HTTP_PROXY_PORT, &proxy_info);
+        curl_easy_setopt(curl, CURLOPT_PROXYPORT, proxy_info.http_proxy_port);
+    }
 }
 
-pkgi_http* pkgi_http_get(const char* url, const char* content, uint64_t offset)
+pkgi_http* pkgi_http_get(const char* url, uint64_t offset)
 {
     LOG("http get");
 
@@ -1479,7 +1498,7 @@ char * pkgi_http_download_buffer(const char* url, uint32_t* buf_size)
     return (chunk.memory);
 }
 
-const char * pkgi_get_user_language()
+const char * pkgi_get_user_language(void)
 {
     int language;
 
