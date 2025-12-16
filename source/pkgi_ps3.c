@@ -1160,9 +1160,7 @@ void pkgi_curl_init(CURL *curl)
     curl_easy_setopt(curl, CURLOPT_USE_SSL, CURLUSESSL_TRY);
 
     curl_easy_setopt(curl, CURLOPT_BUFFERSIZE, PKGI_CURL_BUFFER_SIZE);
-    curl_easy_setopt(curl, CURLOPT_TCP_NODELAY, 1L);
     curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
-    curl_easy_setopt(curl, CURLOPT_TCP_KEEPIDLE, 60L);
     curl_easy_setopt(curl, CURLOPT_TCP_KEEPINTVL, 30L);
 
     // check for proxy settings
