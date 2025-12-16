@@ -48,8 +48,6 @@
 struct pkgi_http
 {
     int used;
-    uint64_t size;
-    uint64_t offset;
     CURL *curl;
 };
 
@@ -1222,17 +1220,26 @@ pkgi_http* pkgi_http_get(const char* url, uint64_t offset)
     return(http);
 }
 
-int pkgi_http_response_length(pkgi_http* http, int64_t* length)
+int pkgi_http_content_size(const char* url, int64_t* length)
 {
+    CURL *curl;
     CURLcode res;
 
+    curl = curl_easy_init();
+    if(!curl)
+    {
+        LOG("cURL init error");
+        return 0;
+    }
+
+    pkgi_curl_init(curl);
+    curl_easy_setopt(curl, CURLOPT_URL, url);
     // do the download request without getting the body
-    curl_easy_setopt(http->curl, CURLOPT_NOBODY, 1L);
-    curl_easy_setopt(http->curl, CURLOPT_NOPROGRESS, 1L);
+    curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
+    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
 
     // Perform the request
-    res = curl_easy_perform(http->curl);
-
+    res = curl_easy_perform(curl);
     if(res != CURLE_OK)
     {
         LOG("curl_easy_perform() failed: %s", curl_easy_strerror(res));
@@ -1240,12 +1247,12 @@ int pkgi_http_response_length(pkgi_http* http, int64_t* length)
     }
 
     long status = 0;
-    curl_easy_getinfo(http->curl, CURLINFO_RESPONSE_CODE, &status);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
     LOG("http status code = %d", status);
 
-    curl_easy_getinfo(http->curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, length);
+    curl_easy_getinfo(curl, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, length);
     LOG("http response length = %llu", *length);
-    http->size = *length;
+    curl_easy_cleanup(curl);
 
     return 1;
 }
