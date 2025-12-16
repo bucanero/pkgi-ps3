@@ -5,7 +5,7 @@
 #include "pkgi_dialog.h"
 
 #define PKGI_UPDATE_URL     "https://api.github.com/repos/bucanero/pkgi-ps3/releases/latest"
-#define PKGI_VERSION        "1.2.4"
+#define PKGI_VERSION        "1.3.0"
 
 #define PKGI_BUTTON_SELECT 0x00010000
 #define PKGI_BUTTON_START  0x00080000
@@ -58,8 +58,6 @@ int pkgi_memequ(const void* a, const void* b, uint32_t size);
 void* pkgi_malloc(uint32_t size);
 void pkgi_free(void* ptr);
 
-int pkgi_is_unsafe_mode(void);
-
 int pkgi_ok_button(void);
 int pkgi_cancel_button(void);
 
@@ -105,7 +103,7 @@ typedef struct pkgi_http pkgi_http;
 
 int pkgi_validate_url(const char* url);
 pkgi_http* pkgi_http_get(const char* url, uint64_t offset);
-int pkgi_http_response_length(pkgi_http* http, int64_t* length);
+int pkgi_http_content_size(const char* url, int64_t* length);
 int pkgi_http_read(pkgi_http* http, void* write_func, void* xferinfo_func);
 void pkgi_http_close(pkgi_http* http);
 

@@ -32,17 +32,14 @@ static int download_resume;
 
 static uint64_t initial_offset;  // where http download resumes
 static uint64_t download_offset; // pkg absolute offset
-static uint64_t download_size;   // pkg total size (from http request)
+static uint64_t total_size;      // pkg total size (from http request)
+static uint64_t download_size;   // remaining size to download
 
 static sha256_context sha;
 
 static void* item_file;     // current file handle
 static char item_name[256]; // current file name
 static char item_path[256]; // current file path
-
-
-// pkg header
-static uint64_t total_size;
 
 // UI stuff
 static char dialog_extra[256];
@@ -84,11 +81,11 @@ static void write_pdb_string(void* fp, const char* header, const char* pdbstr)
 	pkgi_write(fp, pdbstr, pdbstr_len);
 }
 
-static void write_pdb_int64(void* fp, const char* header, const uint64_t* pdb_u64)
+static void write_pdb_int64(void* fp, const char* header, const uint64_t pdb_u64)
 {
-	pkgi_write(fp, header, 4);
-	pkgi_write(fp, "\x00\x00\x00\x08\x00\x00\x00\x08", 8);
-	pkgi_write(fp, pdb_u64, 8);
+    pkgi_write(fp, header, 4);
+    pkgi_write(fp, "\x00\x00\x00\x08\x00\x00\x00\x08", 8);
+    pkgi_write(fp, &pdb_u64, 8);
 }
 
 static int create_queue_pdb_files(void)
@@ -120,7 +117,7 @@ static int create_queue_pdb_files(void)
 	pkgi_write(fpPDB, pkg_d0top_data, d0top_data_size);
 	
 	// 000000CE - Download expected size (in bytes)
-	write_pdb_int64(fpPDB, PDB_HDR_SIZE, &total_size);
+	write_pdb_int64(fpPDB, PDB_HDR_SIZE, total_size);
 
 	// 000000CB - PKG file name
 	write_pdb_string(fpPDB, PDB_HDR_FILENAME, root);
@@ -169,12 +166,12 @@ static int create_install_pdb_files(const char *path, uint64_t size)
 	pkgi_write(fp2, install_data_pdb, install_data_pdb_size);
 
 	// 000000D0 - Downloaded size (in bytes)
-	write_pdb_int64(fp1, PDB_HDR_DLSIZE, &size);
-	write_pdb_int64(fp2, PDB_HDR_DLSIZE, &size);
+	write_pdb_int64(fp1, PDB_HDR_DLSIZE, size);
+	write_pdb_int64(fp2, PDB_HDR_DLSIZE, size);
 
 	// 000000CE - Package expected size (in bytes)
-	write_pdb_int64(fp1, PDB_HDR_SIZE, &size);
-	write_pdb_int64(fp2, PDB_HDR_SIZE, &size);
+	write_pdb_int64(fp1, PDB_HDR_SIZE, size);
+	write_pdb_int64(fp2, PDB_HDR_SIZE, size);
 
 	// 00000069 - Display title	
     pkgi_snprintf(temp_buffer, sizeof(temp_buffer), "\xE2\x98\x85 %s \x22%s\x22", _("Install"), db_item->name);
@@ -207,7 +204,7 @@ static int create_install_pdb_files(const char *path, uint64_t size)
 
 static void calculate_eta(uint32_t speed)
 {
-    uint64_t seconds = (download_size - download_offset) / speed;
+    uint64_t seconds = (total_size - download_offset) / speed;
     if (seconds < 60)
     {
         pkgi_snprintf(dialog_eta, sizeof(dialog_eta), "%s: %us", _("ETA"), (uint32_t)seconds);
@@ -259,17 +256,7 @@ static int update_progress(void *p, int64_t dltotal, int64_t dlnow, int64_t ulto
             }
         }
 
-        float percent;
-        if (download_resume)
-        {
-            // if resuming, then we may not know download size yet, use total_size from pkg header
-            percent = total_size ? (float)((double)download_offset / total_size) : 0.f;
-        }
-        else
-        {
-            // when downloading use content length from http response as download size
-            percent = download_size ? (float)((double)download_offset / download_size) : 0.f;
-        }
+        float percent = total_size ? (float)((double)download_offset / total_size) : 0.f;
 
         pkgi_dialog_update_progress(text, dialog_extra, dialog_eta, percent);
         info_update = info_now + 500;
@@ -302,14 +289,14 @@ static int create_dummy_pkg(void)
 		return 0;
 
 	download_offset=0;
-	if (truncate(dst, download_size) != 0)
+	if (truncate(dst, total_size) != 0)
 	{
 		LOG("Error truncating (%s)", dst);
 		return 0;
 	}
 
-	LOG("(%s) %d bytes written", dst, download_size);
-	download_offset=download_size;
+	LOG("(%s) %llu bytes written", dst, total_size);
+	download_offset=total_size;
     return 1;
 }
 
@@ -326,7 +313,7 @@ static int queue_pkg_task(void)
         return 0;
     }
 
-    if (!pkgi_http_response_length(http, &http_length))
+    if (!pkgi_http_content_size(db_item->url, &http_length))
     {
         pkgi_dialog_error(_("HTTP request failed"));
         return 0;
@@ -338,7 +325,7 @@ static int queue_pkg_task(void)
     }
 
     download_size = http_length;
-    total_size = download_size;
+    total_size = http_length;
 
     if (!pkgi_check_free_space(http_length))
     {
@@ -355,7 +342,7 @@ static int queue_pkg_task(void)
 		return 0;
 	}
 
-    LOG("http response length = %lld, total pkg size = %llu", http_length, download_size);
+    LOG("http response length = %lld, total pkg size = %llu", http_length, total_size);
     info_start = pkgi_time_msec();
     info_update = pkgi_time_msec() + 500;
 
@@ -369,13 +356,13 @@ static int queue_pkg_task(void)
 		return 0;
 	}
     
-	if(!create_queue_pdb_files())
-	{
-		pkgi_dialog_error(_("Could not create task files to HDD."));
-		return 0;
-	}
+    if(!create_queue_pdb_files())
+    {
+        pkgi_dialog_error(_("Could not create task files to HDD."));
+        return 0;
+    }
 
-	return 1;
+    return 1;
 }
 
 static void download_start(void)
@@ -392,15 +379,9 @@ static int download_data(void)
     if (!http)
     {
         LOG("requesting %s @ %llu", db_item->url, initial_offset);
-        http = pkgi_http_get(db_item->url, initial_offset);
-        if (!http)
-        {
-            pkgi_dialog_error(_("Could not send HTTP request"));
-            return 0;
-        }
 
         int64_t http_length;
-        if (!pkgi_http_response_length(http, &http_length))
+        if (!pkgi_http_content_size(db_item->url, &http_length))
         {
             pkgi_dialog_error(_("HTTP request failed"));
             return 0;
@@ -411,16 +392,23 @@ static int download_data(void)
             return 0;
         }
 
-        download_size = http_length;
-        total_size = initial_offset + download_size;
+        total_size = http_length;
+        download_size = total_size - initial_offset;
+        LOG("http remaining length = %llu, total pkg size = %llu", download_size, total_size);
 
         if (!pkgi_check_free_space(http_length))
         {
-            LOG("error! out of space");
+            pkgi_dialog_error(_("Not enough free space on HDD"));
             return 0;
         }
 
-        LOG("http response length = %lld, total pkg size = %llu", http_length, total_size);
+        http = pkgi_http_get(db_item->url, initial_offset);
+        if (!http)
+        {
+            pkgi_dialog_error(_("Could not send HTTP request"));
+            return 0;
+        }
+
         info_start = pkgi_time_msec();
         info_update = pkgi_time_msec() + 500;
     }
@@ -633,6 +621,7 @@ int pkgi_download(const DbItem* item, const int background_dl)
 
     http = NULL;
     item_file = NULL;
+    total_size = 0;
     download_size = 0;
     download_offset = 0;
     initial_offset = 0;

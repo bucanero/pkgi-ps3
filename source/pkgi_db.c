@@ -158,7 +158,7 @@ int update_database(const char* update_url, const char* path, char* error, uint3
     else
     {
         int64_t length;
-        if (!pkgi_http_response_length(http, &length))
+        if (!pkgi_http_content_size(update_url, &length))
         {
             pkgi_snprintf(error, error_size, "%s\n%s", _("failed to download list from"), update_url);
         }
