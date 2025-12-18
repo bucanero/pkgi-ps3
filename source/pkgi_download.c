@@ -730,14 +730,14 @@ int pkgi_download_icon(const char* content)
     if (!buffer)
     {
         LOG("http request to %s failed", icon_url);
-        return pkgi_save(icon_file, iconfile_data, iconfile_data_size);
+        return pkgi_save(icon_file, ICONFILE_png, ICONFILE_png_size);
     }
 
     if (!sz)
     {
         LOG("icon not found, using default");
         free(buffer);
-        return pkgi_save(icon_file, iconfile_data, iconfile_data_size);
+        return pkgi_save(icon_file, ICONFILE_png, ICONFILE_png_size);
     }
 
     LOG("received %u bytes", sz);
