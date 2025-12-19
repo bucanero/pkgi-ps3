@@ -4,6 +4,29 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 ## [Unreleased]()
 
+---
+
+## [v1.3.0](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.3.0) - 2025-12-20
+
+### Added
+
+* Support for multi-part packages (XML) using background download mode
+* Support system proxy settings for direct downloads
+
+### Misc
+
+* Updated app icon
+* Updated License (GPL)
+* Updated Polish translation
+* Hungarian translation
+
+### Fixed
+
+* Fixed translation support for size units (B/KB/MB/GB)
+* Progress bar not showing correct values when resuming a file
+
+---
+
 ## [v1.2.4](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.2.4) - 2023-01-23
 
 ### Added
@@ -16,6 +39,8 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 * Progress bar not showing correct values when resuming a file
 * Proper screen aspect ratio (Tiny3D issue)
+
+---
 
 ## [v1.2.2](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.2.2) - 2021-10-22
 
@@ -35,6 +60,8 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 * Crash when item list is empty
 
+---
+
 ## [v1.2.0](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.2.0) - 2021-10-09
 
 ### Added
@@ -45,6 +72,8 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 * Online scan for available content updates
 * Support for TLS v1.2 using newer libcurl+polarSSL
 * UI: use customized dialogs
+
+---
 
 ## [v1.1.8](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.1.8) - 2020-12-08
 
@@ -58,6 +87,8 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 * XMB callback handling
 
+---
+
 ## [v1.1.6](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.1.6) - 2020-06-23
 
 ### Added
@@ -65,6 +96,8 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 * Generate `.rif` files when downloading items (system must be activated)
 * Improved speed when creating empty files in background download mode
 * Enter button detection (`cross`/`circle`)
+
+---
 
 ## [v1.1.3](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.1.3) - 2020-05-20
 
@@ -79,6 +112,8 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 * The app now allows to download items that already exist
 * Start/Stop music works without requiring to restart the application
 
+---
+
 ## [v1.1.2](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.1.2) - 2019-12-31
 
 ### Added
@@ -90,6 +125,8 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 ### Fixed
 
 * Filter unsupported or missing URLs when loading a database
+
+---
 
 ## [v1.1.0](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.1.0) - 2019-12-23
 
@@ -105,6 +142,8 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 * Fixed UI issue where texts could go beyond the screen limits
 
+---
+
 ## [v1.0.8](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.0.8) - 2019-12-19
 
 ### Added
@@ -118,6 +157,8 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 * Improved empty `.pkg` file generation using async IO.
 * Improved UI
+
+---
 
 ## [v1.0.5](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.0.5) - 2019-12-14
 
@@ -133,6 +174,8 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 * Fixed unresponsive `background download` dialog while creating a PKG file
 * Fixed a bug when the URL was missing
 
+---
+
 ## [v1.0.0](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.0.0) - 2019-12-11
 
 ### Added
@@ -144,6 +187,8 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 ### Fixed
 
 * Fixed incorrect progress bar information during direct download
+
+---
 
 ## [v0.0.1-beta](https://github.com/bucanero/pkgi-ps3/releases/tag/v0.0.1-beta) - 2019-12-04
 
