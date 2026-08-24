@@ -1,0 +1,6 @@
+language ru
+content 0
+sort name
+order asc
+filter ASA,EUR,JPN,USA
+no_music 1

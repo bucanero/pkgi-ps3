@@ -6,6 +6,36 @@ All notable changes to the `pkgi-ps3` project will be documented in this file. T
 
 ---
 
+## [v1.3.1] - 2026-08-23 [UNOFFICIAL BUILD - not affiliated with the upstream bucanero/pkgi-ps3 project]
+
+### Added
+
+* Russian localization (`pkgfiles/USRDIR/LANG/ru.po`), credited to ErikPshat / PSPx Team, GPL-2.0; re-encoded from CP1251 to UTF-8 so Cyrillic renders correctly on all platforms
+* New application icon and title ("PKGi PS3 by 1nk1") to distinguish this build from upstream; branded "by 1nk1"
+* `pkgi_set_file_buffer()` helper that applies 1 MB stdio full-buffering (`_IOFBF`) to the download file handle
+* default config.txt and pkgi.txt are now bundled in the package so a fresh install starts with working settings
+
+### Changed
+
+* `CURLOPT_BUFFERSIZE` set to 262144 (256 KB) in `pkgi_curl_init()` - libcurl default was 16 KB; reduces write-callback frequency on large transfers
+* `CURLOPT_TCP_NODELAY` enabled in `pkgi_curl_init()` to disable Nagle's algorithm and avoid latency stalls on small ACK-bound transfers
+* 1 MB stdio write buffer applied to the download file in both `create_file()` and `resume_partial_file()` via `pkgi_set_file_buffer()`
+* `pkgi_security_check()` stubbed to return 1 so builds from public source can run on CFW; the upstream public release intentionally returns 0
+* Version bumped to 1.3.1 / APP_VER 01.31
+
+### Fixed
+
+* text renderer is now selected per string - ASCII uses the bitmap font, non-ASCII uses TTF - which fixes glyph artifacts on the progress bar and reduces glyph-cache pressure
+* curl handle leak in `pkgi_http_content_size()`: `curl_easy_cleanup()` was not called on the early-return error path
+* UI text (header, bottom bar) now rendered via the TTF renderer so non-Latin translations (e.g. Cyrillic) display correctly; `pkgi_draw_text` delegates to `pkgi_draw_text_z(PKGI_FONT_Z)` instead of the bitmap `DrawString` path
+* Checkbox glyphs switched from bitmap-font single-byte values (0x04/0x09) to UTF-8 sequences U+25CF (BLACK CIRCLE) / U+25CB (WHITE CIRCLE), which render correctly under TTF
+* New application icon (320x176 RGBA PNG) installed; previous icon preserved as `ICON0.PNG.gen-prev`
+* Fixed text coordinates when a clip region is active: `pkgi_draw_text_z` now subtracts the clip origin from the absolute caller coordinates before passing to `display_ttf_string`, preventing double-application of the window offset
+* Converted remaining bitmap-font glyph constants to UTF-8: sort arrows (U+25B2 / U+25BC), clear button label (U+00D7), and degree sign (U+00B0) now use proper UTF-8 sequences instead of single high/control bytes
+* Installed/partial list markers (`PKGI_UTF8_INSTALLED` / `PKGI_UTF8_PARTIAL`) converted to UTF-8 circles (U+25CF / U+25CB) so they render correctly with the TTF renderer instead of appearing as dark boxes
+
+---
+
 ## [v1.3.0](https://github.com/bucanero/pkgi-ps3/releases/tag/v1.3.0) - 2025-12-20
 
 ### Added

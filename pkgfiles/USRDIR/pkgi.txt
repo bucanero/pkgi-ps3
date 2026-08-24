@@ -1,0 +1,3 @@
+UP0001-NP00PKGI3_00-0000000000000000,10,*PKGi PS3 RUS MOD v1.3.0.X - Latest Debug,Latest DEBUG PKG,,https://github.com/ErikPshat/pkgi/releases/latest/download/pkgi.pkg,10755456,
+UP0001-NP00PKGI3_00-0000000000000000,10,*PKGi PS3 RUS MOD v1.3.0.X - Latest Retail,Latest RETAIL PKG,,https://github.com/ErikPshat/pkgi/releases/latest/download/pkgi.gnpdrm.pkg,10755456,
+UP0001-BENCH0001_00-0000000000000000,10,*AAA Speed Benchmark 1GB,LAN throughput test,,http://192.168.0.22:8088/test.pkg,1073741824,

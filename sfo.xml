@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <sfo>
 	<value name="APP_VER" type="string">
-		01.30
+		01.31
 	</value>
 	<value name="ATTRIBUTE" type="integer">
 		0
@@ -28,12 +28,12 @@
 		279
 	</value>
 	<value name="TITLE" type="string">
-		PKGi PS3
+		PKGi PS3 by 1nk1
 	</value>
 	<value name="TITLE_ID" type="string">
 		NP00PKGI3
 	</value>
 	<value name="VERSION" type="string">
-		01.30
+		01.31
 	</value>
 </sfo>

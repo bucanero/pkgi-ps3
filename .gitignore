@@ -53,3 +53,11 @@ Module.symvers
 dkms.conf
 
 build/
+# артефакты сборки
+*.pkg
+*.self
+*.elf
+*.bin
+*.diff
+build/
+UP0001-*/
