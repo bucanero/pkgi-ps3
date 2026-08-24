@@ -5,7 +5,7 @@
 #include "pkgi_dialog.h"
 
 #define PKGI_UPDATE_URL     "https://api.github.com/repos/bucanero/pkgi-ps3/releases/latest"
-#define PKGI_VERSION        "1.3.0"
+#define PKGI_VERSION        "1.3.1"
 
 #define PKGI_BUTTON_SELECT 0x00010000
 #define PKGI_BUTTON_START  0x00080000
@@ -34,6 +34,8 @@
 
 
 #define PKGI_COUNTOF(arr) (sizeof(arr)/sizeof(0[arr]))
+
+#define PKGI_IO_BUFFER_SIZE (1024 * 1024)
 
 #ifdef PKGI_ENABLE_LOGGING
 #include <stddef.h>
@@ -117,6 +119,8 @@ void* pkgi_create(const char* path);
 void* pkgi_open(const char* path);
 // open file for writing, next write will append data to end of it
 void* pkgi_append(const char* path);
+// apply full buffering to an open file handle
+void pkgi_set_file_buffer(void* f, uint32_t size);
 
 void pkgi_close(void* f);
 

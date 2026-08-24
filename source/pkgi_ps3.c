@@ -26,7 +26,6 @@
 #include <mikmod.h>
 #include "mikmod_loader.h"
 
-
 #define OSKDIALOG_FINISHED          0x503
 #define OSKDIALOG_UNLOADED          0x504
 #define OSKDIALOG_INPUT_ENTERED     0x505
@@ -68,6 +67,9 @@ typedef struct
 
 static sys_mutex_t g_dialog_lock;
 static uint32_t cpu_temp_c[2];
+
+static int g_clip_x = 0;
+static int g_clip_y = 0;
 
 static int g_ok_button;
 static int g_cancel_button;
@@ -1016,11 +1018,15 @@ void pkgi_free_texture(pkgi_texture texture)
 
 void pkgi_clip_set(int x, int y, int w, int h)
 {
+    g_clip_x = x;
+    g_clip_y = y;
     set_ttf_window(x, y, w, h*2, 0);
 }
 
 void pkgi_clip_remove(void)
 {
+    g_clip_x = 0;
+    g_clip_y = 0;
     set_ttf_window(0, 0, VITA_WIDTH, VITA_HEIGHT, 0);
 }
 
@@ -1044,7 +1050,100 @@ void pkgi_draw_rect(int x, int y, int w, int h, uint32_t color)
 	ya2d_drawRect(x, y, w, h, RGBA_COLOR(color, 255));
 }
 
-void pkgi_draw_text_z(int x, int y, int z, uint32_t color, const char* text)
+static int pkgi_text_is_ascii(const char* text)
+{
+    for (const unsigned char* p = (const unsigned char*)text; *p; p++)
+    {
+        if (*p < 0x80) continue;
+        /* button sentinels are handled by both renderers */
+        if (*p >= 0xfa && *p <= 0xfd) continue;
+        return 0;
+    }
+    return 1;
+}
+
+static void pkgi_draw_text_z_ttf_impl(int x, int y, int z, uint32_t color, const char* text)
+{
+    int i = x, j = y;
+    char run[512];
+    int run_len = 0;
+
+    /* Flush accumulated run via TTF renderer (shadow + foreground).
+     * display_ttf_string positions are RELATIVE to the clip window origin
+     * (set by set_ttf_window in pkgi_clip_set), so subtract g_clip_x/g_clip_y
+     * to convert the absolute screen coordinates that callers pass. */
+#define FLUSH_RUN() \
+    do { \
+        if (run_len > 0) { \
+            run[run_len] = '\0'; \
+            Z_ttf = z; \
+            display_ttf_string((i - g_clip_x) + PKGI_FONT_SHADOW, (j - g_clip_y) + PKGI_FONT_SHADOW, run, \
+                RGBA_COLOR(PKGI_COLOR_TEXT_SHADOW, 128), 0, \
+                PKGI_FONT_WIDTH + 6, PKGI_FONT_HEIGHT + 2); \
+            display_ttf_string((i - g_clip_x), (j - g_clip_y), run, RGBA_COLOR(color, 255), 0, \
+                PKGI_FONT_WIDTH + 6, PKGI_FONT_HEIGHT + 2); \
+            i += display_ttf_string(0, 0, run, 0, 0, \
+                PKGI_FONT_WIDTH + 6, PKGI_FONT_HEIGHT + 2); \
+            run_len = 0; \
+        } \
+    } while (0)
+
+    while (*text) {
+        unsigned char c = (unsigned char)*text;
+        switch (c) {
+            case '\n':
+                FLUSH_RUN();
+                i = x;
+                j += PKGI_FONT_HEIGHT;
+                text++;
+                continue;
+            case 0xfa:
+                FLUSH_RUN();
+                /* Button glyphs are drawn via ya2d_drawTextureZ which takes
+                 * ABSOLUTE screen coordinates, not clip-relative ones.
+                 * The TTF text runs above use (i - g_clip_x) because
+                 * display_ttf_string adds Win_X_ttf back internally, but
+                 * ya2d does not go through the TTF window at all.
+                 * Both paths therefore resolve to the same absolute pixel,
+                 * so i/j (absolute) is correct here - no adjustment needed. */
+                pkgi_draw_texture_z(tex_buttons.circle, i, j, z, 0.5f);
+                i += PKGI_FONT_WIDTH;
+                text++;
+                continue;
+            case 0xfb:
+                FLUSH_RUN();
+                pkgi_draw_texture_z(tex_buttons.cross, i, j, z, 0.5f);
+                i += PKGI_FONT_WIDTH;
+                text++;
+                continue;
+            case 0xfc:
+                FLUSH_RUN();
+                pkgi_draw_texture_z(tex_buttons.triangle, i, j, z, 0.5f);
+                i += PKGI_FONT_WIDTH;
+                text++;
+                continue;
+            case 0xfd:
+                FLUSH_RUN();
+                pkgi_draw_texture_z(tex_buttons.square, i, j, z, 0.5f);
+                i += PKGI_FONT_WIDTH;
+                text++;
+                continue;
+            default:
+                /* Guard against buffer overflow: flush early when nearly full. */
+                if (run_len >= (int)(sizeof(run) - 5)) {
+                    FLUSH_RUN();
+                }
+                run[run_len++] = (char)c;
+                text++;
+                continue;
+        }
+    }
+    FLUSH_RUN();
+
+#undef FLUSH_RUN
+}
+
+static void pkgi_draw_text_z_ascii_impl(int x, int y, int z, uint32_t color, const char* text)
 {
     int i=x, j=y;
     SetFontColor(RGBA_COLOR(color, 255), 0);
@@ -1076,13 +1175,19 @@ void pkgi_draw_text_z(int x, int y, int z, uint32_t color, const char* text)
                 text++;
                 continue;
         }
-        
+
         DrawChar(i, j, z, (u8) *text);
         i += PKGI_FONT_WIDTH;
-        text++; 
-    }    
+        text++;
+    }
 }
 
+
+void pkgi_draw_text_z(int x, int y, int z, uint32_t color, const char* text)
+{
+    if (pkgi_text_is_ascii(text)) pkgi_draw_text_z_ascii_impl(x, y, z, color, text);
+    else pkgi_draw_text_z_ttf_impl(x, y, z, color, text);
+}
 
 void pkgi_draw_text_ttf(int x, int y, int z, uint32_t color, const char* text)
 {
@@ -1099,17 +1204,76 @@ int pkgi_text_width_ttf(const char* text)
 
 void pkgi_draw_text(int x, int y, uint32_t color, const char* text)
 {
-    SetFontColor(RGBA_COLOR(PKGI_COLOR_TEXT_SHADOW, 128), 0);
-    DrawString((float)x+PKGI_FONT_SHADOW, (float)y+PKGI_FONT_SHADOW, (char *)text);
-
-    SetFontColor(RGBA_COLOR(color, 200), 0);
-    DrawString((float)x, (float)y, (char *)text);
+    /* Delegate to TTF renderer so non-Latin (e.g. Cyrillic) text in the
+     * header and bottom bar renders correctly.  Shadow is handled inside
+     * pkgi_draw_text_z, so no separate DrawString call is needed here. */
+    pkgi_draw_text_z(x, y, PKGI_FONT_Z, color, text);
 }
 
 
-int pkgi_text_width(const char* text)
+static int pkgi_text_width_ascii_impl(const char* text)
 {
     return (strlen(text) * PKGI_FONT_WIDTH) + PKGI_FONT_SHADOW;
+}
+
+static int pkgi_text_width_ttf_impl(const char* text)
+{
+    /* Walk string with the same run/button/newline logic as pkgi_draw_text_z_ttf_impl
+     * so layout measurements match TTF rendering exactly.
+     * Returns the maximum line width across all newline-separated lines. */
+    int line_width = 0;
+    int max_width = 0;
+    char run[512];
+    int run_len = 0;
+
+#define FLUSH_WIDTH() \
+    do { \
+        if (run_len > 0) { \
+            run[run_len] = '\0'; \
+            line_width += display_ttf_string(0, 0, run, 0, 0, \
+                PKGI_FONT_WIDTH + 6, PKGI_FONT_HEIGHT + 2); \
+            run_len = 0; \
+        } \
+    } while (0)
+
+    while (*text) {
+        unsigned char c = (unsigned char)*text;
+        switch (c) {
+            case '\n':
+                FLUSH_WIDTH();
+                if (line_width > max_width) max_width = line_width;
+                line_width = 0;
+                text++;
+                continue;
+            case 0xfa:
+            case 0xfb:
+            case 0xfc:
+            case 0xfd:
+                FLUSH_WIDTH();
+                line_width += PKGI_FONT_WIDTH;
+                text++;
+                continue;
+            default:
+                if (run_len >= (int)(sizeof(run) - 5)) {
+                    FLUSH_WIDTH();
+                }
+                run[run_len++] = (char)c;
+                text++;
+                continue;
+        }
+    }
+    FLUSH_WIDTH();
+    if (line_width > max_width) max_width = line_width;
+
+#undef FLUSH_WIDTH
+
+    return max_width + PKGI_FONT_SHADOW;
+}
+
+int pkgi_text_width(const char* text)
+{
+    if (pkgi_text_is_ascii(text)) return pkgi_text_width_ascii_impl(text);
+    else return pkgi_text_width_ttf_impl(text);
 }
 
 int pkgi_text_height(const char* text)
@@ -1153,6 +1317,10 @@ void pkgi_curl_init(CURL *curl)
     curl_easy_setopt(curl, CURLOPT_FAILONERROR, 1L);
     // request using SSL for the FTP transfer if available
     curl_easy_setopt(curl, CURLOPT_USE_SSL, CURLUSESSL_TRY);
+    // larger receive buffer reduces write-callback frequency
+    curl_easy_setopt(curl, CURLOPT_BUFFERSIZE, 262144L);
+    // disable Nagle to avoid latency stalls on small ACK-bound transfers
+    curl_easy_setopt(curl, CURLOPT_TCP_NODELAY, 1L);
 
     // check for proxy settings
     memset(&proxy_info, 0, sizeof(proxy_info));
@@ -1243,6 +1411,7 @@ int pkgi_http_content_size(const char* url, int64_t* length)
     if(res != CURLE_OK)
     {
         LOG("curl_easy_perform() failed: %s", curl_easy_strerror(res));
+        curl_easy_cleanup(curl);
         return 0;
     }
 
@@ -1358,6 +1527,11 @@ int64_t pkgi_get_size(const char* path)
     return st.st_size;
 }
 
+void pkgi_set_file_buffer(void* f, uint32_t size)
+{
+    if (f) setvbuf((FILE*)f, NULL, _IOFBF, size);
+}
+
 void* pkgi_create(const char* path)
 {
     LOG("fopen create on %s", path);
@@ -1368,7 +1542,6 @@ void* pkgi_create(const char* path)
         return NULL;
     }
     LOG("fopen returned fd=%d", fd);
-
     return (void*)fd;
 }
 
@@ -1396,7 +1569,6 @@ void* pkgi_append(const char* path)
         return NULL;
     }
     LOG("fopen returned fd=%d", fd);
-
     return (void*)fd;
 }
 

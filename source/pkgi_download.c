@@ -452,6 +452,7 @@ static int create_file(void)
         pkgi_dialog_error(error);
         return 0;
     }
+    pkgi_set_file_buffer(item_file, PKGI_IO_BUFFER_SIZE);
 
     return 1;
 }
@@ -467,6 +468,7 @@ static int resume_partial_file(void)
         pkgi_dialog_error(error);
         return 0;
     }
+    pkgi_set_file_buffer(item_file, PKGI_IO_BUFFER_SIZE);
 
     return 1;
 }
