@@ -13,21 +13,21 @@
 #define PKGI_UTF8_S "\xfd" // "\xe2\x96\xa1" // 0x25a1
 
 
-#define PKGI_UTF8_INSTALLED "\x04"//"\xe2\x97\x8f" // 0x25cf
-#define PKGI_UTF8_PARTIAL   "\x09"//"\xe2\x97\x8b" // 0x25cb
+#define PKGI_UTF8_INSTALLED "\xe2\x97\x8f" // U+25CF BLACK CIRCLE (was "\x04")
+#define PKGI_UTF8_PARTIAL   "\xe2\x97\x8b" // U+25CB WHITE CIRCLE (was "\x09")
 
 #define PKGI_UTF8_B  "B"
 #define PKGI_UTF8_KB "KB" // "\xe3\x8e\x85" // 0x3385
 #define PKGI_UTF8_MB "MB" // "\xe3\x8e\x86" // 0x3386
 #define PKGI_UTF8_GB "GB" // "\xe3\x8e\x87" // 0x3387
 
-#define PKGI_UTF8_CLEAR "\xaf" // 0x00d7
+#define PKGI_UTF8_CLEAR "\xc3\x97" // U+00D7 MULTIPLICATION SIGN (was "\xaf")
 
-#define PKGI_UTF8_SORT_ASC  "\x1e" //"\xe2\x96\xb2" // 0x25b2
-#define PKGI_UTF8_SORT_DESC "\x1f" //"\xe2\x96\xbc" // 0x25bc
+#define PKGI_UTF8_SORT_ASC  "\xe2\x96\xb2" // U+25B2 BLACK UP-POINTING TRIANGLE (was "\x1e")
+#define PKGI_UTF8_SORT_DESC "\xe2\x96\xbc" // U+25BC BLACK DOWN-POINTING TRIANGLE (was "\x1f")
 
-#define PKGI_UTF8_CHECK_ON  "\x04"//"\xe2\x97\x8f" // 0x25cf
-#define PKGI_UTF8_CHECK_OFF "\x09"//"\xe2\x97\x8b" // 0x25cb
+#define PKGI_UTF8_CHECK_ON  "\xe2\x97\x8f" // U+25CF BLACK CIRCLE  (was bitmap glyph 0x04)
+#define PKGI_UTF8_CHECK_OFF "\xe2\x97\x8b" // U+25CB WHITE CIRCLE  (was bitmap glyph 0x09)
 
 #define PKGI_COLOR_DIALOG_BACKGROUND    PKGI_COLOR(48, 48, 48)
 #define PKGI_COLOR_MENU_BORDER          PKGI_COLOR(80, 80, 255)
