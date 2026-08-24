@@ -1,0 +1,448 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PKGi PS3 RUS MOD\n"
+"POT-Creation-Date: 2021-10-09 19:00-0300\n"
+"PO-Revision-Date: 2021-10-09 19:00-0300\n"
+"Last-Translator: ErikPshat\n"
+"Language-Team: PSPx Team\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
+"X-Poedit-Basepath: ./source\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Flags-xgettext: --add-comments\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: _\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: pkgi.c:82
+msgid "Installing"
+msgstr "Установка"
+
+#: pkgi.c:82
+msgid "Please wait..."
+msgstr "Пожалуйста, подождите..."
+
+#: pkgi.c:94
+msgid "Installation failed"
+msgstr "Установка не удалась"
+
+#: pkgi.c:118
+msgid "Successfully downloaded"
+msgstr "Загрузка завершена!"
+
+#: pkgi.c:122
+msgid "Task successfully queued (reboot to start)"
+msgstr "Задача добавлена в очередь (старт после перезагрузки)"
+
+#: pkgi.c:163
+msgid "GB"
+msgstr "ГБ"
+
+#: pkgi.c:167 pkgi_download.c:249
+msgid "MB"
+msgstr "МБ"
+
+#: pkgi.c:171 pkgi.c:504 pkgi_download.c:253
+msgid "KB"
+msgstr "КБ"
+
+#: pkgi.c:175
+msgid "B"
+msgstr "Б"
+
+#: pkgi.c:185
+#, c-format
+msgid "pkg requires %u %s free space, but only %u %s available"
+msgstr "Требуется %u %s свободного места, доступно %u %s"
+
+#: pkgi.c:225 pkgi_menu.c:113 pkgi_menu.c:125
+msgid "All"
+msgstr "Все"
+
+#: pkgi.c:226 pkgi_menu.c:126
+msgid "Games"
+msgstr "Игры из регионов"
+
+#: pkgi.c:227 pkgi_menu.c:127
+msgid "RUS"
+msgstr "Игры на русском"
+
+#: pkgi.c:228 pkgi_menu.c:128
+msgid "PS2"
+msgstr "Игры PS2 для PS3"
+
+#: pkgi.c:229 pkgi_menu.c:129
+msgid "PS1"
+msgstr "Игры PS1 для PS3"
+
+#: pkgi.c:230 pkgi_menu.c:130
+msgid "miniS"
+msgstr "miniS для PS3"
+
+#: pkgi.c:231 pkgi_menu.c:131
+msgid "DLCs"
+msgstr "Дополнения DLC"
+
+#: pkgi.c:232 pkgi_menu.c:132
+msgid "Themes"
+msgstr "Темы оформления"
+
+#: pkgi.c:233 pkgi_menu.c:133
+msgid "Avatars"
+msgstr "Аватары"
+
+#: pkgi.c:234 pkgi_menu.c:134
+msgid "Demos"
+msgstr "Демо"
+
+#: pkgi.c:235 pkgi_menu.c:135
+msgid "Apps"
+msgstr "Приложения"
+
+#: pkgi.c:236 pkgi_menu.c:136
+msgid "Tunings"
+msgstr "Тюнинг"
+
+#: pkgi.c:237 pkgi_menu.c:137
+msgid "Cheats"
+msgstr "Читы к играм"
+
+#: pkgi.c:238 pkgi_menu.c:122 pkgi_menu.c:138
+msgid "Updates"
+msgstr "Обновление"
+
+#: pkgi.c:239
+msgid "Unknown"
+msgstr "Неизвестно"
+
+#: pkgi.c:271
+msgid "Exit to XMB?"
+msgstr "Вы действительно хотите выйти в XMB?"
+
+#: pkgi.c:454
+msgid "No items!"
+msgstr "Список пуст!"
+
+#: pkgi.c:462
+msgid "Item already installed, download again?"
+msgstr "Контент уже установлен, скачать заново?"
+
+#: pkgi.c:253 pkgi.c:493 pkgi_download.c:387 pkgi_download.c:630
+#: msgid "Downloading..."
+#: msgstr "Скачивание..."
+
+#: pkgi.c:253 pkgi.c:493 pkgi.c:696
+#: msgid "Preparing..."
+#: msgstr "Подготовка..."
+
+#: pkgi.c:504 pkgi.c:508
+msgid "Refreshing"
+msgstr "Обновление"
+
+#: pkgi.c:563 pkgi.c:567
+msgid "Count"
+msgstr "Итого"
+
+#: pkgi.c:575
+msgid "Free"
+msgstr "Свободно"
+
+#: pkgi.c:585
+msgid "Select"
+msgstr "Выбор"
+
+#: pkgi.c:585
+msgid "Close"
+msgstr "Закрыть"
+
+#: pkgi.c:585
+msgid "Cancel"
+msgstr "Отмена"
+
+#: pkgi.c:589 pkgi_download.c:136
+msgid "Download"
+msgstr "Скачать"
+
+#: pkgi.c:589
+msgid "Menu"
+msgstr "Меню"
+
+#: pkgi.c:589
+msgid "Details"
+msgstr "Детали"
+
+#: pkgi.c:589
+msgid "Exit"
+msgstr "Выход"
+
+#: pkgi.c:594
+msgid "L2 R2 change category, L1 R1 flip through the page"
+msgstr "L2 R2 изменить категорию, L1 R1 перелистнуть страницу"
+
+#: pkgi.c:678
+msgid "Successfully downloaded PKGi PS3 RUS MOD update."
+msgstr "Успешно скачано обновление PKGi PS3 RUS MOD."
+
+msgid "Install it via the menu item Manage PKG files"
+msgstr "Установите его через пункт меню  Управление файлами PKG"
+
+#: pkgi.c:748
+msgid "The system is not activated!"
+msgstr "Система не активирована!"
+
+#: pkgi.c:748
+msgid "Activation check disabled"
+msgstr "Выключена проверка на активацию"
+
+#: pkgi.c:751
+msgid "Active user: %d"
+msgstr "Активный пользователь: %d"
+
+#: pkgi.c:814
+msgid "Act.dat not found, activate the console according"
+msgstr "Act.dat не найден, активируйте консоль согласно"
+
+msgid "to the instructions in the topic [FAQ] Game formats"
+msgstr "инструкции в теме [FAQ] Форматы игр"
+
+msgid "[install, mount, transfer, delete]"
+msgstr "[установка, монтирование, перенос, удаление]"
+
+#: pkgi.c:1051
+msgid "Search"
+msgstr "Поиск"
+
+#: pkgi_db.c:145 pkgi_db.c:153
+msgid "failed to download list from"
+msgstr "не удалось загрузить список из"
+
+#: pkgi_db.c:159
+msgid "list is too large... check for newer pkgi version!"
+msgstr "список слишком велик... проверьте наличие более новой версии pkgi!"
+
+#: pkgi_db.c:187
+msgid "list is empty... check the DB server"
+msgstr "список пуст... проверьте сервер БД"
+
+#: pkgi_db.c:390
+msgid "ERROR: pkgi.txt file(s) missing or bad config.txt file"
+msgstr "ОШИБКА: отсутствует файл pkgi.txt или испорчен config.txt"
+
+#: pkgi_dialog.c:80
+msgid "Content"
+msgstr "Контент"
+
+#: pkgi_dialog.c:108
+#: msgid "ERROR"
+#: msgstr "ОШИБКА!"
+
+#: pkgi_dialog.c:169
+msgid "Failed to download the update list"
+msgstr "Не удалось загрузить список обновлений"
+
+#: pkgi_dialog.c:174
+msgid "update(s) loaded"
+msgstr "обновлений загружено"
+
+#: pkgi_dialog.c:319
+#, c-format
+msgid "press %s to cancel"
+msgstr "Нажмите %s  для отмены"
+
+#: pkgi_dialog.c:333
+#, c-format
+msgid "press %s to close - %s to scan updates"
+msgstr "Нажмите %s  чтобы закрыть - %s  для проверки обновлений"
+
+#: pkgi_dialog.c:365
+msgid "Enter"
+msgstr "Ввод"
+
+#: pkgi_dialog.c:365
+msgid "Back"
+msgstr "Назад"
+
+#: pkgi_dialog.c:373
+#, c-format
+msgid "press %s to close"
+msgstr "Нажмите %s  чтобы закрыть"
+
+#. 00000069 - Display title
+#: pkgi_download.c:183
+msgid "Install"
+msgstr "Установка"
+
+#: pkgi_download.c:216 pkgi_download.c:220 pkgi_download.c:226
+msgid "ETA"
+msgstr "Осталось"
+
+#: pkgi_download.c:320 pkgi_download.c:400
+msgid "Could not send HTTP request. The file is temporarily unavailable!"
+msgstr "Не удалось отправить HTTP-запрос. Файл временно недоступен!"
+
+msgid "The connection failed or the file is missing or blocked"
+msgstr "Сбой  соединения  или  файл отсутствует, либо заблокирован"
+
+msgid "due to Yandex limits being enabled. Download from pspx.ru the:"
+msgstr "из-за лимита Яндекса. Скачайте с форума pspx.ru,  из темы:"
+
+msgid "'Direct Download games HEN/CFW' topic."
+msgstr "'Прямое скачивание PS3 игр [HEN/CFW]'"
+
+#: pkgi_download.c:332 pkgi_download.c:406
+msgid "HTTP request failed"
+msgstr "HTTP-запрос не удался. Качайте с форума."
+
+#: pkgi_download.c:322 pkgi_download.c:404
+msgid "HTTP response has unknown length"
+msgstr "HTTP-ответ имеет неизвестную длину"
+
+#: pkgi_download.c:331
+msgid "Not enough free space on HDD"
+msgstr "Недостаточно свободного места на HDD"
+
+#: pkgi_download.c:340
+msgid "Could not create task directory on HDD."
+msgstr "Не удалось создать директорию задач на HDD."
+
+#: pkgi_download.c:348
+msgid "Saving background task..."
+msgstr "Сохранение фоновой задачи..."
+
+#: pkgi_download.c:354
+msgid "Could not create PKG file to HDD."
+msgstr "Не удалось создать файл PKG на HDD."
+
+#: pkgi_download.c:360
+msgid "Could not create task files to HDD."
+msgstr "Не удалось создать файлы задач на HDD."
+
+#: pkgi_download.c:425
+msgid "HTTP download error"
+msgstr "Ошибка загрузки по HTTP"
+
+#: pkgi_download.c:432
+msgid "HTTP connection closed"
+msgstr "HTTP-соединение закрыто"
+
+#: pkgi_download.c:445
+msgid "failed to write to"
+msgstr "не удалось записать"
+
+#: pkgi_download.c:465
+msgid "cannot create folder"
+msgstr "не удалось создать папку"
+
+#: pkgi_download.c:475
+msgid "cannot create file"
+msgstr "не удалось создать файл"
+
+#: pkgi_download.c:490
+msgid "cannot resume file"
+msgstr "невозможно возобновить файл"
+
+#: pkgi_download.c:562
+msgid "pkg integrity failed, try downloading again"
+msgstr "Ошибка целостности pkg, попробуйте загрузить снова"
+
+#: pkgi_download.c:573
+msgid "Creating RAP file"
+msgstr "Создание файла RAP"
+
+#: pkgi_download.c:581 pkgi_download.c:626
+msgid "Cannot save"
+msgstr "Не удалось сохранить"
+
+#: pkgi_download.c:621
+msgid "Creating RIF file"
+msgstr "Создание файла RIF"
+
+#: pkgi_download.c:646
+msgid "Resuming..."
+msgstr "Возобновление..."
+
+#: pkgi_download.c:652
+#: msgid "Adding background task..."
+#: msgstr "Добавлена фоновая задача..."
+
+#: pkgi_download.c:675
+msgid "Downloading icon"
+msgstr "Загрузка иконки"
+
+#: pkgi_download.c:713
+msgid "Could not create install directory on HDD."
+msgstr "Не удалось создать установочный каталог на HDD."
+
+#: pkgi_menu.c:102
+msgid "Search..."
+msgstr "Поиск..."
+
+#: pkgi_menu.c:103
+msgid "Sort by:"
+msgstr "Сортировка:"
+
+#: pkgi_menu.c:104
+msgid "Title"
+msgstr "TitleID"
+
+#: pkgi_menu.c:105
+msgid "Region"
+msgstr "Регион"
+
+#: pkgi_menu.c:106
+msgid "Name"
+msgstr "Название"
+
+#: pkgi_menu.c:107
+msgid "Size"
+msgstr "Размер"
+
+#: pkgi_menu.c:108
+msgid "Content:"
+msgstr "Контент:"
+
+#: pkgi_menu.c:110
+msgid "Regions:"
+msgstr "Регионы:"
+
+#: pkgi_menu.c:111
+msgid "Asia"
+msgstr "Азия"
+
+#: pkgi_menu.c:112
+msgid "Europe"
+msgstr "Европа"
+
+#: pkgi_menu.c:113
+msgid "Japan"
+msgstr "Япония"
+
+#: pkgi_menu.c:114
+msgid "USA"
+msgstr "Америка"
+
+#: pkgi_menu.c:115
+msgid "Options:"
+msgstr "Параметры:"
+
+#: pkgi_menu.c:116
+msgid "Back. DL"
+msgstr "Фоновая загрузка"
+
+#: pkgi_menu.c:117
+msgid "Music"
+msgstr "Мелодия"
+
+#: pkgi_menu.c:119
+msgid "Refresh..."
+msgstr "Обновить базу..."
+
+#: pkgi_menu.c:334
+msgid "Direct DL"
+msgstr "Прямая загрузка"
+
+#msgid "---translated by---"
+#msgstr "ErikPshat"
