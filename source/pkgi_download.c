@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <mini18n.h>
+#include <libxml/parser.h>
 
 
 #define PDB_HDR_FILENAME	"\x00\x00\x00\xCB"
@@ -21,6 +22,7 @@
 #define PDB_HDR_CONTENT		"\x00\x00\x00\xD9"
 #define PDB_HDR_UNUSED		"\x00\x00\x00\x00"
 #define PDB_HDR_DLSIZE		"\x00\x00\x00\xD0"
+#define PDB_HDR_FULLSIZE	"\x00\x00\x00\xFA" // multi-part total pkg size
 
 
 static char root[256];
@@ -88,61 +90,180 @@ static void write_pdb_int64(void* fp, const char* header, const uint64_t pdb_u64
     pkgi_write(fp, &pdb_u64, 8);
 }
 
-static int create_queue_pdb_files(void)
+static void write_pdb_int32(void* fp, const char* header, const uint32_t pdb_u32)
 {
-	// Create files	
-	char srcFile[256];
-	char szIconFile[256];
-	
-	pkgi_snprintf(srcFile, sizeof(srcFile), "%s/%.9s.PNG", pkgi_get_temp_folder(), root + 7);
-	pkgi_snprintf(szIconFile, sizeof(szIconFile), PKGI_QUEUE_FOLDER "/%d/ICON_FILE", queue_task_id);
-	
-	// write - ICON_FILE
-	if (rename(srcFile, szIconFile) != 0)
-	{
-		LOG("Error saving %s", szIconFile);
-		return 0;
-	}
-	
-	pkgi_snprintf(srcFile, sizeof(srcFile), PKGI_QUEUE_FOLDER "/%d/d0.pdb", queue_task_id);
-	void *fpPDB = pkgi_create(srcFile);
-	if(!fpPDB)
-	{
-		LOG("Failed to create file %s", srcFile);
-		return 0;
-	}
+	pkgi_write(fp, header, 4);
+	pkgi_write(fp, "\x00\x00\x00\x04\x00\x00\x00\x04", 8);
+	pkgi_write(fp, &pdb_u32, 4);
+}
 
-	// write - d0.pdb
-	//
-	pkgi_write(fpPDB, pkg_d0top_data, d0top_data_size);
-	
-	// 000000CE - Download expected size (in bytes)
-	write_pdb_int64(fpPDB, PDB_HDR_SIZE, total_size);
+static void set_id(char* header_id, uint32_t id)
+{
+    header_id[0] = 0;
+    header_id[1] = 0;
+    header_id[2] = ((id & 0xFF00) >> 8);
+    header_id[3] = (id  & 0x00FF);
+}
 
-	// 000000CB - PKG file name
-	write_pdb_string(fpPDB, PDB_HDR_FILENAME, root);
+static int load_xml_pkg_parts(const char* xmlUrl, char* part_url[16], uint64_t part_size[16], int64_t* file_size)
+{
+    xmlDoc *doc = NULL;
+    xmlNode *root_element = NULL;
+    xmlNode *cur_node = NULL;
+    char *value;
+    uint32_t size;
+    int parts = 0;
 
-	// 000000CC - date/time
-	write_pdb_string(fpPDB, PDB_HDR_DATETIME, "Mon, 11 Dec 2017 11:45:10 GMT");
+    LOG("Loading pkg xml (%s)...", xmlUrl);
 
-	// 000000CA - PKG Link download URL
-	write_pdb_string(fpPDB, PDB_HDR_URL, db_item->url);
+    char * buffer = pkgi_http_download_buffer(xmlUrl, &size);
+    if (!buffer)
+        return 0;
 
-	// 0000006A - Icon location / path (PNG w/o extension) 
-	write_pdb_string(fpPDB, PDB_HDR_ICON, szIconFile);
+    /*parse the file and get the DOM */
+    doc = xmlParseMemory(buffer, size);
+    if (!doc)
+    {
+        LOG("XML: could not parse file %s", xmlUrl);
+        free(buffer);
+        return 0;
+    }
 
-	// 00000069 - Display title	
-	char title_str[256];
-	pkgi_snprintf(title_str, sizeof(title_str), "\xE2\x98\x85 %s \x22%s\x22", _("Download"), db_item->name);
-	write_pdb_string(fpPDB, PDB_HDR_TITLE, title_str);
-	
-	// 000000D9 - Content id 
-	write_pdb_string(fpPDB, PDB_HDR_CONTENT, db_item->content);
-	
-	pkgi_write(fpPDB, pkg_d0end_data, pkg_d0end_data_size);
-	pkgi_close(fpPDB);
-	
-	return 1;
+    /*Get the root element node */
+    root_element = xmlDocGetRootElement(doc);
+    cur_node = root_element->children;
+
+    if (xmlStrcasecmp(cur_node->name, BAD_CAST "hfs_manifest") == 0)
+        cur_node = cur_node->children;
+
+    for (; cur_node; cur_node = cur_node->next)
+    {
+        if (cur_node->type != XML_ELEMENT_NODE)
+            continue;
+
+        if (xmlStrcasecmp(cur_node->name, BAD_CAST "file_size") == 0)
+        {
+            value = (char*) xmlNodeGetContent(cur_node);
+            *file_size = pkgi_strtoll(value);
+            LOG("Total pkg size: %ld", *file_size);
+            continue;
+        }
+
+        if ((xmlStrcasecmp(cur_node->name, BAD_CAST "pieces") == 0) && (parts < 16))
+        {
+            value = (char*) xmlGetProp(cur_node, BAD_CAST "url");
+            size = pkgi_strlen(value) + 1;
+            part_url[parts] = malloc(size);
+            pkgi_memcpy(part_url[parts], value, size);
+
+            value = (char*) xmlGetProp(cur_node, BAD_CAST "file_size");
+            part_size[parts] = pkgi_strtoll(value);
+
+            LOG("Part: '%s' [%d] %ld", part_url[parts], parts, part_size[parts]);
+            parts++;
+        }
+    }
+
+    /*free the document */
+    xmlFreeDoc(doc);
+    xmlCleanupParser();
+    free(buffer);
+
+    return parts;
+}
+
+static int create_queue_pdb_files(int parts, char* parts_url[], uint64_t parts_size[])
+{
+    char srcFile[256];
+    char szIconFile[256];
+
+    // Create files
+    pkgi_snprintf(srcFile, sizeof(srcFile), "%s/%.9s.PNG", pkgi_get_temp_folder(), root + 7);
+    pkgi_snprintf(szIconFile, sizeof(szIconFile), PKGI_QUEUE_FOLDER "/%d/ICON_FILE", queue_task_id);
+
+    // write - ICON_FILE
+    if (rename(srcFile, szIconFile) != 0)
+    {
+        LOG("Error saving %s", szIconFile);
+        return 0;
+    }
+
+    pkgi_snprintf(srcFile, sizeof(srcFile), PKGI_QUEUE_FOLDER "/%d/d0.pdb", queue_task_id);
+    void *fpPDB = pkgi_create(srcFile);
+    if(!fpPDB)
+    {
+        LOG("Failed to create file %s", srcFile);
+        return 0;
+    }
+
+    // write - d0.pdb
+    pkgi_write(fpPDB, pkg_d0top_data, pkg_d0top_data_size);
+
+    for (int i = 0, id = 0x1380; i < parts; i++, id += 0x20)
+    {
+        char header_id[5] = {0};
+
+        set_id(header_id, id + 0x8);
+        write_pdb_string(fpPDB, header_id, parts_url[i]);
+
+        set_id(header_id, id + 0x9);
+        write_pdb_string(fpPDB, header_id, root);
+
+        set_id(header_id, id + 0xA);
+        write_pdb_int64(fpPDB, header_id, parts_size[i]);
+
+        set_id(header_id, id + 0xD);
+        write_pdb_int32(fpPDB, header_id, 0x25EE0D00 + i*0x100 + i);
+
+        set_id(header_id, id + 0xE);
+        write_pdb_string(fpPDB, header_id, "\x03in memory of Leon and Luna <3\x03");
+    }
+
+    // 000000D0 - Downloaded size (in bytes)
+    write_pdb_int64(fpPDB, PDB_HDR_DLSIZE, 0);
+
+    // 000000CE - Download expected size (in bytes)
+    write_pdb_int64(fpPDB, PDB_HDR_SIZE, parts ? parts_size[0] : total_size);
+
+    if (parts)
+    {
+        // 0x000000FB 08/08 -> 0 unknown (8 bytes)
+        write_pdb_int64(fpPDB, "\x00\x00\x00\xFB", 0);
+
+        // 0x000000E6 04/04 -> 0 unknown (4 bytes)
+        write_pdb_int32(fpPDB, "\x00\x00\x00\xE6", 0);
+
+        // 0x000000E5 04/04 -> 7 total parts? (4 bytes)
+        write_pdb_int32(fpPDB, "\x00\x00\x00\xE5", parts);
+
+        // 0x000000FA 08/08 -> pdb total pkg size (8 bytes)
+        write_pdb_int64(fpPDB, PDB_HDR_FULLSIZE, total_size);
+    }
+
+    // 000000CB - PKG file name
+    write_pdb_string(fpPDB, PDB_HDR_FILENAME, root);
+
+    // 000000CC - date/time
+    write_pdb_string(fpPDB, PDB_HDR_DATETIME, "Mon, 11 Dec 2017 11:45:10 GMT");
+
+    // 000000CA - PKG Link download URL
+    write_pdb_string(fpPDB, PDB_HDR_URL, parts ? parts_url[0] : db_item->url);
+
+    // 0000006A - Icon location / path (PNG w/o extension) 
+    write_pdb_string(fpPDB, PDB_HDR_ICON, szIconFile);
+
+    // 00000069 - Display title	
+    char title_str[256];
+    pkgi_snprintf(title_str, sizeof(title_str), "\xE2\x98\x85 %s \x22%s\x22", _("Download"), db_item->name);
+    write_pdb_string(fpPDB, PDB_HDR_TITLE, title_str);
+    
+    // 000000D9 - Content id 
+    write_pdb_string(fpPDB, PDB_HDR_CONTENT, db_item->content);
+
+    pkgi_write(fpPDB, pkg_d0end_data, pkg_d0end_data_size);
+    pkgi_close(fpPDB);
+
+    return 1;
 }
 
 static int create_install_pdb_files(const char *path, uint64_t size)
@@ -304,24 +425,33 @@ static int queue_pkg_task(void)
 {
     char pszPKGDir[256];
     int64_t http_length;
+    int pkg_parts = 0;
+    char *part_urls[16] = {0};
+    uint64_t part_sizes[16] = {0};
 
-    LOG("requesting %s @ %llu", db_item->url, initial_offset);
-    http = pkgi_http_get(db_item->url, initial_offset);
-    if (!http)
-    {
-        pkgi_dialog_error(_("Could not send HTTP request"));
-        return 0;
-    }
+    LOG("requesting %s @ %llu", db_item->url, 0);
 
-    if (!pkgi_http_content_size(db_item->url, &http_length))
+    if(pkgi_memequ(pkgi_strrchr(db_item->url, '.'), ".xml", 5))
     {
-        pkgi_dialog_error(_("HTTP request failed"));
-        return 0;
+        pkg_parts = load_xml_pkg_parts(db_item->url, part_urls, part_sizes, &http_length);
+        if (!pkg_parts)
+        {
+            pkgi_dialog_error(_("Could not load multi-part XML"));
+            return 0;
+        }
     }
-    if (http_length < 0)
+    else
     {
-        pkgi_dialog_error(_("HTTP response has unknown length"));
-        return 0;
+        if (!pkgi_http_content_size(db_item->url, &http_length))
+        {
+            pkgi_dialog_error(_("HTTP request failed"));
+            return 0;
+        }
+        if (http_length < 0)
+        {
+            pkgi_dialog_error(_("HTTP response has unknown length"));
+            return 0;
+        }
     }
 
     download_size = http_length;
@@ -355,12 +485,15 @@ static int queue_pkg_task(void)
 		pkgi_dialog_error(_("Could not create PKG file to HDD."));
 		return 0;
 	}
-    
-    if(!create_queue_pdb_files())
+
+    if(!create_queue_pdb_files(pkg_parts, part_urls, part_sizes))
     {
         pkgi_dialog_error(_("Could not create task files to HDD."));
         return 0;
     }
+
+    for (int i = 0; i < pkg_parts; i++)
+        free(part_urls[i]);
 
     return 1;
 }
